@@ -5,7 +5,7 @@ const Contact: React.FC = () => {
   const contactLinks = {
     email: "a.zahi2002@gmail.com",
     github: "https://github.com/a-zahi2002",
-    linkedin: "https://linkedin.com/in/a-zahi-faleel"
+    linkedin: "https://linkedin.com/in/a-zahi-faleel-a929411aa"
   };
 
   return (

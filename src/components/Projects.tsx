@@ -9,7 +9,7 @@ const Projects: React.FC = () => {
       description: "A visually appealing recipe site showcasing traditional Sri Lankan dishes, organized by category for easy browsing.",
       techUsed: ["HTML", "CSS", "JavaScript"],
       image: "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=600",
-      link: "https://github.com/a-zahi2002/your-cookbook-repo"
+      link: "https://github.com/a-zahi2002/Taste-of-Tradition-Cookbook"
     },
     {
       name: "Personal Portfolio (Old)",
@@ -30,7 +30,7 @@ const Projects: React.FC = () => {
       description: "Tourist-friendly platform for Sri Lankan travel planning, built with React and TypeScript.",
       techUsed: ["React", "TypeScript"],
       image: "https://images.pexels.com/photos/2034335/pexels-photo-2034335.jpeg?auto=compress&cs=tinysrgb&w=600",
-      link: "https://github.com/a-zahi2002/ExploreLanka"
+      link: "https://github.com/a-zahi2002/ExploreLanka-TravelAdvisor-web"
     }
   ];
 

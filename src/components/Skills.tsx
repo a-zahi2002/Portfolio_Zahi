@@ -5,9 +5,9 @@ import { SkillCategory } from '../types';
 const Skills: React.FC = () => {
   const skillCategories: SkillCategory = {
     "Frontend": ["React", "TailwindCSS", "HTML", "CSS", "JavaScript"],
-    "Frameworks & Tools": ["Vite", "Framer Motion"],
-    "Backend & Databases": ["Node.js", "SQLite", "MySQL"],
-    "Other": ["Git", "GitHub", "Electron", "Angular"]
+    "Frameworks & Tools": ["Vite", "Angular", "Electron"],
+    "Backend & Databases": ["Node.js","php", "SQLite", "MySQL"],
+    "Other": ["Git", "GitHub"]
   };
 
   const getCategoryIcon = (category: string) => {

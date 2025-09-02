@@ -7,24 +7,24 @@ const Certificates: React.FC = () => {
 
   const certificates: Certificate[] = [
     {
-      name: "Frontend Development",
-      issuer: "FreeCodeCamp",
-      image: "https://images.pexels.com/photos/267507/pexels-photo-267507.jpeg?auto=compress&cs=tinysrgb&w=600"
+      name: "Web Design for Beginners",
+      issuer: "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
+      image: "/Public/Assets/certificate1.jpg"
     },
     {
-      name: "React Developer",
-      issuer: "Udemy",
-      image: "https://images.pexels.com/photos/1181298/pexels-photo-1181298.jpeg?auto=compress&cs=tinysrgb&w=600"
+      name: "Front-end Web Development",
+      issuer: "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
+      image: "/Public/Assets/certificate2.jpg"
     },
     {
-      name: "JavaScript Fundamentals",
-      issuer: "Coursera",
-      image: "https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=600"
+      name: "Server-side Web Programming",
+      issuer: "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
+      image: "/Public/Assets/certificate3.jpg"
     },
     {
-      name: "Web Design Principles",
-      issuer: "edX",
-      image: "https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=600"
+      name: "Python for Beginners",
+      issuer: "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
+      image: "/Public/Assets/certificate4.jpg"
     }
   ];
 
