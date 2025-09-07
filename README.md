@@ -28,8 +28,8 @@ A modern, responsive personal portfolio built with **React**, **TypeScript**, an
 Clone the repository:
 
 ```sh
-git clone https://github.com/a-zahi2002/your-portfolio-repo.git
-cd your-portfolio-repo
+git clone https://github.com/a-zahi2002/Portfolio_Zahi.git
+cd Portfolio_Zahi
 ```
 
 Install dependencies:
