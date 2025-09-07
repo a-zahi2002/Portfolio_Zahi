@@ -11,25 +11,25 @@ const Certificates: React.FC = () => {
       name: "Web Design for Beginners",
       issuer:
         "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
-      image: "/Portfolio_Zahi/Assets/certificate1.jpg",
+      image: "/Portfolio_Zahi/assets/certificate1.jpg",
     },
     {
       name: "Front-end Web Development",
       issuer:
         "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
-      image: "/Portfolio_Zahi/Assets/certificate2.jpg",
+      image: "/Portfolio_Zahi/assets/certificate2.jpg",
     },
     {
       name: "Server-side Web Programming",
       issuer:
         "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
-      image: "/Portfolio_Zahi/Assets/certificate3.jpg",
+      image: "/Portfolio_Zahi/assets/certificate3.jpg",
     },
     {
       name: "Python for Beginners",
       issuer:
         "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
-      image: "/Portfolio_Zahi/Assets/certificate4.jpg",
+      image: "/Portfolio_Zahi/assets/certificate4.jpg",
     },
   ];
 
