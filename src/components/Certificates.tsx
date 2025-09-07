@@ -1,31 +1,36 @@
-import React, { useState } from 'react';
-import { X, Award } from 'lucide-react';
-import { Certificate } from '../types';
+import React, { useState } from "react";
+import { X, Award } from "lucide-react";
+import { Certificate } from "../types";
 
 const Certificates: React.FC = () => {
-  const [selectedCertificate, setSelectedCertificate] = useState<Certificate | null>(null);
+  const [selectedCertificate, setSelectedCertificate] =
+    useState<Certificate | null>(null);
 
   const certificates: Certificate[] = [
     {
       name: "Web Design for Beginners",
-      issuer: "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
-      image: "/Public/Assets/certificate1.jpg"
+      issuer:
+        "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
+      image: "/Portfolio_Zahi/Assets/certificate1.jpg",
     },
     {
       name: "Front-end Web Development",
-      issuer: "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
-      image: "/Public/Assets/certificate2.jpg"
+      issuer:
+        "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
+      image: "/Portfolio_Zahi/Assets/certificate2.jpg",
     },
     {
       name: "Server-side Web Programming",
-      issuer: "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
-      image: "/Public/Assets/certificate3.jpg"
+      issuer:
+        "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
+      image: "/Portfolio_Zahi/Assets/certificate3.jpg",
     },
     {
       name: "Python for Beginners",
-      issuer: "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
-      image: "/Public/Assets/certificate4.jpg"
-    }
+      issuer:
+        "Centre for Open & Distance Learning(CODL) University of Moratuwa,Sri Lanka",
+      image: "/Portfolio_Zahi/Assets/certificate4.jpg",
+    },
   ];
 
   return (
@@ -35,7 +40,7 @@ const Certificates: React.FC = () => {
           <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 dark:text-white mb-16">
             Certificates
           </h2>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {certificates.map((certificate, index) => (
               <div
@@ -47,15 +52,15 @@ const Certificates: React.FC = () => {
                   <div className="w-16 h-16 bg-blue-600 dark:bg-blue-500 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
                     <Award className="w-8 h-8 text-white" />
                   </div>
-                  
+
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                     {certificate.name}
                   </h3>
-                  
+
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     {certificate.issuer}
                   </p>
-                  
+
                   <div className="mt-3 text-xs text-blue-600 dark:text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     Click to view
                   </div>
@@ -81,7 +86,7 @@ const Certificates: React.FC = () => {
                 <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            
+
             <div className="p-6">
               <img
                 src={selectedCertificate.image}
@@ -90,7 +95,10 @@ const Certificates: React.FC = () => {
               />
               <div className="mt-4 text-center">
                 <p className="text-gray-600 dark:text-gray-400">
-                  Issued by <span className="font-semibold text-blue-600 dark:text-blue-400">{selectedCertificate.issuer}</span>
+                  Issued by{" "}
+                  <span className="font-semibold text-blue-600 dark:text-blue-400">
+                    {selectedCertificate.issuer}
+                  </span>
                 </p>
               </div>
             </div>

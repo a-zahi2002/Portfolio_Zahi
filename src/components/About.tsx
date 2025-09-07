@@ -13,7 +13,7 @@ const About: React.FC = () => {
             <div className="lg:w-1/3">
               <div className="relative">
                 <img
-                  src="/Public/Assets/Profile.jpg"
+                  src="/Portfolio_Zahi/assets/profile.jpg"
                   alt="A. Zahi Faleel"
                   className="w-80 h-80 object-cover rounded-2xl shadow-2xl mx-auto transform hover:scale-105 transition-transform duration-300"
                 />
