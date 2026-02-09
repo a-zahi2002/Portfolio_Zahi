@@ -1,83 +1,82 @@
 import React from 'react';
-import { Code, Database, Wrench, Layers } from 'lucide-react';
-import { SkillCategory } from '../types';
+import { motion } from 'framer-motion';
+
+const skillsData = [
+  { name: 'React', color: '#61DAFB' },
+  { name: 'Next.js', color: '#ffffff' },
+  { name: 'TypeScript', color: '#3178C6' },
+  { name: 'Tailwind CSS', color: '#38B2AC' },
+  { name: 'Three.js', color: '#ffffff' },
+  { name: 'Node.js', color: '#339933' },
+  { name: 'Python', color: '#3776AB' },
+  { name: 'JavaScript', color: '#F7DF1E' },
+  { name: 'Framer Motion', color: '#0055FF' },
+  { name: 'Git', color: '#F05032' },
+  { name: 'Figma', color: '#F24E1E' },
+  { name: 'PostgreSQL', color: '#336791' },
+];
 
 const Skills: React.FC = () => {
-  const skillCategories: SkillCategory = {
-    "Frontend": ["React", "TailwindCSS", "HTML", "CSS", "JavaScript"],
-    "Frameworks & Tools": ["Vite", "Angular", "Electron"],
-    "Backend & Databases": ["Node.js","php", "SQLite", "MySQL"],
-    "Other": ["Git", "GitHub"]
-  };
-
-  const getCategoryIcon = (category: string) => {
-    switch (category) {
-      case 'Frontend':
-        return <Code className="w-6 h-6" />;
-      case 'Frameworks & Tools':
-        return <Wrench className="w-6 h-6" />;
-      case 'Backend & Databases':
-        return <Database className="w-6 h-6" />;
-      default:
-        return <Layers className="w-6 h-6" />;
-    }
-  };
-
-  const getCategoryColor = (category: string) => {
-    switch (category) {
-      case 'Frontend':
-        return 'from-blue-500 to-blue-600';
-      case 'Frameworks & Tools':
-        return 'from-indigo-500 to-indigo-600';
-      case 'Backend & Databases':
-        return 'from-purple-500 to-purple-600';
-      default:
-        return 'from-gray-500 to-gray-600';
-    }
-  };
-
   return (
-    <section id="skills" className="py-20 bg-gray-50 dark:bg-gray-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="fade-in">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-gray-900 dark:text-white mb-16">
-            Skills
-          </h2>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {Object.entries(skillCategories).map(([category, skills], categoryIndex) => (
-              <div
-                key={category}
-                className="bg-white dark:bg-gray-900 rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow duration-300"
-              >
-                <div className="flex items-center mb-6">
-                  <div className={`p-3 rounded-xl bg-gradient-to-r ${getCategoryColor(category)} text-white mr-4`}>
-                    {getCategoryIcon(category)}
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
-                    {category}
-                  </h3>
-                </div>
-                
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  {skills.map((skill, skillIndex) => (
-                    <div
-                      key={skill}
-                      className="skill-item bg-gray-50 dark:bg-gray-800 px-4 py-3 rounded-lg text-center hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 transition-all duration-300 cursor-default group"
-                    >
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
-                        {skill}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+    <section id="skills" className="py-32 bg-white dark:bg-charcoal-950 relative overflow-hidden transition-colors duration-300">
+        {/* Background Decorative Elements */}
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-white dark:from-charcoal-900 to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-white dark:from-charcoal-900 to-transparent z-10 pointer-events-none"></div>
+
+      <div className="max-w-7xl mx-auto px-6 lg:px-12 mb-16 relative z-20">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center"
+        >
+            <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
+            Technical <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-purple dark:to-pink-500">Arsenal</span>
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+            The tools and technologies I use to bring ideas to life.
+            </p>
+        </motion.div>
+      </div>
+
+      {/* Infinite Marquee Rows */}
+      <div className="flex flex-col gap-8 relative z-0">
+        {/* Row 1: Left to Right */}
+        <MarqueeRow skills={skillsData} direction="left" speed={30} />
+        
+        {/* Row 2: Right to Left */}
+        <MarqueeRow skills={[...skillsData].reverse()} direction="right" speed={40} />
       </div>
     </section>
   );
 };
+
+const MarqueeRow: React.FC<{ skills: typeof skillsData, direction: 'left' | 'right', speed: number }> = ({ skills, direction, speed }) => {
+    return (
+        <div className="relative flex overflow-hidden group">
+            <motion.div
+                className="flex gap-4 md:gap-8 flex-nowrap whitespace-nowrap"
+                animate={{
+                    x: direction === 'left' ? [0, -1000] : [-1000, 0]
+                }}
+                transition={{
+                    ease: "linear",
+                    duration: speed,
+                    repeat: Infinity,
+                }}
+            >
+                {[...skills, ...skills, ...skills, ...skills].map((skill, index) => (
+                    <div 
+                        key={`${skill.name}-${index}`}
+                        className="glass-panel px-8 py-4 rounded-full border border-gray-200 dark:border-white/5 hover:border-blue-500/50 dark:hover:border-accent-cyan/50 transition-colors duration-300 flex items-center gap-3 cursor-default bg-white/50 dark:bg-transparent"
+                    >
+                        <span className="w-2 h-2 rounded-full shadow-[0_0_10px_currentColor]" style={{ backgroundColor: skill.color }}></span>
+                        <span className="text-lg font-medium text-gray-800 dark:text-gray-200">{skill.name}</span>
+                    </div>
+                ))}
+            </motion.div>
+        </div>
+    );
+}
 
 export default Skills;

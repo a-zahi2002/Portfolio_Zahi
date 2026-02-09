@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,77 +6,116 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Default light mode text */
+    @apply text-gray-900;
   }
-  
+
+  html.dark {
+    @apply text-white;
+  }
+
   body {
     font-family: 'Inter', sans-serif;
     line-height: 1.6;
+    overflow-x: hidden;
+    /* Default light mode background */
+    @apply bg-gray-50 text-gray-900 transition-colors duration-300;
   }
-  
+
+  /* Dark mode background override */
+  .dark body {
+    @apply bg-charcoal-950 text-gray-300;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  /* Custom Scrollbar */
   * {
     scrollbar-width: thin;
     scrollbar-color: #3b82f6 #f1f5f9;
   }
-  
+
+  .dark * {
+    scrollbar-color: #3b82f6 #050505;
+  }
+
   *::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   *::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    @apply bg-gray-100 dark:bg-charcoal-950;
   }
-  
+
   *::-webkit-scrollbar-thumb {
-    background: #3b82f6;
-    border-radius: 3px;
-  }
-  
-  *::-webkit-scrollbar-thumb:hover {
-    background: #1e40af;
-  }
-  
-  .dark *::-webkit-scrollbar-track {
-    background: #374151;
-  }
-  
-  .dark *::-webkit-scrollbar-thumb {
-    background: #60a5fa;
-  }
-  
-  .dark *::-webkit-scrollbar-thumb:hover {
-    background: #3b82f6;
+    @apply bg-blue-500 rounded-full hover:bg-blue-600;
   }
 }
 
 @layer components {
   .section-padding {
-    @apply py-16 sm:py-20 lg:py-24;
+    @apply py-20 lg:py-32;
   }
-  
+
   .container-padding {
-    @apply px-4 sm:px-6 lg:px-8;
+    @apply px-6 lg:px-12 max-w-7xl mx-auto;
   }
-  
-  .btn-primary {
-    @apply inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-medium rounded-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl;
+
+  /* Glassmorphism Card - Refined */
+  /* Light mode: Premium 'Frosted Ceramic' look */
+  .glass-panel {
+    @apply bg-white/80 backdrop-blur-2xl border border-white/20 shadow-xl rounded-2xl transition-all duration-300;
   }
-  
-  .card-hover {
-    @apply transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl;
+
+  .glass-panel:hover {
+    @apply shadow-2xl;
+  }
+
+  /* Dark mode: Deep 'Cyber Glass' look */
+  .dark .glass-panel {
+    @apply bg-charcoal-900/40 border-white/5 shadow-xl;
+  }
+
+  .dark .glass-panel:hover {
+    @apply border-white/10 bg-charcoal-800/40;
+  }
+
+  .glass-button {
+    @apply px-6 py-3 rounded-full transition-all duration-300 backdrop-blur-md font-medium hover:scale-105 active:scale-95 border shadow-sm;
+    /* Light mode */
+    @apply bg-white/90 border-gray-100 text-charcoal-900 hover:bg-white hover:shadow-md;
+  }
+
+  .dark .glass-button {
+    @apply bg-white/5 border-white/10 text-white hover:bg-white/10 hover:border-accent-cyan/30 hover:shadow-lg hover:shadow-cyan-500/20;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
   }
 }
 
 @layer utilities {
-  .text-gradient {
-    @apply bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent;
+  .text-gradient-cyan {
+    @apply bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient;
   }
-  
-  .bg-grid {
-    background-image: radial-gradient(circle, #e5e7eb 1px, transparent 1px);
-    background-size: 20px 20px;
+
+  .dark .text-gradient-cyan {
+    @apply from-accent-cyan via-blue-500 to-accent-cyan;
   }
-  
-  .dark .bg-grid {
-    background-image: radial-gradient(circle, #374151 1px, transparent 1px);
+
+  .text-gradient-purple {
+    @apply bg-gradient-to-r from-purple-600 via-pink-500 to-purple-600 bg-clip-text text-transparent bg-[length:200%_auto] animate-gradient;
+  }
+
+  .dark .text-gradient-purple {
+    @apply from-accent-purple via-pink-500 to-accent-purple;
   }
 }
