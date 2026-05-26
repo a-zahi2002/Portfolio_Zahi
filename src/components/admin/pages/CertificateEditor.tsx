@@ -7,7 +7,6 @@ import PageHeader from '../ui/PageHeader';
 import Button from '../ui/Button';
 import FormField from '../ui/FormField';
 import Input from '../ui/Input';
-import Textarea from '../ui/Textarea';
 import Toggle from '../ui/Toggle';
 import ImageUploader from '../ui/ImageUploader';
 import { SkeletonForm } from '../ui/Skeleton';

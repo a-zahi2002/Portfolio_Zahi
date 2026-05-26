@@ -1,15 +1,63 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown } from 'lucide-react';
 import { useHeroSection } from '../hooks/cms/useHeroSection';
 
+const MagneticButton = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouse = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const { clientX, clientY } = e;
+    const { height, width, left, top } = ref.current!.getBoundingClientRect();
+    const middleX = clientX - (left + width / 2);
+    const middleY = clientY - (top + height / 2);
+    setPosition({ x: middleX * 0.2, y: middleY * 0.2 });
+  };
+
+  const reset = () => {
+    setPosition({ x: 0, y: 0 });
+  };
+
+  const { x, y } = position;
+  return (
+    <motion.button
+      ref={ref}
+      onMouseMove={handleMouse}
+      onMouseLeave={reset}
+      animate={{ x, y }}
+      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+      onClick={onClick}
+      className="group relative flex items-center justify-center gap-3 px-10 py-5 bg-charcoal-900 dark:bg-white text-white dark:text-charcoal-900 rounded-full font-bold tracking-wide overflow-hidden hover:scale-105 shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(255,255,255,0.1)]"
+    >
+      <span className="relative z-10">{children}</span>
+      <ArrowDown className="relative z-10 w-4 h-4 group-hover:translate-y-1 transition-transform" />
+    </motion.button>
+  );
+};
+
+const FloatingShape = ({ className, delay = 0, yOffset = 20 }: { className: string; delay?: number; yOffset?: number }) => (
+  <motion.div
+    animate={{
+      y: [0, yOffset, 0],
+      rotate: [0, 5, -5, 0],
+    }}
+    transition={{
+      duration: 6,
+      repeat: Infinity,
+      ease: "easeInOut",
+      delay: delay
+    }}
+    className={`absolute pointer-events-none rounded-3xl backdrop-blur-2xl border border-white/20 shadow-2xl ${className}`}
+  />
+);
+
 const HeroSkeleton: React.FC = () => (
-  <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-charcoal-950 transition-colors duration-300">
+  <section id="hero" className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
     <div className="relative z-10 text-center px-4 max-w-4xl mx-auto">
       <div className="mb-8 space-y-4 animate-pulse">
-        <div className="h-16 md:h-24 bg-white/5 rounded-2xl w-3/4 mx-auto" />
-        <div className="h-1 w-24 mx-auto bg-white/5 rounded-full" />
-        <div className="h-8 bg-white/5 rounded-xl w-1/2 mx-auto mt-6" />
+        <div className="h-16 md:h-24 bg-charcoal-900/5 dark:bg-white/5 rounded-2xl w-3/4 mx-auto" />
+        <div className="h-1 w-24 mx-auto bg-charcoal-900/5 dark:bg-white/5 rounded-full" />
       </div>
     </div>
   </section>
@@ -20,78 +68,79 @@ const Hero: React.FC = () => {
 
   if (isLoading) return <HeroSkeleton />;
 
-  // Fallback to hardcoded values if Supabase is not configured
   const heading = hero?.heading ?? 'A. Zahi';
   const headingHighlight = hero?.heading_highlight ?? 'Faleel';
-  const subheading = hero?.subheading ?? 'Building immersive Digital Experiences with robust engineering and elegant design.';
+  const subheading = hero?.subheading ?? 'Crafting intuitive and immersive digital experiences bridging robust engineering with elegant design.';
   const ctaText = hero?.cta_text ?? 'Explore Work';
   const ctaTarget = hero?.cta_scroll_target ?? 'projects';
   const availabilityStatus = hero?.availability_status ?? true;
   const availabilityLabel = hero?.availability_label ?? 'OPEN TO WORK';
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-50 dark:bg-charcoal-950 transition-colors duration-300">
-      {/* Overlay Content */}
-      <div className="relative z-10 text-center px-4 max-w-4xl mx-auto pointer-events-none">
-        
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="mb-8"
-        >
-          <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-4 text-gray-900 dark:text-white">
-            {heading} <span className="text-blue-600 dark:text-accent-cyan text-glow">{headingHighlight}</span>
-          </h1>
-          <div className="h-1 w-24 mx-auto bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-accent-cyan dark:to-blue-500 rounded-full" />
-        </motion.div>
+    <section id="hero" className="relative min-h-[95vh] flex items-center justify-center overflow-hidden">
+      
+      {/* Floating Glass Shapes */}
+      <FloatingShape className="w-32 h-32 bg-blue-500/10 dark:bg-white/5 top-[20%] left-[10%] rotate-12" delay={0} yOffset={30} />
+      <FloatingShape className="w-48 h-48 bg-purple-500/10 dark:bg-white/5 bottom-[20%] right-[10%] -rotate-12 rounded-full" delay={1} yOffset={-40} />
+      <FloatingShape className="w-24 h-24 bg-cyan-500/10 dark:bg-white/5 top-[30%] right-[20%] rotate-45" delay={2} yOffset={20} />
 
+      {/* Grid Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none opacity-50" />
+
+      {/* Main Content */}
+      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto flex flex-col items-center">
+        
+        {/* Availability Badge */}
+        {availabilityStatus && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/60 dark:bg-white/5 border border-charcoal-900/10 dark:border-white/10 backdrop-blur-md shadow-sm"
+          >
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
+            <span className="text-xs font-bold uppercase tracking-widest text-charcoal-700 dark:text-gray-300">
+              {availabilityLabel}
+            </span>
+          </motion.div>
+        )}
+
+        {/* Heading with Mask Reveal */}
+        <div className="mb-6 overflow-hidden py-2">
+          <motion.h1
+            initial={{ y: "100%", opacity: 0, rotateZ: 5 }}
+            animate={{ y: 0, opacity: 1, rotateZ: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            className="text-6xl md:text-8xl lg:text-[7rem] font-display font-bold tracking-tighter text-charcoal-900 dark:text-white leading-[1.1]"
+          >
+            {heading}{' '}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple drop-shadow-sm">
+              {headingHighlight}
+            </span>
+          </motion.h1>
+        </div>
+
+        {/* Subheading */}
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.8 }}
-          className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-12 leading-relaxed"
+          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          className="text-lg md:text-2xl text-charcoal-600 dark:text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed font-sans"
         >
           {subheading}
         </motion.p>
 
+        {/* Magnetic CTA Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6, duration: 0.8 }}
-          className="pointer-events-auto flex flex-col items-center gap-4"
+          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
         >
-          <button
-            onClick={() => document.getElementById(ctaTarget)?.scrollIntoView({ behavior: 'smooth' })}
-            className="glass-button group flex items-center gap-2 mx-auto"
-          >
+          <MagneticButton onClick={() => document.getElementById(ctaTarget)?.scrollIntoView({ behavior: 'smooth' })}>
             {ctaText}
-            <ArrowDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
-          </button>
-
-          {availabilityStatus && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.9, duration: 0.5 }}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 text-green-500 text-xs font-semibold uppercase tracking-wider"
-            >
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              {availabilityLabel}
-            </motion.div>
-          )}
+          </MagneticButton>
         </motion.div>
       </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2"
-      >
-        <div className="w-[1px] h-24 bg-gradient-to-b from-transparent via-blue-500 dark:via-accent-cyan to-transparent" />
-      </motion.div>
     </section>
   );
 };

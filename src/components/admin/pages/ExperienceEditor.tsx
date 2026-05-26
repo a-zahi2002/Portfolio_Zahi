@@ -30,7 +30,7 @@ const defaultForm: ExperienceFormData = {
 
 const ExperienceEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const isEdit = id && id !== 'new';
+  const isEdit = !!(id && id !== 'new');
   const navigate = useNavigate();
   const queryClient = useAllExperiences(); // to get list length for default order index
   

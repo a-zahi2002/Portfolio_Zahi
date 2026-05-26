@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { projectsService } from '../../services/projectsService';
-import type { CMSProject, ProjectFormData } from '../../types/cms';
+import type { ProjectFormData } from '../../types/cms';
 
 export const PROJECTS_QUERY_KEY = ['projects'] as const;
 export const ALL_PROJECTS_QUERY_KEY = ['projects', 'all'] as const;

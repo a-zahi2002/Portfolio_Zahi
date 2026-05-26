@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { educationService } from '../../services/educationService';
-import type { Education, EducationFormData } from '../../types/cms';
+import type { EducationFormData } from '../../types/cms';
 
 export const EDUCATION_QUERY_KEY = ['education'] as const;
 export const ALL_EDUCATION_QUERY_KEY = ['education', 'all'] as const;

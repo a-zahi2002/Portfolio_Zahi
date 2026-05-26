@@ -1,128 +1,130 @@
 import React, { useRef } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { useProjects } from '../hooks/cms/useProjects';
 import type { CMSProject } from '../types/cms';
 
-// ── TiltCard (unchanged – all original animations preserved) ──────────────────
-const TiltCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const mouseX = useSpring(x, { stiffness: 500, damping: 100 });
-  const mouseY = useSpring(y, { stiffness: 500, damping: 100 });
-  const rotateX = useTransform(mouseY, [-0.5, 0.5], ['15deg', '-15deg']);
-  const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-15deg', '15deg']);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    x.set((e.clientX - rect.left - rect.width / 2) / rect.width);
-    y.set((e.clientY - rect.top - rect.height / 2) / rect.height);
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => { x.set(0); y.set(0); }}
-      style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-      className={`relative active:scale-95 transition-transform duration-200 ease-out ${className}`}
-    >
-      {children}
-    </motion.div>
-  );
-};
-
 // ── Skeleton card ─────────────────────────────────────────────────────────────
 const ProjectCardSkeleton: React.FC<{ wide?: boolean }> = ({ wide }) => (
   <div className={`rounded-3xl bg-white dark:bg-charcoal-800 border border-gray-200 dark:border-white/5 overflow-hidden animate-pulse ${wide ? 'md:col-span-2' : ''}`}>
-    <div className="w-full h-full bg-gray-100 dark:bg-white/5 min-h-[200px]" />
+    <div className="w-full h-full bg-gray-100 dark:bg-white/5 min-h-[400px]" />
   </div>
 );
 
-// ── Project card ──────────────────────────────────────────────────────────────
-const ProjectCard: React.FC<{ project: CMSProject; wide: boolean }> = ({ project, wide }) => (
-  <TiltCard
-    className={`group rounded-3xl bg-white dark:bg-charcoal-800 border border-gray-200 dark:border-white/5 overflow-hidden hover:shadow-2xl hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 ${wide ? 'md:col-span-2' : ''}`}
-  >
-    <div className="absolute inset-0 z-0">
-      <img
-        src={project.thumbnail_url}
-        alt={project.title}
-        className="w-full h-full object-cover opacity-90 dark:opacity-60 group-hover:opacity-100 dark:group-hover:opacity-40 group-hover:scale-110 transition-all duration-700 ease-out"
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=600';
+// ── Spotlight Card ────────────────────────────────────────────────────────────
+const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: number }> = ({ project, wide, index }) => {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
+      viewport={{ once: true, margin: "-50px" }}
+      onMouseMove={handleMouseMove}
+      ref={cardRef}
+      className={`group relative rounded-3xl overflow-hidden bg-white/60 dark:bg-charcoal-900/40 backdrop-blur-md border border-gray-200/50 dark:border-white/10 hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 ${wide ? 'md:col-span-2' : ''}`}
+    >
+      {/* Spotlight Effect */}
+      <motion.div
+        className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover:opacity-100 z-20 mix-blend-overlay dark:mix-blend-screen"
+        style={{
+          background: useMotionTemplate`
+            radial-gradient(
+              600px circle at ${mouseX}px ${mouseY}px,
+              rgba(59, 130, 246, 0.15),
+              transparent 80%
+            )
+          `,
         }}
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent dark:from-charcoal-950 dark:via-charcoal-950/50 dark:to-transparent" />
-    </div>
 
-    <div className="absolute inset-0 z-10 p-8 flex flex-col justify-end transform translate-z-20">
-      <div className="transform transition-transform duration-500 translate-y-4 group-hover:translate-y-0">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex gap-2 mb-3 flex-wrap">
-            {project.technologies.map(tech => (
-              <span key={tech} className="px-3 py-1 text-xs font-medium uppercase tracking-wider text-blue-100 bg-blue-600/20 border border-blue-400/20 dark:text-accent-cyan dark:bg-accent-cyan/10 dark:border-accent-cyan/20 backdrop-blur-md rounded-full">
-                {tech}
-              </span>
-            ))}
-          </div>
-          {project.github_url && (
-            <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-md transition-colors">
-              <ArrowUpRight size={20} />
-            </a>
-          )}
-          {project.live_url && !project.github_url && (
-            <a href={project.live_url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-md transition-colors">
-              <ArrowUpRight size={20} />
-            </a>
-          )}
-        </div>
-
-        <h3 className="text-2xl font-bold text-white mb-2">{project.title}</h3>
-        <p className="text-gray-200 dark:text-gray-400 line-clamp-2 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-          {project.description}
-        </p>
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <img
+          src={project.thumbnail_url}
+          alt={project.title}
+          className="w-full h-full object-cover opacity-90 dark:opacity-50 group-hover:opacity-100 dark:group-hover:opacity-80 group-hover:scale-110 transition-transform duration-1000 ease-out"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=800';
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/40 to-transparent dark:from-charcoal-950 dark:via-charcoal-950/70 dark:to-transparent pointer-events-none opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
       </div>
-    </div>
-  </TiltCard>
-);
+
+      <div className="absolute inset-0 z-10 p-8 flex flex-col justify-end pointer-events-none">
+        <div className="transform transition-transform duration-500 translate-y-4 group-hover:translate-y-0">
+          <div className="flex justify-between items-start mb-4 pointer-events-auto">
+            <div className="flex gap-2 flex-wrap">
+              {project.technologies.slice(0, 3).map(tech => (
+                <span key={tech} className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white bg-white/10 border border-white/20 backdrop-blur-md rounded-full shadow-sm">
+                  {tech}
+                </span>
+              ))}
+              {project.technologies.length > 3 && (
+                <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white bg-white/10 border border-white/20 backdrop-blur-md rounded-full shadow-sm">
+                  +{project.technologies.length - 3}
+                </span>
+              )}
+            </div>
+            <div className="flex gap-2">
+              {(project.live_url || project.github_url) && (
+                <a href={project.live_url || project.github_url} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/10 hover:bg-white/30 border border-white/20 rounded-full text-white backdrop-blur-md transition-all shadow-sm group-hover:bg-blue-600 dark:group-hover:bg-accent-cyan dark:group-hover:text-charcoal-900 group-hover:border-transparent group-hover:scale-110">
+                  <ArrowUpRight size={18} />
+                </a>
+              )}
+            </div>
+          </div>
+
+          <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-2 pointer-events-auto">{project.title}</h3>
+          <p className="text-gray-300 dark:text-gray-400 line-clamp-2 text-sm md:text-base opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 pointer-events-auto">
+            {project.description}
+          </p>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
 
 // ── Main component ────────────────────────────────────────────────────────────
 const Projects: React.FC = () => {
   const { data: projects, isLoading } = useProjects();
 
   return (
-    <section id="projects" className="py-32 bg-gray-50 dark:bg-charcoal-900 relative transition-colors duration-300">
-      {/* Decorative grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-
+    <section id="projects" className="py-32 relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
           className="mb-16"
         >
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
-            Selected <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-accent-cyan dark:to-blue-500">Works</span>
+          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-4 text-charcoal-900 dark:text-white">
+            Selected <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-accent-cyan dark:to-blue-400">Works</span>
           </h2>
-          <p className="text-gray-600 dark:text-gray-400 max-w-xl text-lg">
-            A showcase of my recent production-ready applications and experiments.
+          <p className="text-charcoal-600 dark:text-gray-400 max-w-xl text-lg font-sans">
+            A showcase of recent production-ready applications and technical experiments.
           </p>
         </motion.div>
 
         {/* Bento Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[400px]">
           {isLoading
-            ? [true, false, false, true].map((wide, i) => <ProjectCardSkeleton key={i} wide={wide} />)
+            ? [true, false, false, true, false, false].map((wide, i) => <ProjectCardSkeleton key={i} wide={wide} />)
             : (projects ?? []).map((project, index) => (
-                <ProjectCard
+                <SpotlightCard
                   key={project.id}
                   project={project}
-                  // Use featured flag for wide card, or fall back to position-based logic
-                  wide={project.featured || index === 0}
+                  index={index}
+                  wide={project.featured || index === 0 || index === 3}
                 />
               ))
           }

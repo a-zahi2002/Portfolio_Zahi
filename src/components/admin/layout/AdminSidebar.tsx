@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, User, Code2, Award, Wrench, Mail, Link2,
-  Settings, Search, Image, Menu, X, LogOut, ChevronRight,
+  Settings, Search, Image, LogOut, ChevronRight,
   Briefcase, GraduationCap
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';

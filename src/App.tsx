@@ -9,13 +9,15 @@ import Certificates from './components/Certificates';
 import Skills from './components/Skills';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
-import SEOHead from './components/SEOHead';
+import SEOHead from './components/SEOHead.tsx';
 import ProtectedRoute from './components/admin/guards/ProtectedRoute';
 import { initScrollAnimations } from './utils/animations';
 
 // Lazy-load admin pages to keep portfolio bundle lean
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
-const AdminLayout = lazy(() => import('./components/admin/layout/AdminLayout'));
+const AdminLayout = lazy(() => import('./components/admin/layout/AdminLayout.tsx'));
+
+import AuroraBackground from './components/ui/AuroraBackground';
 
 /** Portfolio single-page layout (unchanged) */
 const Portfolio: React.FC = () => {
@@ -27,10 +29,11 @@ const Portfolio: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-charcoal-950 text-white selection:bg-accent-cyan selection:text-charcoal-950">
+    <div className="min-h-screen text-charcoal-900 dark:text-white selection:bg-accent-cyan selection:text-charcoal-950">
+      <AuroraBackground />
       <SEOHead route="/" />
       <Navbar />
-      <main>
+      <main className="relative z-10">
         <Hero />
         <About />
         <Journey />

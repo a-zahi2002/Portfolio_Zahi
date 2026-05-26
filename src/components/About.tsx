@@ -29,7 +29,7 @@ const About: React.FC = () => {
   ];
 
   return (
-    <section id="about" className="relative py-32 bg-white dark:bg-charcoal-950 overflow-hidden transition-colors duration-300">
+    <section id="about" className="relative py-32 overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-blue-500/20 dark:bg-accent-purple/20 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none" />
 

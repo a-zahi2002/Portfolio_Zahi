@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import { storageService } from '../../../services/storageService';
 import { mediaService } from '../../../services/mediaService';
 import PageHeader from '../ui/PageHeader';
-import Button from '../ui/Button';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import { Skeleton } from '../ui/Skeleton';
 import type { MediaAsset, StorageBucket } from '../../../types/cms';

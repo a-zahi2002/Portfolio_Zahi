@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { experiencesService } from '../../services/experiencesService';
-import type { Experience, ExperienceFormData } from '../../types/cms';
+import type { ExperienceFormData } from '../../types/cms';
 
 export const EXPERIENCES_QUERY_KEY = ['experiences'] as const;
 export const ALL_EXPERIENCES_QUERY_KEY = ['experiences', 'all'] as const;

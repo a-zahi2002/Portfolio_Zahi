@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Code2, Award, Wrench, Mail, Settings, ArrowRight, TrendingUp, Briefcase, GraduationCap } from 'lucide-react';
+import { Code2, Award, Wrench, Settings, ArrowRight, TrendingUp, Briefcase, GraduationCap } from 'lucide-react';
 import { useAllProjects } from '../../../hooks/cms/useProjects';
 import { useAllCertificates } from '../../../hooks/cms/useCertificates';
 import { useAllSkills } from '../../../hooks/cms/useSkills';

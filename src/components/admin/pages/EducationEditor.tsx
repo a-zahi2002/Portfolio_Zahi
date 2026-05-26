@@ -29,7 +29,7 @@ const defaultForm: EducationFormData = {
 
 const EducationEditor: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const isEdit = id && id !== 'new';
+  const isEdit = !!(id && id !== 'new');
   const navigate = useNavigate();
   const queryClient = useAllEducation(); // to get list length for default order index
 

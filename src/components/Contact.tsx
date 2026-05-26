@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Linkedin, Copy, Check } from 'lucide-react';
+import { Github, Linkedin, Copy, Check, Mail } from 'lucide-react';
 import { useContactInfo } from '../hooks/cms/useContactInfo';
 import { useSocialLinks } from '../hooks/cms/useSocialLinks';
 
@@ -27,32 +27,50 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-32 bg-gray-50 dark:bg-charcoal-950 relative overflow-hidden flex flex-col items-center justify-center min-h-[60vh] transition-colors duration-300">
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-blue-500/10 dark:bg-accent-cyan/10 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
+    <section id="contact" className="py-32 relative overflow-hidden flex flex-col items-center justify-center min-h-[60vh]">
+      
+      {/* Massive Immersive Glow */}
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut"
+        }}
+        className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-blue-500/20 dark:bg-accent-cyan/20 rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+      />
 
       <div className="max-w-4xl mx-auto px-6 lg:px-12 relative z-10 text-center">
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-blue-600 dark:text-accent-purple font-medium uppercase tracking-widest mb-8"
-        >
-          {contactLoading ? <span className="opacity-0">placeholder</span> : eyebrow}
-        </motion.p>
-
-        <motion.h2
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="text-4xl md:text-6xl lg:text-7xl font-bold text-gray-900 dark:text-white mb-12 leading-tight"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 dark:bg-white/5 border border-charcoal-900/10 dark:border-white/10 backdrop-blur-md mb-8"
+        >
+          <Mail className="w-4 h-4 text-blue-600 dark:text-accent-cyan" />
+          <span className="text-sm font-bold uppercase tracking-widest text-charcoal-700 dark:text-gray-300">
+            {contactLoading ? '...' : eyebrow}
+          </span>
+        </motion.div>
+
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.1 }}
+          className="text-5xl md:text-7xl font-display font-bold text-charcoal-900 dark:text-white mb-16 leading-[1.1]"
         >
           {contactLoading ? (
-            <span className="opacity-0">placeholder</span>
+            <div className="h-16 bg-charcoal-900/5 dark:bg-white/5 animate-pulse rounded-2xl w-3/4 mx-auto" />
           ) : (
             <>
               {heading} <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-600">{headingHighlight}</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-400">
+                {headingHighlight}
+              </span>
             </>
           )}
         </motion.h2>
@@ -61,28 +79,29 @@ const Contact: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
           className="relative inline-block group"
         >
           <button
             onClick={handleCopy}
             disabled={contactLoading}
-            className="relative z-10 text-2xl md:text-4xl lg:text-5xl font-mono text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors duration-300 flex items-center gap-4 py-4 px-8 rounded-full border border-gray-200 dark:border-white/5 hover:border-blue-500 dark:hover:border-white/20 bg-white/50 dark:bg-white/5 backdrop-blur-md disabled:opacity-50"
+            className="relative z-10 text-2xl md:text-5xl font-sans font-bold text-charcoal-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-white transition-all duration-300 flex items-center gap-6 py-6 px-10 rounded-full border border-gray-200/50 dark:border-white/10 hover:border-blue-500/50 dark:hover:border-accent-cyan/50 bg-white/60 dark:bg-charcoal-900/40 backdrop-blur-xl disabled:opacity-50 shadow-xl hover:shadow-2xl hover:-translate-y-1"
           >
             {contactLoading ? '…' : email}
-            <div className="p-2 rounded-full bg-gray-200 dark:bg-white/10 text-gray-700 dark:text-white group-hover:bg-blue-500 dark:group-hover:bg-accent-cyan group-hover:text-white dark:group-hover:text-charcoal-950 transition-all duration-300">
-              {copied ? <Check size={24} /> : <Copy size={24} />}
+            <div className="p-3 md:p-4 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 group-hover:bg-blue-600 dark:group-hover:bg-accent-cyan group-hover:text-white dark:group-hover:text-charcoal-950 transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-12">
+              {copied ? <Check size={28} /> : <Copy size={28} />}
             </div>
           </button>
 
           <AnimatePresence>
             {copied && (
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute -top-12 left-1/2 -translate-x-1/2 bg-blue-500 dark:bg-accent-cyan text-white dark:text-charcoal-950 text-sm font-bold px-3 py-1 rounded-full whitespace-nowrap"
+                initial={{ opacity: 0, y: 10, scale: 0.8 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.8 }}
+                className="absolute -top-14 left-1/2 -translate-x-1/2 bg-blue-600 dark:bg-accent-cyan text-white dark:text-charcoal-950 text-sm font-bold px-4 py-2 rounded-full shadow-lg whitespace-nowrap"
               >
-                Email Copied!
+                Email Copied to Clipboard!
               </motion.div>
             )}
           </AnimatePresence>
@@ -93,13 +112,13 @@ const Contact: React.FC = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.2 }}
-          className="mt-20 flex justify-center gap-8"
+          transition={{ delay: 0.4 }}
+          className="mt-24 flex justify-center gap-6"
         >
           {socialLoading ? (
             <>
-              <div className="w-12 h-12 rounded-full bg-white/5 animate-pulse" />
-              <div className="w-12 h-12 rounded-full bg-white/5 animate-pulse" />
+              <div className="w-14 h-14 rounded-full bg-charcoal-900/5 dark:bg-white/5 animate-pulse" />
+              <div className="w-14 h-14 rounded-full bg-charcoal-900/5 dark:bg-white/5 animate-pulse" />
             </>
           ) : (
             (socialLinks ?? []).map(link => (
@@ -108,10 +127,10 @@ const Contact: React.FC = () => {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-500 hover:text-blue-600 dark:hover:text-white transition-colors p-2 md:p-4 hover:bg-gray-100 dark:hover:bg-white/5 rounded-full"
+                className="p-4 rounded-full bg-white/60 dark:bg-white/5 border border-gray-200/50 dark:border-white/10 text-charcoal-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-accent-cyan hover:bg-white dark:hover:bg-white/10 backdrop-blur-md transition-all duration-300 hover:scale-110 hover:-translate-y-1 shadow-sm hover:shadow-md"
                 aria-label={link.platform}
               >
-                {ICON_MAP[link.icon] ?? <span className="text-sm font-medium">{link.platform}</span>}
+                {ICON_MAP[link.icon] ?? <span className="text-sm font-bold">{link.platform}</span>}
               </a>
             ))
           )}
