@@ -1,133 +1,129 @@
-import React, { useRef } from 'react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import React from 'react';
+import { motion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { useProjects } from '../hooks/cms/useProjects';
 import type { CMSProject } from '../types/cms';
 
-// ── TiltCard (unchanged – all original animations preserved) ──────────────────
-const TiltCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const mouseX = useSpring(x, { stiffness: 500, damping: 100 });
-  const mouseY = useSpring(y, { stiffness: 500, damping: 100 });
-  const rotateX = useTransform(mouseY, [-0.5, 0.5], ['15deg', '-15deg']);
-  const rotateY = useTransform(mouseX, [-0.5, 0.5], ['-15deg', '15deg']);
+const ProjectSkeleton: React.FC = () => (
+  <div className="min-h-screen w-full flex items-center justify-center bg-charcoal-900/5 dark:bg-white/5 animate-pulse border-b border-charcoal-900/10 dark:border-white/10" />
+);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    x.set((e.clientX - rect.left - rect.width / 2) / rect.width);
-    y.set((e.clientY - rect.top - rect.height / 2) / rect.height);
-  };
+const ProjectCaseStudy: React.FC<{ project: CMSProject; index: number }> = ({ project, index }) => {
+  const isEven = index % 2 === 0;
 
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => { x.set(0); y.set(0); }}
-      style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-      className={`relative active:scale-95 transition-transform duration-200 ease-out ${className}`}
-    >
-      {children}
-    </motion.div>
+    <div className="relative min-h-[100vh] md:min-h-screen w-full flex items-center justify-center overflow-hidden group border-b border-charcoal-900/10 dark:border-white/10 last:border-0 bg-white dark:bg-charcoal-950">
+      
+      {/* Parallax Background Image */}
+      <div className="absolute inset-0 w-full h-[120%] -top-[10%] z-0 parallax" data-speed="0.15">
+        <div className="absolute inset-0 bg-charcoal-950/80 dark:bg-black/80 z-10 transition-opacity duration-700 group-hover:bg-charcoal-950/60 dark:group-hover:bg-black/60" />
+        <img
+          src={project.thumbnail_url}
+          alt={project.title}
+          className="w-full h-full object-cover grayscale opacity-50 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-1000 ease-out"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop';
+          }}
+        />
+      </div>
+
+      <div className="container-padding relative z-20 w-full">
+        <div className={`flex flex-col ${isEven ? 'md:items-start' : 'md:items-end'} text-left ${isEven ? '' : 'md:text-right'}`}>
+          
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+            className="flex flex-col gap-6 max-w-2xl"
+          >
+            {/* Tech Stack */}
+            <div className={`flex flex-wrap gap-3 ${isEven ? 'justify-start' : 'md:justify-end justify-start'}`}>
+              {project.technologies.slice(0, 4).map(tech => (
+                <span key={tech} className="text-xs uppercase tracking-widest text-accent-gold font-medium">
+                  {tech}
+                </span>
+              ))}
+            </div>
+
+            {/* Title */}
+            <h3 className="text-5xl md:text-7xl lg:text-8xl font-display font-medium text-white uppercase leading-[0.9]">
+              {project.title}
+            </h3>
+
+            {/* Description */}
+            <p className="text-lg md:text-xl font-sans text-gray-300 leading-relaxed max-w-xl">
+              {project.description}
+            </p>
+
+            {/* Links */}
+            <div className={`flex items-center gap-6 mt-4 ${isEven ? 'justify-start' : 'md:justify-end justify-start'}`}>
+              {(project.live_url || project.github_url) && (
+                <a 
+                  href={project.live_url || project.github_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="group/btn flex items-center gap-3 text-sm font-bold tracking-widest uppercase text-white hover:text-accent-gold transition-colors"
+                >
+                  <span className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover/btn:border-accent-gold transition-colors backdrop-blur-sm">
+                    <ArrowUpRight className="w-5 h-5 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+                  </span>
+                  <span>View Case</span>
+                </a>
+              )}
+            </div>
+          </motion.div>
+
+        </div>
+      </div>
+      
+    </div>
   );
 };
 
-// ── Skeleton card ─────────────────────────────────────────────────────────────
-const ProjectCardSkeleton: React.FC<{ wide?: boolean }> = ({ wide }) => (
-  <div className={`rounded-3xl bg-white dark:bg-charcoal-800 border border-gray-200 dark:border-white/5 overflow-hidden animate-pulse ${wide ? 'md:col-span-2' : ''}`}>
-    <div className="w-full h-full bg-gray-100 dark:bg-white/5 min-h-[200px]" />
-  </div>
-);
-
-// ── Project card ──────────────────────────────────────────────────────────────
-const ProjectCard: React.FC<{ project: CMSProject; wide: boolean }> = ({ project, wide }) => (
-  <TiltCard
-    className={`group rounded-3xl bg-white dark:bg-charcoal-800 border border-gray-200 dark:border-white/5 overflow-hidden hover:shadow-2xl hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 ${wide ? 'md:col-span-2' : ''}`}
-  >
-    <div className="absolute inset-0 z-0">
-      <img
-        src={project.thumbnail_url}
-        alt={project.title}
-        className="w-full h-full object-cover opacity-90 dark:opacity-60 group-hover:opacity-100 dark:group-hover:opacity-40 group-hover:scale-110 transition-all duration-700 ease-out"
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=600';
-        }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent dark:from-charcoal-950 dark:via-charcoal-950/50 dark:to-transparent" />
-    </div>
-
-    <div className="absolute inset-0 z-10 p-8 flex flex-col justify-end transform translate-z-20">
-      <div className="transform transition-transform duration-500 translate-y-4 group-hover:translate-y-0">
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex gap-2 mb-3 flex-wrap">
-            {project.technologies.map(tech => (
-              <span key={tech} className="px-3 py-1 text-xs font-medium uppercase tracking-wider text-blue-100 bg-blue-600/20 border border-blue-400/20 dark:text-accent-cyan dark:bg-accent-cyan/10 dark:border-accent-cyan/20 backdrop-blur-md rounded-full">
-                {tech}
-              </span>
-            ))}
-          </div>
-          {project.github_url && (
-            <a href={project.github_url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-md transition-colors">
-              <ArrowUpRight size={20} />
-            </a>
-          )}
-          {project.live_url && !project.github_url && (
-            <a href={project.live_url} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur-md transition-colors">
-              <ArrowUpRight size={20} />
-            </a>
-          )}
-        </div>
-
-        <h3 className="text-2xl font-bold text-white mb-2">{project.title}</h3>
-        <p className="text-gray-200 dark:text-gray-400 line-clamp-2 mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-          {project.description}
-        </p>
-      </div>
-    </div>
-  </TiltCard>
-);
-
-// ── Main component ────────────────────────────────────────────────────────────
 const Projects: React.FC = () => {
   const { data: projects, isLoading } = useProjects();
 
   return (
-    <section id="projects" className="py-32 bg-gray-50 dark:bg-charcoal-900 relative transition-colors duration-300">
-      {/* Decorative grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-16"
-        >
-          <h2 className="text-4xl lg:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
-            Selected <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-accent-cyan dark:to-blue-500">Works</span>
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400 max-w-xl text-lg">
-            A showcase of my recent production-ready applications and experiments.
-          </p>
-        </motion.div>
-
-        {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[400px]">
-          {isLoading
-            ? [true, false, false, true].map((wide, i) => <ProjectCardSkeleton key={i} wide={wide} />)
-            : (projects ?? []).map((project, index) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  // Use featured flag for wide card, or fall back to position-based logic
-                  wide={project.featured || index === 0}
-                />
-              ))
-          }
+    <section id="projects" className="bg-[#f5f5f7] dark:bg-charcoal-950 transition-colors duration-500">
+      
+      {/* Intro Header */}
+      <div className="container-padding py-32 md:py-48">
+        <div className="max-w-4xl">
+          <motion.h2 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-6xl font-display font-medium mb-6 text-charcoal-900 dark:text-white uppercase tracking-tight"
+          >
+            Selected <br/> <span className="text-accent-gold italic font-light">Cases</span>
+          </motion.h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-charcoal-600 dark:text-gray-400 max-w-xl text-lg font-sans"
+          >
+            A curated selection of digital experiences, combining intentional design with robust engineering.
+          </motion.p>
         </div>
       </div>
+
+      {/* Case Studies */}
+      <div className="flex flex-col w-full">
+        {isLoading
+          ? [true, false].map((_, i) => <ProjectSkeleton key={i} />)
+          : (projects ?? []).map((project, index) => (
+              <ProjectCaseStudy
+                key={project.id}
+                project={project}
+                index={index}
+              />
+            ))
+        }
+      </div>
+      
     </section>
   );
 };
