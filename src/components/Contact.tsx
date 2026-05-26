@@ -29,19 +29,21 @@ const Contact: React.FC = () => {
   return (
     <section id="contact" className="py-32 relative overflow-hidden flex flex-col items-center justify-center min-h-[60vh]">
       
-      {/* Massive Immersive Glow */}
-      <motion.div
-        animate={{
-          scale: [1, 1.2, 1],
-          opacity: [0.3, 0.5, 0.3],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-        className="absolute top-1/2 left-1/2 w-[600px] h-[600px] bg-blue-500/20 dark:bg-accent-cyan/20 rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"
-      />
+      {/* Massive Immersive Glow with Parallax */}
+      <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 pointer-events-none parallax-glow">
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="w-full h-full bg-blue-500/20 dark:bg-accent-cyan/20 rounded-full blur-[150px]"
+        />
+      </div>
 
       <div className="max-w-4xl mx-auto px-6 lg:px-12 relative z-10 text-center">
         <motion.div

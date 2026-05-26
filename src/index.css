@@ -119,3 +119,32 @@
     @apply from-accent-purple via-pink-500 to-accent-purple;
   }
 }
+
+/* Antigravity Global Mouse Parallax */
+:root {
+  --mouse-x: 0;
+  --mouse-y: 0;
+}
+
+@media (hover: hover) {
+  .parallax-slow {
+    transform: translate3d(calc(var(--mouse-x) * -20px), calc(var(--mouse-y) * -20px), 0);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .parallax-medium {
+    transform: translate3d(calc(var(--mouse-x) * -35px), calc(var(--mouse-y) * -35px), 0);
+    transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .parallax-fast {
+    transform: translate3d(calc(var(--mouse-x) * 30px), calc(var(--mouse-y) * 30px), 0);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .parallax-card {
+    transform: translate3d(calc(var(--mouse-x) * 8px), calc(var(--mouse-y) * 8px), 0);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .parallax-glow {
+    transform: translate3d(calc(var(--mouse-x) * -60px), calc(var(--mouse-y) * -60px), 0);
+    transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}

@@ -76,8 +76,8 @@ const Journey: React.FC = () => {
     <section id="journey" className="relative py-32 overflow-hidden">
       
       {/* Background Glow */}
-      <div className="absolute top-1/3 right-1/4 w-[40vw] h-[40vw] max-w-[400px] max-h-[400px] bg-purple-500/5 dark:bg-accent-purple/5 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-1/3 left-1/4 w-[40vw] h-[40vw] max-w-[400px] max-h-[400px] bg-blue-500/5 dark:bg-accent-cyan/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-1/3 right-1/4 w-[40vw] h-[40vw] max-w-[400px] max-h-[400px] bg-purple-500/5 dark:bg-accent-purple/5 rounded-full blur-[100px] pointer-events-none parallax-glow" />
+      <div className="absolute bottom-1/3 left-1/4 w-[40vw] h-[40vw] max-w-[400px] max-h-[400px] bg-blue-500/5 dark:bg-accent-cyan/5 rounded-full blur-[100px] pointer-events-none parallax-glow" />
 
       <div className="max-w-5xl mx-auto px-6 lg:px-12 relative z-10">
         <div className="text-center mb-16">
@@ -176,7 +176,7 @@ const Journey: React.FC = () => {
 
                       {/* Content Card container */}
                       <div className={`w-full md:w-1/2 pl-16 md:pl-0 ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}>
-                        <div className="bg-white dark:bg-charcoal-800/50 p-6 md:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-xl hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 hover:-translate-y-1 relative group">
+                        <div className="bg-white dark:bg-charcoal-800/50 p-6 md:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-xl hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 hover:-translate-y-1 relative group parallax-card">
                           {/* Inner glowing accent */}
                           <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-3xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple opacity-20 group-hover:opacity-100 transition-opacity" />
 

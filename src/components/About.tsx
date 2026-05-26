@@ -31,7 +31,7 @@ const About: React.FC = () => {
   return (
     <section id="about" className="relative py-32 overflow-hidden">
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-blue-500/20 dark:bg-accent-purple/20 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none" />
+      <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-blue-500/20 dark:bg-accent-purple/20 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none parallax-glow" />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         <motion.div
@@ -42,7 +42,7 @@ const About: React.FC = () => {
           className="grid lg:grid-cols-2 gap-16 items-center"
         >
           {/* Image Column */}
-          <div className="relative group">
+          <div className="relative group parallax-card">
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple rounded-2xl blur opacity-20 group-hover:opacity-60 transition duration-1000 group-hover:duration-200" />
             <div className="relative glass-panel p-2 rounded-2xl overflow-hidden aspect-square max-w-md mx-auto lg:mx-0">
               {isLoading ? (
@@ -73,7 +73,7 @@ const About: React.FC = () => {
               {title} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-500">{titleHighlight}</span>
             </h2>
 
-            <div className="glass-panel p-8 md:p-10 relative overflow-hidden group border-gray-200 dark:border-white/5 hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-colors duration-500">
+            <div className="glass-panel p-8 md:p-10 relative overflow-hidden group border-gray-200 dark:border-white/5 hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-colors duration-500 parallax-card">
               {isLoading ? (
                 <div className="space-y-3 animate-pulse">
                   <div className="h-4 bg-white/5 rounded w-full" />

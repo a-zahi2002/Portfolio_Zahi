@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 const AuroraBackground: React.FC = () => {
   return (
     <div className="fixed inset-0 z-[-1] overflow-hidden pointer-events-none bg-[#fafafa] dark:bg-[#050505] transition-colors duration-700">
-      <div className="absolute inset-0 opacity-30 dark:opacity-40">
+      <div className="absolute inset-0 opacity-30 dark:opacity-40 parallax-glow">
         <motion.div
           animate={{
             transform: [

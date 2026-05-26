@@ -79,10 +79,16 @@ const Hero: React.FC = () => {
   return (
     <section id="hero" className="relative min-h-[95vh] flex items-center justify-center overflow-hidden">
       
-      {/* Floating Glass Shapes */}
-      <FloatingShape className="w-32 h-32 bg-blue-500/10 dark:bg-white/5 top-[20%] left-[10%] rotate-12" delay={0} yOffset={30} />
-      <FloatingShape className="w-48 h-48 bg-purple-500/10 dark:bg-white/5 bottom-[20%] right-[10%] -rotate-12 rounded-full" delay={1} yOffset={-40} />
-      <FloatingShape className="w-24 h-24 bg-cyan-500/10 dark:bg-white/5 top-[30%] right-[20%] rotate-45" delay={2} yOffset={20} />
+      {/* Floating Glass Shapes with Antigravity Parallax */}
+      <div className="absolute top-[20%] left-[10%] w-32 h-32 parallax-slow pointer-events-none">
+        <FloatingShape className="w-full h-full bg-blue-500/10 dark:bg-white/5 rotate-12" delay={0} yOffset={30} />
+      </div>
+      <div className="absolute bottom-[20%] right-[10%] w-48 h-48 parallax-medium pointer-events-none">
+        <FloatingShape className="w-full h-full bg-purple-500/10 dark:bg-white/5 -rotate-12 rounded-full" delay={1} yOffset={-40} />
+      </div>
+      <div className="absolute top-[30%] right-[20%] w-24 h-24 parallax-fast pointer-events-none">
+        <FloatingShape className="w-full h-full bg-cyan-500/10 dark:bg-white/5 rotate-45" delay={2} yOffset={20} />
+      </div>
 
       {/* Grid Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none opacity-50" />

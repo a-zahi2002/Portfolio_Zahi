@@ -25,7 +25,30 @@ const Portfolio: React.FC = () => {
     const timer = setTimeout(() => {
       initScrollAnimations();
     }, 100);
-    return () => clearTimeout(timer);
+
+    const mediaQuery = window.matchMedia('(hover: hover)');
+    if (!mediaQuery.matches) return () => clearTimeout(timer);
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const x = (e.clientX / window.innerWidth) - 0.5;
+      const y = (e.clientY / window.innerHeight) - 0.5;
+      document.documentElement.style.setProperty('--mouse-x', x.toString());
+      document.documentElement.style.setProperty('--mouse-y', y.toString());
+    };
+
+    const handleMouseLeave = () => {
+      document.documentElement.style.setProperty('--mouse-x', '0');
+      document.documentElement.style.setProperty('--mouse-y', '0');
+    };
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseleave', handleMouseLeave);
+    };
   }, []);
 
   return (
