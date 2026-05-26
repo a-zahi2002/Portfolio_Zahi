@@ -1,7 +1,11 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
+import { useSiteSettings } from '../hooks/cms/useSiteSettings';
 
 const Footer: React.FC = () => {
+  const { data: settings } = useSiteSettings();
+  const copyrightText = settings?.copyright_text ?? '© 2025 A. Zahi Faleel. All rights reserved.';
+
   return (
     <footer className="bg-charcoal-950 text-white py-12 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -9,13 +13,11 @@ const Footer: React.FC = () => {
           <div className="flex items-center justify-center mb-4">
             <span className="text-gray-400">Made with</span>
             <Heart className="w-4 h-4 text-red-500 mx-2 animate-pulse" />
-            <span className="text-gray-400">using React & TailwindCSS</span>
+            <span className="text-gray-400">using React &amp; TailwindCSS</span>
           </div>
-          
-          <p className="text-gray-400 text-sm">
-            © 2025 A. Zahi Faleel. All rights reserved.
-          </p>
-          
+
+          <p className="text-gray-400 text-sm">{copyrightText}</p>
+
           <div className="mt-6 pt-6 border-t border-gray-800">
             <p className="text-xs text-gray-500">
               Designed and developed with modern web technologies

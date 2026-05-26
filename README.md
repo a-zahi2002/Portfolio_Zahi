@@ -2,6 +2,10 @@
 
 A modern, responsive personal portfolio built with **React**, **TypeScript**, and **Tailwind CSS**. Showcasing projects, skills, certificates, and contact information with beautiful animations and a dark mode toggle.
 
+## 📖 Documentation
+
+For a detailed breakdown of the site's architecture, directory structure, UI/UX design, and animation systems, check out the [Project Summary & Architecture Documentation](./docs/PROJECT_SUMMARY.md).
+
 ## Features
 
 - ⚡ Fast and responsive design

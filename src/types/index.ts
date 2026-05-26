@@ -1,3 +1,4 @@
+// Legacy types kept for backward compatibility
 export interface Project {
   name: string;
   description: string;
@@ -21,3 +22,6 @@ export interface ContactLink {
   github: string;
   linkedin: string;
 }
+
+// Re-export all CMS types
+export * from './cms';
