@@ -11,7 +11,7 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import SEOHead from './components/SEOHead';
 import ProtectedRoute from './components/admin/guards/ProtectedRoute';
-import { initScrollAnimations, destroyScrollAnimations } from './utils/animations';
+import { initScrollAnimations } from './utils/animations';
 
 // Lazy-load admin pages to keep portfolio bundle lean
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
@@ -23,18 +23,14 @@ const Portfolio: React.FC = () => {
     const timer = setTimeout(() => {
       initScrollAnimations();
     }, 100);
-    return () => {
-      clearTimeout(timer);
-      destroyScrollAnimations();
-    };
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#f5f5f7] dark:bg-charcoal-950 text-charcoal-900 dark:text-gray-200 selection:bg-accent-gold selection:text-charcoal-950 transition-colors duration-500 relative">
-      <div className="noise-overlay pointer-events-none" />
+    <div className="min-h-screen bg-charcoal-950 text-white selection:bg-accent-cyan selection:text-charcoal-950">
       <SEOHead route="/" />
       <Navbar />
-      <main className="relative z-10">
+      <main>
         <Hero />
         <About />
         <Journey />
