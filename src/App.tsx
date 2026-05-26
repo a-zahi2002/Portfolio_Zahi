@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
+import Journey from './components/Journey';
 import Projects from './components/Projects';
 import Certificates from './components/Certificates';
 import Skills from './components/Skills';
@@ -32,6 +33,7 @@ const Portfolio: React.FC = () => {
       <main>
         <Hero />
         <About />
+        <Journey />
         <Projects />
         <Certificates />
         <Skills />

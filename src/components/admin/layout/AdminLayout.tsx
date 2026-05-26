@@ -3,7 +3,7 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Menu, ExternalLink } from 'lucide-react';
 import AdminSidebar from './AdminSidebar';
 
-// Lazy admin pages
+// Admin pages
 import DashboardOverview from '../pages/DashboardOverview';
 import HeroEditor from '../pages/HeroEditor';
 import AboutEditor from '../pages/AboutEditor';
@@ -17,6 +17,10 @@ import SocialLinksList from '../pages/SocialLinksList';
 import SiteSettingsEditor from '../pages/SiteSettingsEditor';
 import SeoManager from '../pages/SeoManager';
 import MediaLibrary from '../pages/MediaLibrary';
+import ExperiencesList from '../pages/ExperiencesList';
+import ExperienceEditor from '../pages/ExperienceEditor';
+import EducationList from '../pages/EducationList';
+import EducationEditor from '../pages/EducationEditor';
 
 /** Breadcrumb map for page titles */
 const breadcrumbMap: Record<string, string> = {
@@ -24,6 +28,8 @@ const breadcrumbMap: Record<string, string> = {
   'hero': 'Hero Section',
   'about': 'About Section',
   'projects': 'Projects',
+  'experiences': 'Experience',
+  'education': 'Education',
   'certificates': 'Certificates',
   'skills': 'Skills',
   'contact': 'Contact',
@@ -81,6 +87,12 @@ const AdminLayout: React.FC = () => {
             <Route path="projects" element={<ProjectsList />} />
             <Route path="projects/new" element={<ProjectEditor />} />
             <Route path="projects/:id" element={<ProjectEditor />} />
+            <Route path="experiences" element={<ExperiencesList />} />
+            <Route path="experiences/new" element={<ExperienceEditor />} />
+            <Route path="experiences/:id" element={<ExperienceEditor />} />
+            <Route path="education" element={<EducationList />} />
+            <Route path="education/new" element={<EducationEditor />} />
+            <Route path="education/:id" element={<EducationEditor />} />
             <Route path="certificates" element={<CertificatesList />} />
             <Route path="certificates/new" element={<CertificateEditor />} />
             <Route path="certificates/:id" element={<CertificateEditor />} />

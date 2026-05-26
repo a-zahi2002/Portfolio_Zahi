@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Layout, Smartphone, Code, Zap } from 'lucide-react';
 import { useAboutSection } from '../hooks/cms/useAboutSection';
+import { parseMarkdown } from '../utils/markdown';
 
 // Map icon name strings to Lucide components
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -17,7 +18,7 @@ const About: React.FC = () => {
   // Fallback values for when Supabase is not yet configured
   const title = about?.title ?? 'About';
   const titleHighlight = about?.title_highlight ?? 'Me';
-  const bioPrimary = about?.bio_primary ?? 'I am a passionate Creative Developer dedicated to building immersive web experiences. My work bridges the gap between robust engineering and elegant design, ensuring every pixel serves a purpose.';
+  const bioPrimary = about?.bio_primary ?? 'I am a passionate **Creative Developer** dedicated to building immersive web experiences. My work bridges the gap between robust engineering and elegant design, ensuring every pixel serves a purpose.';
   const bioSecondary = about?.bio_secondary ?? 'With a strong foundation in modern web technologies, I focus on performance, accessibility, and creating interfaces that feel "alive" through subtle interactions and 3D elements.';
   const profileImageUrl = about?.profile_image_url ?? './assets/profile.jpg';
   const availabilityStatus = about?.availability_status ?? true;
@@ -81,14 +82,24 @@ const About: React.FC = () => {
                 </div>
               ) : (
                 <>
-                  <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-6 relative z-10">
-                    {bioPrimary.split('Creative Developer').map((part, i) =>
-                      i === 0 ? <span key={i}>{part}<span className="text-blue-600 dark:text-accent-cyan font-medium">Creative Developer</span></span> : <span key={i}>{part}</span>
-                    )}
-                  </p>
-                  <p className="text-gray-500 dark:text-gray-400 text-base leading-relaxed mb-8 relative z-10">
-                    {bioSecondary}
-                  </p>
+                  <div
+                    className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-6 relative z-10
+                      prose prose-sm dark:prose-invert max-w-none
+                      prose-p:mb-4 prose-p:leading-relaxed
+                      prose-strong:text-blue-600 dark:prose-strong:text-accent-cyan prose-strong:font-semibold
+                      prose-a:text-blue-600 dark:prose-a:text-accent-cyan prose-a:underline hover:opacity-80"
+                    dangerouslySetInnerHTML={{ __html: parseMarkdown(bioPrimary) }}
+                  />
+                  {bioSecondary && (
+                    <div
+                      className="text-gray-500 dark:text-gray-400 text-base leading-relaxed mb-8 relative z-10
+                        prose prose-sm dark:prose-invert max-w-none
+                        prose-p:mb-4 prose-p:leading-relaxed
+                        prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:font-semibold
+                        prose-a:text-blue-600 dark:prose-a:text-accent-cyan prose-a:underline hover:opacity-80"
+                      dangerouslySetInnerHTML={{ __html: parseMarkdown(bioSecondary) }}
+                    />
+                  )}
 
                   {highlights.length > 0 && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">

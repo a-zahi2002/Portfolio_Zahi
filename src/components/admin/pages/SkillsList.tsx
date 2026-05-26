@@ -1,7 +1,23 @@
-import React, { useState } from 'react';
-import { Plus, Pencil, Trash2, Wrench } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Pencil, Trash2, Wrench, GripVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useAllSkills, useCreateSkill, useUpdateSkill, useDeleteSkill } from '../../../hooks/cms/useSkills';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import SortableItem from '../ui/SortableItem';
+import { useAllSkills, useCreateSkill, useUpdateSkill, useDeleteSkill, useReorderSkills } from '../../../hooks/cms/useSkills';
 import PageHeader from '../ui/PageHeader';
 import Button from '../ui/Button';
 import FormField from '../ui/FormField';
@@ -27,14 +43,33 @@ const SkillsList: React.FC = () => {
   const createSkill = useCreateSkill();
   const updateSkill = useUpdateSkill();
   const deleteSkill = useDeleteSkill();
+  const reorderSkills = useReorderSkills();
 
+  const [items, setItems] = useState<CMSSkill[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editTarget, setEditTarget] = useState<CMSSkill | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<CMSSkill | null>(null);
   const [form, setForm] = useState<SkillFormData>(defaultSkill);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  useEffect(() => {
+    if (skills) {
+      setItems(skills);
+    }
+  }, [skills]);
+
   const openAdd = () => {
-    setForm({ ...defaultSkill, display_order: (skills?.length ?? 0) });
+    setForm({ ...defaultSkill, display_order: (items?.length ?? 0) });
     setEditTarget(null);
     setIsAdding(true);
   };
@@ -78,6 +113,29 @@ const SkillsList: React.FC = () => {
       setDeleteTarget(null);
     } catch {
       toast.error('Failed to delete skill');
+    }
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = items.findIndex((item) => item.id === active.id);
+    const newIndex = items.findIndex((item) => item.id === over.id);
+
+    const reordered = arrayMove(items, oldIndex, newIndex);
+    setItems(reordered);
+
+    try {
+      const payload = reordered.map((item, idx) => ({
+        id: item.id,
+        display_order: idx,
+      }));
+      await reorderSkills.mutateAsync(payload);
+      toast.success('Skills order updated');
+    } catch {
+      toast.error('Failed to update skills order');
+      setItems(skills ?? []);
     }
   };
 
@@ -127,32 +185,60 @@ const SkillsList: React.FC = () => {
 
       {isLoading ? (
         <SkeletonTable />
-      ) : !skills?.length ? (
+      ) : !items.length ? (
         <EmptyState icon={<Wrench className="w-7 h-7" />} title="No skills yet" actionLabel="Add Skill" onAction={openAdd} />
       ) : (
-        <div className="space-y-2">
-          {skills.map(skill => (
-            <div key={skill.id} className="flex items-center gap-4 p-3 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all group">
-              <span
-                className="w-4 h-4 rounded-full shrink-0 shadow-[0_0_8px_currentColor]"
-                style={{ backgroundColor: skill.color }}
-              />
-              <div className="flex-1">
-                <p className="text-sm font-medium text-white">{skill.name}</p>
-                <p className="text-xs text-gray-600">{skill.category} · {skill.proficiency}%</p>
-              </div>
-              {!skill.visible && <span className="text-xs text-gray-600">Hidden</span>}
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => openEdit(skill)} className="p-1.5 rounded-lg text-gray-600 hover:text-accent-cyan hover:bg-accent-cyan/5 transition-colors">
-                  <Pencil className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={() => setDeleteTarget(skill)} className="p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-500/5 transition-colors">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="space-y-2">
+            <SortableContext
+              items={items.map(s => s.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {items.map(skill => (
+                <SortableItem key={skill.id} id={skill.id}>
+                  {({ ref, style, dragHandleProps }) => (
+                    <div
+                      ref={ref}
+                      style={style}
+                      className="flex items-center gap-4 p-3 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all duration-150 group"
+                    >
+                      {/* Drag handle */}
+                      <div
+                        {...dragHandleProps.attributes}
+                        {...dragHandleProps.listeners}
+                        className="cursor-grab p-1 hover:bg-white/5 rounded text-gray-700 hover:text-gray-400 transition-colors shrink-0"
+                      >
+                        <GripVertical className="w-4 h-4" />
+                      </div>
+
+                      <span
+                        className="w-4 h-4 rounded-full shrink-0 shadow-[0_0_8px_currentColor]"
+                        style={{ backgroundColor: skill.color }}
+                      />
+                      <div className="flex-1">
+                        <p className="text-sm font-medium text-white">{skill.name}</p>
+                        <p className="text-xs text-gray-600">{skill.category} · {skill.proficiency}%</p>
+                      </div>
+                      {!skill.visible && <span className="text-xs text-gray-600">Hidden</span>}
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => openEdit(skill)} className="p-1.5 rounded-lg text-gray-600 hover:text-accent-cyan hover:bg-accent-cyan/5 transition-colors">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => setDeleteTarget(skill)} className="p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-500/5 transition-colors">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </SortableItem>
+              ))}
+            </SortableContext>
+          </div>
+        </DndContext>
       )}
 
       <ConfirmDialog

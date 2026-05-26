@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, Eye, EyeOff, GripVertical, ExternalLink } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, GripVertical, GraduationCap, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   DndContext,
@@ -18,24 +18,29 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import SortableItem from '../ui/SortableItem';
-import { useAllProjects, useDeleteProject, useToggleProjectVisibility, useReorderProjects } from '../../../hooks/cms/useProjects';
+import {
+  useAllEducation,
+  useDeleteEducation,
+  useToggleEducationVisibility,
+  useReorderEducation,
+} from '../../../hooks/cms/useEducation';
 import PageHeader from '../ui/PageHeader';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import EmptyState from '../ui/EmptyState';
 import { SkeletonTable } from '../ui/Skeleton';
-import type { CMSProject } from '../../../types/cms';
+import type { Education } from '../../../types/cms';
 
-const ProjectsList: React.FC = () => {
+const EducationList: React.FC = () => {
   const navigate = useNavigate();
-  const { data: projects, isLoading } = useAllProjects();
-  const deleteProject = useDeleteProject();
-  const toggleVisibility = useToggleProjectVisibility();
-  const reorderProjects = useReorderProjects();
-  
-  const [items, setItems] = useState<CMSProject[]>([]);
-  const [deleteTarget, setDeleteTarget] = useState<CMSProject | null>(null);
+  const { data: education, isLoading } = useAllEducation();
+  const deleteEducation = useDeleteEducation();
+  const toggleVisibility = useToggleEducationVisibility();
+  const reorderEducation = useReorderEducation();
+
+  const [items, setItems] = useState<Education[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<Education | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   const sensors = useSensors(
@@ -50,31 +55,31 @@ const ProjectsList: React.FC = () => {
   );
 
   useEffect(() => {
-    if (projects) {
-      setItems(projects);
+    if (education) {
+      setItems(education);
     }
-  }, [projects]);
+  }, [education]);
 
-  const filtered = items.filter(p =>
-    p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    p.category.toLowerCase().includes(searchQuery.toLowerCase())
+  const filtered = items.filter(edu =>
+    edu.institution.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    edu.degree.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await deleteProject.mutateAsync(deleteTarget.id);
-      toast.success(`"${deleteTarget.title}" deleted`);
+      await deleteEducation.mutateAsync(deleteTarget.id);
+      toast.success(`Education at "${deleteTarget.institution}" deleted`);
       setDeleteTarget(null);
     } catch {
-      toast.error('Failed to delete project');
+      toast.error('Failed to delete education item');
     }
   };
 
-  const handleToggle = async (project: CMSProject) => {
+  const handleToggle = async (edu: Education) => {
     try {
-      await toggleVisibility.mutateAsync({ id: project.id, visible: !project.visible });
-      toast.success(`"${project.title}" is now ${!project.visible ? 'visible' : 'hidden'}`);
+      await toggleVisibility.mutateAsync({ id: edu.id, visible: !edu.visible });
+      toast.success(`Education item is now ${!edu.visible ? 'visible' : 'hidden'}`);
     } catch {
       toast.error('Failed to update visibility');
     }
@@ -95,25 +100,25 @@ const ProjectsList: React.FC = () => {
         id: item.id,
         order_index: idx,
       }));
-      await reorderProjects.mutateAsync(payload);
-      toast.success('Project order updated');
+      await reorderEducation.mutateAsync(payload);
+      toast.success('Education order updated');
     } catch {
-      toast.error('Failed to update project order');
-      setItems(projects ?? []);
+      toast.error('Failed to update education order');
+      setItems(education ?? []);
     }
   };
 
   return (
     <div>
       <PageHeader
-        title="Projects"
-        description="Manage your portfolio projects"
+        title="Education"
+        description="Manage your academic background"
         action={
           <Button
-            onClick={() => navigate('/.admin/dashboard/projects/new')}
+            onClick={() => navigate('/.admin/dashboard/education/new')}
             leftIcon={<Plus className="w-4 h-4" />}
           >
-            Add Project
+            Add Education
           </Button>
         }
       />
@@ -124,7 +129,7 @@ const ProjectsList: React.FC = () => {
           type="text"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Search projects…"
+          placeholder="Search education…"
           className="w-full max-w-sm px-4 py-2.5 bg-charcoal-800/60 border border-white/10 rounded-xl text-white placeholder-gray-600 text-sm focus:outline-none focus:border-accent-cyan/50 transition-colors"
         />
       </div>
@@ -133,10 +138,11 @@ const ProjectsList: React.FC = () => {
         <SkeletonTable />
       ) : items.length === 0 ? (
         <EmptyState
-          title="No projects found"
-          description="Add your first project to showcase your work."
-          actionLabel="Add Project"
-          onAction={() => navigate('/.admin/dashboard/projects/new')}
+          icon={<GraduationCap className="w-7 h-7" />}
+          title="No education items found"
+          description="Add your first academic item to showcase your background."
+          actionLabel="Add Education"
+          onAction={() => navigate('/.admin/dashboard/education/new')}
         />
       ) : (
         <DndContext
@@ -146,11 +152,11 @@ const ProjectsList: React.FC = () => {
         >
           <div className="space-y-2">
             <SortableContext
-              items={filtered.map(p => p.id)}
+              items={filtered.map(i => i.id)}
               strategy={verticalListSortingStrategy}
             >
-              {filtered.map(project => (
-                <SortableItem key={project.id} id={project.id}>
+              {filtered.map(edu => (
+                <SortableItem key={edu.id} id={edu.id}>
                   {({ ref, style, dragHandleProps }) => (
                     <div
                       ref={ref}
@@ -166,49 +172,41 @@ const ProjectsList: React.FC = () => {
                         <GripVertical className="w-4 h-4" />
                       </div>
 
-                      {/* Thumbnail */}
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-charcoal-900 border border-white/5 shrink-0">
-                        {project.thumbnail_url ? (
-                          <img src={project.thumbnail_url} alt={project.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-700">
-                            <ExternalLink className="w-4 h-4" />
-                          </div>
-                        )}
+                      {/* Icon & Info */}
+                      <div className="w-10 h-10 rounded-lg bg-accent-purple/10 border border-accent-purple/20 flex items-center justify-center text-accent-purple shrink-0">
+                        <GraduationCap className="w-5 h-5" />
                       </div>
 
-                      {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-sm font-medium text-white truncate">{project.title}</p>
-                          {project.featured && <Badge variant="info">Featured</Badge>}
-                        </div>
-                        <p className="text-xs text-gray-500 truncate">{project.category} · {project.technologies.slice(0, 3).join(', ')}</p>
+                        <p className="text-sm font-medium text-white truncate">{edu.degree}</p>
+                        <p className="text-xs text-gray-500 truncate">
+                          {edu.institution} · <span className="inline-flex items-center gap-1"><Calendar className="w-3 h-3 inline" /> {edu.start_date} - {edu.end_date || 'Present'}</span>
+                        </p>
                       </div>
 
                       {/* Visibility badge */}
-                      <Badge variant={project.visible ? 'success' : 'neutral'}>
-                        {project.visible ? 'Visible' : 'Hidden'}
+                      <Badge variant={edu.visible ? 'success' : 'neutral'}>
+                        {edu.visible ? 'Visible' : 'Hidden'}
                       </Badge>
 
                       {/* Actions */}
                       <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
-                          onClick={() => handleToggle(project)}
-                          title={project.visible ? 'Hide' : 'Show'}
+                          onClick={() => handleToggle(edu)}
+                          title={edu.visible ? 'Hide' : 'Show'}
                           className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
                         >
-                          {project.visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {edu.visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                         <button
-                          onClick={() => navigate(`/.admin/dashboard/projects/${project.id}`)}
+                          onClick={() => navigate(`/.admin/dashboard/education/${edu.id}`)}
                           title="Edit"
                           className="p-2 rounded-lg text-gray-500 hover:text-accent-cyan hover:bg-accent-cyan/5 transition-colors"
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => setDeleteTarget(project)}
+                          onClick={() => setDeleteTarget(edu)}
                           title="Delete"
                           className="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/5 transition-colors"
                         >
@@ -226,15 +224,15 @@ const ProjectsList: React.FC = () => {
 
       <ConfirmDialog
         isOpen={!!deleteTarget}
-        title="Delete Project"
-        message={`Are you sure you want to delete "${deleteTarget?.title}"? This action cannot be undone.`}
+        title="Delete Education Item"
+        message={`Are you sure you want to delete "${deleteTarget?.degree}" from "${deleteTarget?.institution}"? This action cannot be undone.`}
         confirmLabel="Delete"
         onConfirm={handleDelete}
         onCancel={() => setDeleteTarget(null)}
-        isLoading={deleteProject.isPending}
+        isLoading={deleteEducation.isPending}
       />
     </div>
   );
 };
 
-export default ProjectsList;
+export default EducationList;

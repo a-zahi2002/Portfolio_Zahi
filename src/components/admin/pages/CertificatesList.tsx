@@ -1,8 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Award } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Award, GripVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useAllCertificates, useDeleteCertificate, useToggleCertVisibility } from '../../../hooks/cms/useCertificates';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import SortableItem from '../ui/SortableItem';
+import { useAllCertificates, useDeleteCertificate, useToggleCertVisibility, useReorderCertificates } from '../../../hooks/cms/useCertificates';
 import PageHeader from '../ui/PageHeader';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
@@ -16,7 +32,27 @@ const CertificatesList: React.FC = () => {
   const { data: certs, isLoading } = useAllCertificates();
   const deleteCert = useDeleteCertificate();
   const toggleVis = useToggleCertVisibility();
+  const reorderCerts = useReorderCertificates();
+
+  const [items, setItems] = useState<CMSCertificate[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<CMSCertificate | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  useEffect(() => {
+    if (certs) {
+      setItems(certs);
+    }
+  }, [certs]);
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -38,6 +74,29 @@ const CertificatesList: React.FC = () => {
     }
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = items.findIndex((item) => item.id === active.id);
+    const newIndex = items.findIndex((item) => item.id === over.id);
+
+    const reordered = arrayMove(items, oldIndex, newIndex);
+    setItems(reordered);
+
+    try {
+      const payload = reordered.map((item, idx) => ({
+        id: item.id,
+        order_index: idx,
+      }));
+      await reorderCerts.mutateAsync(payload);
+      toast.success('Certificate order updated');
+    } catch {
+      toast.error('Failed to update certificate order');
+      setItems(certs ?? []);
+    }
+  };
+
   return (
     <div>
       <PageHeader
@@ -52,7 +111,7 @@ const CertificatesList: React.FC = () => {
 
       {isLoading ? (
         <SkeletonTable />
-      ) : !certs?.length ? (
+      ) : !items.length ? (
         <EmptyState
           icon={<Award className="w-7 h-7" />}
           title="No certificates yet"
@@ -61,42 +120,74 @@ const CertificatesList: React.FC = () => {
           onAction={() => navigate('/.admin/dashboard/certificates/new')}
         />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {certs.map(cert => (
-            <div key={cert.id} className="group flex gap-4 p-4 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all">
-              <div className="w-14 h-14 rounded-xl overflow-hidden bg-charcoal-900 border border-white/5 shrink-0 flex items-center justify-center">
-                {cert.image_url ? (
-                  <img src={cert.image_url} alt={cert.title} className="w-full h-full object-cover" />
-                ) : (
-                  <Award className="w-6 h-6 text-accent-cyan" />
-                )}
-              </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="space-y-2">
+            <SortableContext
+              items={items.map(c => c.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {items.map(cert => (
+                <SortableItem key={cert.id} id={cert.id}>
+                  {({ ref, style, dragHandleProps }) => (
+                    <div
+                      ref={ref}
+                      style={style}
+                      className="group flex items-center gap-4 p-4 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all duration-150"
+                    >
+                      {/* Drag handle */}
+                      <div
+                        {...dragHandleProps.attributes}
+                        {...dragHandleProps.listeners}
+                        className="cursor-grab p-1 hover:bg-white/5 rounded text-gray-700 hover:text-gray-400 transition-colors shrink-0"
+                      >
+                        <GripVertical className="w-4 h-4" />
+                      </div>
 
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">{cert.title}</p>
-                <p className="text-xs text-gray-500 truncate">{cert.issuer}</p>
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant={cert.visible ? 'success' : 'neutral'} className="text-xs">
-                    {cert.visible ? 'Visible' : 'Hidden'}
-                  </Badge>
-                  {cert.featured && <Badge variant="info" className="text-xs">Featured</Badge>}
-                </div>
-              </div>
+                      {/* Image Thumbnail */}
+                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-charcoal-900 border border-white/5 shrink-0 flex items-center justify-center">
+                        {cert.image_url ? (
+                          <img src={cert.image_url} alt={cert.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <Award className="w-5 h-5 text-accent-cyan" />
+                        )}
+                      </div>
 
-              <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                <button onClick={() => handleToggle(cert)} className="p-1.5 rounded-lg text-gray-600 hover:text-white hover:bg-white/5 transition-colors">
-                  {cert.visible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                </button>
-                <button onClick={() => navigate(`/.admin/dashboard/certificates/${cert.id}`)} className="p-1.5 rounded-lg text-gray-600 hover:text-accent-cyan hover:bg-accent-cyan/5 transition-colors">
-                  <Pencil className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={() => setDeleteTarget(cert)} className="p-1.5 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-500/5 transition-colors">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{cert.title}</p>
+                        <p className="text-xs text-gray-500 truncate">{cert.issuer}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Badge variant={cert.visible ? 'success' : 'neutral'} className="text-xs">
+                          {cert.visible ? 'Visible' : 'Hidden'}
+                        </Badge>
+                        {cert.featured && <Badge variant="info" className="text-xs">Featured</Badge>}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                        <button onClick={() => handleToggle(cert)} className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors">
+                          {cert.visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                        <button onClick={() => navigate(`/.admin/dashboard/certificates/${cert.id}`)} className="p-2 rounded-lg text-gray-500 hover:text-accent-cyan hover:bg-accent-cyan/5 transition-colors">
+                          <Pencil className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => setDeleteTarget(cert)} className="p-2 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/5 transition-colors">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </SortableItem>
+              ))}
+            </SortableContext>
+          </div>
+        </DndContext>
       )}
 
       <ConfirmDialog

@@ -1,9 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Code2, Award, Wrench, Mail, Settings, ArrowRight, TrendingUp } from 'lucide-react';
+import { Code2, Award, Wrench, Mail, Settings, ArrowRight, TrendingUp, Briefcase, GraduationCap } from 'lucide-react';
 import { useAllProjects } from '../../../hooks/cms/useProjects';
 import { useAllCertificates } from '../../../hooks/cms/useCertificates';
 import { useAllSkills } from '../../../hooks/cms/useSkills';
+import { useAllExperiences } from '../../../hooks/cms/useExperiences';
+import { useAllEducation } from '../../../hooks/cms/useEducation';
 import { useSiteSettings } from '../../../hooks/cms/useSiteSettings';
 import { Skeleton } from '../ui/Skeleton';
 
@@ -37,9 +39,11 @@ const DashboardOverview: React.FC = () => {
   const { data: projects, isLoading: projectsLoading } = useAllProjects();
   const { data: certs, isLoading: certsLoading } = useAllCertificates();
   const { data: skills, isLoading: skillsLoading } = useAllSkills();
+  const { data: experiences, isLoading: experiencesLoading } = useAllExperiences();
+  const { data: education, isLoading: educationLoading } = useAllEducation();
   const { data: settings } = useSiteSettings();
 
-  const isLoading = projectsLoading || certsLoading || skillsLoading;
+  const isLoading = projectsLoading || certsLoading || skillsLoading || experiencesLoading || educationLoading;
 
   const stats = [
     {
@@ -48,6 +52,20 @@ const DashboardOverview: React.FC = () => {
       icon: <Code2 className="w-5 h-5" />,
       color: 'bg-blue-500/15 text-blue-400',
       to: '/.admin/dashboard/projects',
+    },
+    {
+      label: 'Experience',
+      value: experiences?.length ?? 0,
+      icon: <Briefcase className="w-5 h-5" />,
+      color: 'bg-green-500/15 text-green-400',
+      to: '/.admin/dashboard/experiences',
+    },
+    {
+      label: 'Education',
+      value: education?.length ?? 0,
+      icon: <GraduationCap className="w-5 h-5" />,
+      color: 'bg-orange-500/15 text-orange-400',
+      to: '/.admin/dashboard/education',
     },
     {
       label: 'Certificates',
@@ -67,7 +85,7 @@ const DashboardOverview: React.FC = () => {
       label: 'Visible Projects',
       value: projects?.filter(p => p.visible).length ?? 0,
       icon: <TrendingUp className="w-5 h-5" />,
-      color: 'bg-green-500/15 text-green-400',
+      color: 'bg-indigo-500/15 text-indigo-400',
       to: '/.admin/dashboard/projects',
     },
   ];
@@ -75,7 +93,7 @@ const DashboardOverview: React.FC = () => {
   const quickLinks = [
     { label: 'Edit Hero Section', path: '/.admin/dashboard/hero', icon: <Settings className="w-4 h-4" /> },
     { label: 'Add a Project', path: '/.admin/dashboard/projects/new', icon: <Code2 className="w-4 h-4" /> },
-    { label: 'Manage Contact Info', path: '/.admin/dashboard/contact', icon: <Mail className="w-4 h-4" /> },
+    { label: 'Add Experience', path: '/.admin/dashboard/experiences/new', icon: <Briefcase className="w-4 h-4" /> },
     { label: 'Site Settings', path: '/.admin/dashboard/settings', icon: <Settings className="w-4 h-4" /> },
   ];
 
@@ -102,9 +120,9 @@ const DashboardOverview: React.FC = () => {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => (
+          ? Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="bg-charcoal-800/60 border border-white/5 rounded-2xl p-6">
                 <Skeleton className="h-10 w-10 rounded-xl mb-4" />
                 <Skeleton className="h-8 w-12 mb-1" />

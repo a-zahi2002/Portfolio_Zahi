@@ -145,5 +145,50 @@ VALUES (
   'A. Zahi Faleel - Web Developer & Tech Explorer. Student and passionate developer creating clean, responsive, user-focused web experiences.',
   'web developer, frontend developer, react developer, portfolio, A. Zahi Faleel',
   'A. Zahi Faleel – Portfolio',
-  'Web Developer & Tech Explorer passionate about modern web technologies'
 );
+
+-- experiences
+INSERT INTO experiences (company, role, start_date, end_date, description, technologies, visible, order_index)
+VALUES
+  (
+    'Digital Wonders Agency',
+    'Creative Developer',
+    'Jun 2023',
+    'Present',
+    'Building premium, high-performance web applications using **React**, **Three.js**, and **Tailwind CSS**. Focused on custom micro-interactions and smooth user experience.',
+    ARRAY['React', 'Three.js', 'Framer Motion', 'Tailwind'],
+    TRUE,
+    0
+  ),
+  (
+    'Tech Solutions Ltd',
+    'Junior Frontend Developer',
+    'Jan 2021',
+    'May 2023',
+    'Worked closely with designers to implement responsive, pixel-perfect user interfaces. Participated in migration of legacy codebase to TypeScript.',
+    ARRAY['HTML', 'CSS', 'JavaScript', 'TypeScript', 'Git'],
+    TRUE,
+    1
+  );
+
+-- education
+INSERT INTO education (institution, degree, start_date, end_date, description, visible, order_index)
+VALUES
+  (
+    'University of Moratuwa',
+    'B.Sc. in Computer Science & Engineering',
+    'Oct 2021',
+    'Present',
+    'Specializing in software engineering, database design, computer networks, and algorithms. Active member of the computer society.',
+    TRUE,
+    0
+  ),
+  (
+    'Royal College Colombo',
+    'Secondary Education',
+    'Jan 2013',
+    'Dec 2020',
+    'Completed secondary schooling with outstanding distinctions in advanced level physical science stream.',
+    TRUE,
+    1
+  );

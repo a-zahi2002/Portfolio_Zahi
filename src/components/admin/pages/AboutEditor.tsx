@@ -6,9 +6,9 @@ import PageHeader from '../ui/PageHeader';
 import Button from '../ui/Button';
 import FormField from '../ui/FormField';
 import Input from '../ui/Input';
-import Textarea from '../ui/Textarea';
 import Toggle from '../ui/Toggle';
 import ImageUploader from '../ui/ImageUploader';
+import MarkdownEditor from '../ui/MarkdownEditor';
 import { SkeletonForm } from '../ui/Skeleton';
 import type { AboutSection } from '../../../types/cms';
 
@@ -67,7 +67,7 @@ const AboutEditor: React.FC = () => {
     <div>
       <PageHeader
         title="About Section"
-        description="Edit your bio, profile image, and highlights"
+        description="Edit your bio, profile image, and highlights using Markdown"
         action={
           <Button
             onClick={handleSave}
@@ -111,22 +111,22 @@ const AboutEditor: React.FC = () => {
         </div>
 
         {/* Bio */}
-        <FormField label="Primary Bio Paragraph" htmlFor="about-bio-primary" required>
-          <Textarea
+        <FormField label="Primary Bio (Markdown supported)" htmlFor="about-bio-primary" required>
+          <MarkdownEditor
             id="about-bio-primary"
             value={form.bio_primary}
-            onChange={e => update('bio_primary', e.target.value)}
-            rows={4}
-            placeholder="I am a passionate..."
+            onChange={val => update('bio_primary', val)}
+            rows={5}
+            placeholder="I am a passionate **Creative Developer**..."
           />
         </FormField>
 
-        <FormField label="Secondary Bio Paragraph" htmlFor="about-bio-secondary">
-          <Textarea
+        <FormField label="Secondary Bio (Markdown supported)" htmlFor="about-bio-secondary">
+          <MarkdownEditor
             id="about-bio-secondary"
             value={form.bio_secondary}
-            onChange={e => update('bio_secondary', e.target.value)}
-            rows={3}
+            onChange={val => update('bio_secondary', val)}
+            rows={4}
             placeholder="With a strong foundation in..."
           />
         </FormField>

@@ -3,7 +3,8 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, User, Code2, Award, Wrench, Mail, Link2,
-  Settings, Search, Image, Menu, X, LogOut, ChevronRight
+  Settings, Search, Image, Menu, X, LogOut, ChevronRight,
+  Briefcase, GraduationCap
 } from 'lucide-react';
 import { useAuth } from '../../../hooks/useAuth';
 import toast from 'react-hot-toast';
@@ -20,6 +21,8 @@ const navItems: NavItem[] = [
   { label: 'Hero',         path: '/.admin/dashboard/hero',          icon: <User className="w-4 h-4" /> },
   { label: 'About',        path: '/.admin/dashboard/about',         icon: <User className="w-4 h-4" /> },
   { label: 'Projects',     path: '/.admin/dashboard/projects',      icon: <Code2 className="w-4 h-4" /> },
+  { label: 'Experience',   path: '/.admin/dashboard/experiences',   icon: <Briefcase className="w-4 h-4" /> },
+  { label: 'Education',    path: '/.admin/dashboard/education',     icon: <GraduationCap className="w-4 h-4" /> },
   { label: 'Certificates', path: '/.admin/dashboard/certificates',  icon: <Award className="w-4 h-4" /> },
   { label: 'Skills',       path: '/.admin/dashboard/skills',        icon: <Wrench className="w-4 h-4" /> },
   { label: 'Contact',      path: '/.admin/dashboard/contact',       icon: <Mail className="w-4 h-4" /> },

@@ -1,7 +1,23 @@
-import React, { useState } from 'react';
-import { Plus, Pencil, Trash2, Link2, Eye, EyeOff } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Pencil, Trash2, Link2, Eye, EyeOff, GripVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useAllSocialLinks, useCreateSocialLink, useUpdateSocialLink, useDeleteSocialLink } from '../../../hooks/cms/useSocialLinks';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import SortableItem from '../ui/SortableItem';
+import { useAllSocialLinks, useCreateSocialLink, useUpdateSocialLink, useDeleteSocialLink, useReorderSocialLinks } from '../../../hooks/cms/useSocialLinks';
 import PageHeader from '../ui/PageHeader';
 import Button from '../ui/Button';
 import FormField from '../ui/FormField';
@@ -36,14 +52,33 @@ const SocialLinksList: React.FC = () => {
   const createLink = useCreateSocialLink();
   const updateLink = useUpdateSocialLink();
   const deleteLink = useDeleteSocialLink();
+  const reorderLinks = useReorderSocialLinks();
 
+  const [items, setItems] = useState<SocialLink[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [editTarget, setEditTarget] = useState<SocialLink | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SocialLink | null>(null);
   const [form, setForm] = useState<SocialLinkFormData>(defaultForm);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  useEffect(() => {
+    if (links) {
+      setItems(links);
+    }
+  }, [links]);
+
   const openAdd = () => {
-    setForm({ ...defaultForm, order_index: links?.length ?? 0 });
+    setForm({ ...defaultForm, order_index: items?.length ?? 0 });
     setEditTarget(null);
     setIsAdding(true);
   };
@@ -95,6 +130,29 @@ const SocialLinksList: React.FC = () => {
     }
   };
 
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = items.findIndex((item) => item.id === active.id);
+    const newIndex = items.findIndex((item) => item.id === over.id);
+
+    const reordered = arrayMove(items, oldIndex, newIndex);
+    setItems(reordered);
+
+    try {
+      const payload = reordered.map((item, idx) => ({
+        id: item.id,
+        order_index: idx,
+      }));
+      await reorderLinks.mutateAsync(payload);
+      toast.success('Social links order updated');
+    } catch {
+      toast.error('Failed to update social links order');
+      setItems(links ?? []);
+    }
+  };
+
   return (
     <div>
       <PageHeader
@@ -127,33 +185,61 @@ const SocialLinksList: React.FC = () => {
 
       {isLoading ? (
         <SkeletonTable rows={3} />
-      ) : !links?.length ? (
+      ) : !items.length ? (
         <EmptyState icon={<Link2 className="w-7 h-7" />} title="No social links yet" actionLabel="Add Link" onAction={openAdd} />
       ) : (
-        <div className="space-y-2">
-          {links.map(link => (
-            <div key={link.id} className="flex items-center gap-4 p-4 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all group">
-              <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
-                <Link2 className="w-4 h-4 text-gray-500" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white">{link.platform}</p>
-                <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 hover:text-accent-cyan truncate block transition-colors">{link.url}</a>
-              </div>
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button onClick={() => handleToggle(link)} className="p-2 rounded-lg text-gray-600 hover:text-white hover:bg-white/5 transition-colors">
-                  {link.visible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                </button>
-                <button onClick={() => openEdit(link)} className="p-2 rounded-lg text-gray-600 hover:text-accent-cyan hover:bg-accent-cyan/5 transition-colors">
-                  <Pencil className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={() => setDeleteTarget(link)} className="p-2 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-500/5 transition-colors">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="space-y-2">
+            <SortableContext
+              items={items.map(l => l.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {items.map(link => (
+                <SortableItem key={link.id} id={link.id}>
+                  {({ ref, style, dragHandleProps }) => (
+                    <div
+                      ref={ref}
+                      style={style}
+                      className="flex items-center gap-4 p-4 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all duration-150 group"
+                    >
+                      {/* Drag handle */}
+                      <div
+                        {...dragHandleProps.attributes}
+                        {...dragHandleProps.listeners}
+                        className="cursor-grab p-1 hover:bg-white/5 rounded text-gray-700 hover:text-gray-400 transition-colors shrink-0"
+                      >
+                        <GripVertical className="w-4 h-4" />
+                      </div>
+
+                      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                        <Link2 className="w-4 h-4 text-gray-500" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-white">{link.platform}</p>
+                        <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 hover:text-accent-cyan truncate block transition-colors">{link.url}</a>
+                      </div>
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button onClick={() => handleToggle(link)} className="p-2 rounded-lg text-gray-600 hover:text-white hover:bg-white/5 transition-colors">
+                          {link.visible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                        </button>
+                        <button onClick={() => openEdit(link)} className="p-2 rounded-lg text-gray-600 hover:text-accent-cyan hover:bg-accent-cyan/5 transition-colors">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => setDeleteTarget(link)} className="p-2 rounded-lg text-gray-600 hover:text-red-400 hover:bg-red-500/5 transition-colors">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </SortableItem>
+              ))}
+            </SortableContext>
+          </div>
+        </DndContext>
       )}
 
       <ConfirmDialog

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { socialLinksService } from '../../services/socialLinksService';
-import type { SocialLink, SocialLinkFormData } from '../../types/cms';
+import type { SocialLinkFormData } from '../../types/cms';
 
 export const SOCIAL_QUERY_KEY = ['social_links'] as const;
 export const ALL_SOCIAL_QUERY_KEY = ['social_links', 'all'] as const;
@@ -48,6 +48,18 @@ export const useDeleteSocialLink = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => socialLinksService.delete(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: SOCIAL_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ALL_SOCIAL_QUERY_KEY });
+    },
+  });
+};
+
+export const useReorderSocialLinks = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (items: { id: string; order_index: number }[]) =>
+      socialLinksService.reorder(items),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: SOCIAL_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ALL_SOCIAL_QUERY_KEY });

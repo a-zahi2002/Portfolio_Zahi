@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { certificatesService } from '../../services/certificatesService';
-import type { CMSCertificate, CertificateFormData } from '../../types/cms';
+import type { CertificateFormData } from '../../types/cms';
 
 export const CERTS_QUERY_KEY = ['certificates'] as const;
 export const ALL_CERTS_QUERY_KEY = ['certificates', 'all'] as const;
@@ -69,6 +69,19 @@ export const useToggleCertVisibility = () => {
     mutationFn: ({ id, visible }: { id: string; visible: boolean }) =>
       certificatesService.toggleVisibility(id, visible),
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CERTS_QUERY_KEY });
+      queryClient.invalidateQueries({ queryKey: ALL_CERTS_QUERY_KEY });
+    },
+  });
+};
+
+export const useReorderCertificates = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (items: { id: string; order_index: number }[]) =>
+      certificatesService.reorder(items),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: CERTS_QUERY_KEY });
       queryClient.invalidateQueries({ queryKey: ALL_CERTS_QUERY_KEY });
     },
   });
