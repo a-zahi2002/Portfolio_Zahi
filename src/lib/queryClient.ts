@@ -1,4 +1,5 @@
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, MutationCache } from '@tanstack/react-query';
+import { toast } from 'react-hot-toast';
 
 /**
  * TanStack React Query client configuration.
@@ -7,6 +8,11 @@ import { QueryClient } from '@tanstack/react-query';
  * - refetchOnWindowFocus: false (avoids unnecessary refetches)
  */
 export const queryClient = new QueryClient({
+  mutationCache: new MutationCache({
+    onError: (error: any) => {
+      toast.error(`Operation failed: ${error?.message || 'Unknown error'}`);
+    },
+  }),
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes

@@ -116,10 +116,10 @@ VALUES
 -- certificates
 INSERT INTO certificates (title, issuer, image_url, visible, order_index)
 VALUES
-  ('Web Design for Beginners', 'Centre for Open & Distance Learning (CODL) - UoM', '/Portfolio_Zahi/assets/certificate1.jpg', TRUE, 0),
-  ('Front-end Web Development', 'Centre for Open & Distance Learning (CODL) - UoM', '/Portfolio_Zahi/assets/certificate2.jpg', TRUE, 1),
-  ('Server-side Web Programming', 'Centre for Open & Distance Learning (CODL) - UoM', '/Portfolio_Zahi/assets/certificate3.jpg', TRUE, 2),
-  ('Python for Beginners', 'Centre for Open & Distance Learning (CODL) - UoM', '/Portfolio_Zahi/assets/certificate4.jpg', TRUE, 3);
+  ('Web Design for Beginners', 'Centre for Open & Distance Learning (CODL) - UoM', '/assets/certificate1.jpg', TRUE, 0),
+  ('Front-end Web Development', 'Centre for Open & Distance Learning (CODL) - UoM', '/assets/certificate2.jpg', TRUE, 1),
+  ('Server-side Web Programming', 'Centre for Open & Distance Learning (CODL) - UoM', '/assets/certificate3.jpg', TRUE, 2),
+  ('Python for Beginners', 'Centre for Open & Distance Learning (CODL) - UoM', '/assets/certificate4.jpg', TRUE, 3);
 
 -- skills
 INSERT INTO skills (name, color, category, display_order, visible)

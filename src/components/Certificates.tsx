@@ -7,6 +7,7 @@ import type { CMSCertificate } from '../types/cms';
 const Certificates: React.FC = () => {
   const { data: certificates, isLoading } = useCertificates();
   const [selectedCertificate, setSelectedCertificate] = useState<CMSCertificate | null>(null);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   return (
     <section id="certificates" className="py-20 bg-charcoal-900 overflow-hidden relative">
@@ -44,8 +45,13 @@ const Certificates: React.FC = () => {
                 >
                   <div className="flex flex-col items-center text-center">
                     <div className="w-16 h-16 bg-accent-cyan/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300 ring-1 ring-accent-cyan/30">
-                      {certificate.image_url ? (
-                        <img src={certificate.image_url} alt={certificate.title} className="w-10 h-10 object-cover rounded-full" />
+                      {certificate.image_url && !imageErrors[certificate.id] ? (
+                        <img
+                          src={certificate.image_url}
+                          alt={certificate.title}
+                          className="w-10 h-10 object-cover rounded-full"
+                          onError={() => setImageErrors(prev => ({ ...prev, [certificate.id]: true }))}
+                        />
                       ) : (
                         <Award className="w-8 h-8 text-accent-cyan" />
                       )}
@@ -101,8 +107,13 @@ const Certificates: React.FC = () => {
               </div>
 
               <div className="p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
-                {selectedCertificate.image_url ? (
-                  <img src={selectedCertificate.image_url} alt={selectedCertificate.title} className="w-full rounded-lg shadow-lg" />
+                {selectedCertificate.image_url && !imageErrors[selectedCertificate.id] ? (
+                  <img
+                    src={selectedCertificate.image_url}
+                    alt={selectedCertificate.title}
+                    className="w-full rounded-lg shadow-lg"
+                    onError={() => setImageErrors(prev => ({ ...prev, [selectedCertificate.id]: true }))}
+                  />
                 ) : (
                   <div className="w-full h-48 flex items-center justify-center bg-charcoal-900 rounded-lg">
                     <Award className="w-16 h-16 text-accent-cyan/30" />

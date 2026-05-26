@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Upload, X, ImageIcon, Loader2 } from 'lucide-react';
 import { storageService } from '../../../services/storageService';
 import type { StorageBucket } from '../../../types/cms';
@@ -29,6 +29,12 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<string>(currentUrl || '');
+
+  useEffect(() => {
+    if (!isUploading) {
+      setPreview(currentUrl || '');
+    }
+  }, [currentUrl, isUploading]);
 
   const handleFile = useCallback(async (file: File) => {
     if (file.size > maxSizeMB * 1024 * 1024) {

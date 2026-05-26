@@ -6,14 +6,16 @@ import { Toaster } from 'react-hot-toast';
 import App from './App.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { queryClient } from './lib/queryClient.ts';
+import { ErrorBoundary } from './components/common/ErrorBoundary.tsx';
 import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <App />
+    <ErrorBoundary>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            <App />
           <Toaster
             position="top-right"
             toastOptions={{
@@ -36,5 +38,6 @@ createRoot(document.getElementById('root')!).render(
         </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>
+    </ErrorBoundary>
   </StrictMode>
 );
