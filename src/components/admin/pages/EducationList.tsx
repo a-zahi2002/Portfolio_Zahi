@@ -130,7 +130,7 @@ const EducationList: React.FC = () => {
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           placeholder="Search education…"
-          className="w-full max-w-sm px-4 py-2.5 bg-charcoal-800/60 border border-white/10 rounded-xl text-white placeholder-gray-600 text-sm focus:outline-none focus:border-accent-cyan/50 transition-colors"
+          className="w-full max-w-sm px-4 py-2.5 bg-white dark:bg-charcoal-800/60 border border-gray-300 dark:border-white/10 rounded-xl text-charcoal-900 dark:text-white placeholder-gray-600 text-sm focus:outline-none focus:border-accent-cyan/50 transition-colors"
         />
       </div>
 
@@ -161,13 +161,13 @@ const EducationList: React.FC = () => {
                     <div
                       ref={ref}
                       style={style}
-                      className="flex items-center gap-4 p-4 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all duration-150 group"
+                      className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-xl hover:border-gray-300 dark:border-white/10 transition-all duration-150 group"
                     >
                       {/* Drag handle */}
                       <div
                         {...dragHandleProps.attributes}
                         {...dragHandleProps.listeners}
-                        className="cursor-grab p-1 hover:bg-white/5 rounded text-gray-700 hover:text-gray-400 transition-colors shrink-0"
+                        className="cursor-grab p-1 hover:bg-gray-100 dark:bg-white/5 rounded text-gray-700 hover:text-gray-500 dark:text-gray-400 transition-colors shrink-0"
                       >
                         <GripVertical className="w-4 h-4" />
                       </div>
@@ -178,7 +178,7 @@ const EducationList: React.FC = () => {
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-white truncate">{edu.degree}</p>
+                        <p className="text-sm font-medium text-charcoal-900 dark:text-white truncate">{edu.degree}</p>
                         <p className="text-xs text-gray-500 truncate">
                           {edu.institution} · <span className="inline-flex items-center gap-1"><Calendar className="w-3 h-3 inline" /> {edu.start_date} - {edu.end_date || 'Present'}</span>
                         </p>
@@ -190,11 +190,11 @@ const EducationList: React.FC = () => {
                       </Badge>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 mt-2 sm:mt-0 w-full sm:w-auto justify-end transition-opacity">
                         <button
                           onClick={() => handleToggle(edu)}
                           title={edu.visible ? 'Hide' : 'Show'}
-                          className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                          className="p-2 rounded-lg text-gray-500 hover:text-charcoal-900 dark:text-white hover:bg-gray-100 dark:bg-white/5 transition-colors"
                         >
                           {edu.visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>

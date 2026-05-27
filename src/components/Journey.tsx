@@ -53,9 +53,14 @@ const Journey: React.FC = () => {
     }
   ];
 
-  const currentItems = activeTab === 'experience'
-    ? (experiences && experiences.length > 0 ? experiences : fallbackExperiences)
-    : (education && education.length > 0 ? education : fallbackEducation);
+  // If data is loaded but empty, we don't want fallbacks, we want the empty state.
+  // Fallbacks are only for when we literally have null/undefined (not fetched yet or error) but wait, if it's an empty array, supabase returns [].
+  // Let's use fallbacks ONLY if we haven't fetched OR if we explicitly want to show mocks when no DB connection.
+  // Assuming a real DB returns [] when empty.
+  const experienceList = experiences && experiences.length > 0 ? experiences : (experiences ? [] : fallbackExperiences);
+  const educationList = education && education.length > 0 ? education : (education ? [] : fallbackEducation);
+
+  const currentItems = activeTab === 'experience' ? experienceList : educationList;
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -143,87 +148,106 @@ const Journey: React.FC = () => {
             {/* Center line for desktop, left line for mobile */}
             <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-blue-600/30 via-purple-600/30 to-transparent dark:from-accent-cyan/20 dark:via-accent-purple/20 dark:to-transparent -translate-x-1/2" />
 
-            <motion.div
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="show"
-              viewport={{ once: true, margin: '-100px' }}
-              className="space-y-12"
-            >
-              <AnimatePresence mode="wait">
-                {currentItems.map((item, idx) => {
-                  const isLeft = idx % 2 === 0;
-                  const itemTitle = 'role' in item ? item.role : item.degree;
-                  const itemSub = 'company' in item ? item.company : item.institution;
-                  const itemTech = 'technologies' in item ? item.technologies : null;
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                variants={containerVariants}
+                initial="hidden"
+                animate="show"
+                exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                className="space-y-12 w-full"
+              >
+                {currentItems.length === 0 ? (
+                  <motion.div variants={itemVariants} className="text-center py-12">
+                    <div className="w-16 h-16 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-white/10">
+                      {activeTab === 'experience' ? (
+                        <Briefcase className="w-6 h-6 text-gray-400" />
+                      ) : (
+                        <GraduationCap className="w-6 h-6 text-gray-400" />
+                      )}
+                    </div>
+                    <h3 className="text-xl font-display font-bold text-charcoal-900 dark:text-white mb-2">
+                      No {activeTab} added yet
+                    </h3>
+                    <p className="text-gray-500 max-w-sm mx-auto">
+                      Check back later for updates to this section.
+                    </p>
+                  </motion.div>
+                ) : (
+                  currentItems.map((item, idx) => {
+                    const isLeft = idx % 2 === 0;
+                    const itemTitle = 'role' in item ? item.role : item.degree;
+                    const itemSub = 'company' in item ? item.company : item.institution;
+                    const itemTech = 'technologies' in item ? item.technologies : null;
 
-                  return (
-                    <motion.div
-                      key={item.id}
-                      variants={itemVariants}
-                      className={`relative flex flex-col md:flex-row items-start md:items-center ${
-                        isLeft ? 'md:flex-row-reverse' : ''
-                      }`}
-                    >
-                      {/* Timeline Node Icon */}
-                      <div className="absolute left-6 md:left-1/2 w-10 h-10 rounded-full bg-white dark:bg-[#0a0a0a] border border-blue-200 dark:border-accent-cyan/50 flex items-center justify-center -translate-x-1/2 z-20 shadow-[0_0_15px_rgba(59,130,246,0.15)] dark:shadow-[0_0_15px_rgba(0,243,255,0.1)]">
-                        {activeTab === 'experience' ? (
-                          <Briefcase className="w-4 h-4 text-blue-600 dark:text-accent-cyan" />
-                        ) : (
-                          <GraduationCap className="w-4 h-4 text-purple-600 dark:text-accent-purple" />
-                        )}
-                      </div>
-
-                      {/* Content Card container */}
-                      <div className={`w-full md:w-1/2 pl-16 md:pl-0 ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}>
-                        <div className="bg-white dark:bg-charcoal-800/50 p-6 md:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-xl hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 hover:-translate-y-1 relative group parallax-card">
-                          {/* Inner glowing accent */}
-                          <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-3xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple opacity-20 group-hover:opacity-100 transition-opacity" />
-
-                          {/* Date badge */}
-                          <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-blue-600 dark:text-accent-cyan bg-blue-50 dark:bg-accent-cyan/10 border border-blue-100 dark:border-accent-cyan/20 px-3 py-1.5 rounded-full mb-4 tracking-widest uppercase">
-                            <Calendar className="w-3 h-3" />
-                            {item.start_date} - {item.end_date || 'Present'}
-                          </div>
-
-                          <h3 className="text-xl font-display font-bold text-charcoal-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-accent-cyan transition-colors">
-                            {itemTitle}
-                          </h3>
-                          <h4 className="text-sm font-medium font-sans text-charcoal-600 dark:text-gray-400 mb-4">
-                            {itemSub}
-                          </h4>
-
-                          {/* Description */}
-                          <div
-                            className="text-charcoal-600 dark:text-gray-400 text-sm leading-relaxed mb-4
-                              prose prose-sm dark:prose-invert max-w-none
-                              prose-p:mb-2 font-sans
-                              prose-strong:text-charcoal-900 dark:prose-strong:text-white prose-strong:font-bold
-                              prose-ul:list-disc prose-ul:pl-4 prose-ul:mb-2
-                              prose-li:my-0.5"
-                            dangerouslySetInnerHTML={{ __html: parseMarkdown(item.description ?? '') }}
-                          />
-
-                          {/* Tech pills for Experience */}
-                          {itemTech && itemTech.length > 0 && (
-                            <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100 dark:border-white/5 mt-4">
-                              {itemTech.map(tech => (
-                                <span
-                                  key={tech}
-                                  className="inline-flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase text-charcoal-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-2.5 py-1 rounded-full"
-                                >
-                                  {tech}
-                                </span>
-                              ))}
-                            </div>
+                    return (
+                      <motion.div
+                        key={`${activeTab}-${item.id}`}
+                        variants={itemVariants}
+                        className={`relative flex flex-col md:flex-row items-start md:items-center ${
+                          isLeft ? 'md:flex-row-reverse' : ''
+                        }`}
+                      >
+                        {/* Timeline Node Icon */}
+                        <div className="absolute left-6 md:left-1/2 w-10 h-10 rounded-full bg-white dark:bg-[#0a0a0a] border border-blue-200 dark:border-accent-cyan/50 flex items-center justify-center -translate-x-1/2 z-20 shadow-[0_0_15px_rgba(59,130,246,0.15)] dark:shadow-[0_0_15px_rgba(0,243,255,0.1)]">
+                          {activeTab === 'experience' ? (
+                            <Briefcase className="w-4 h-4 text-blue-600 dark:text-accent-cyan" />
+                          ) : (
+                            <GraduationCap className="w-4 h-4 text-purple-600 dark:text-accent-purple" />
                           )}
                         </div>
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </AnimatePresence>
-            </motion.div>
+
+                        {/* Content Card container */}
+                        <div className={`w-full md:w-1/2 pl-16 md:pl-0 ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}>
+                          <div className="bg-white dark:bg-charcoal-800/50 p-6 md:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-xl hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 hover:-translate-y-1 relative group parallax-card">
+                            {/* Inner glowing accent */}
+                            <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-3xl bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple opacity-20 group-hover:opacity-100 transition-opacity" />
+
+                            {/* Date badge */}
+                            <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-blue-600 dark:text-accent-cyan bg-blue-50 dark:bg-accent-cyan/10 border border-blue-100 dark:border-accent-cyan/20 px-3 py-1.5 rounded-full mb-4 tracking-widest uppercase">
+                              <Calendar className="w-3 h-3" />
+                              {item.start_date} - {item.end_date || 'Present'}
+                            </div>
+
+                            <h3 className="text-xl font-display font-bold text-charcoal-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-accent-cyan transition-colors">
+                              {itemTitle}
+                            </h3>
+                            <h4 className="text-sm font-medium font-sans text-charcoal-600 dark:text-gray-400 mb-4">
+                              {itemSub}
+                            </h4>
+
+                            {/* Description */}
+                            <div
+                              className="text-charcoal-600 dark:text-gray-400 text-sm leading-relaxed mb-4
+                                prose prose-sm dark:prose-invert max-w-none
+                                prose-p:mb-2 font-sans
+                                prose-strong:text-charcoal-900 dark:prose-strong:text-white prose-strong:font-bold
+                                prose-ul:list-disc prose-ul:pl-4 prose-ul:mb-2
+                                prose-li:my-0.5"
+                              dangerouslySetInnerHTML={{ __html: parseMarkdown(item.description ?? '') }}
+                            />
+
+                            {/* Tech pills for Experience */}
+                            {itemTech && itemTech.length > 0 && (
+                              <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100 dark:border-white/5 mt-4">
+                                {itemTech.map(tech => (
+                                  <span
+                                    key={tech}
+                                    className="inline-flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase text-charcoal-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-2.5 py-1 rounded-full"
+                                  >
+                                    {tech}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })
+                )}
+              </motion.div>
+            </AnimatePresence>
           </div>
         )}
       </div>

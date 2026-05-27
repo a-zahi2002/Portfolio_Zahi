@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, Eye, EyeOff, Award, GripVertical } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, Award, GripVertical, FileText } from 'lucide-react';
 import toast from 'react-hot-toast';
 import {
   DndContext,
@@ -136,21 +136,25 @@ const CertificatesList: React.FC = () => {
                     <div
                       ref={ref}
                       style={style}
-                      className="group flex items-center gap-4 p-4 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all duration-150"
+                      className="group flex items-center gap-4 p-4 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-xl hover:border-gray-300 dark:border-white/10 transition-all duration-150"
                     >
                       {/* Drag handle */}
                       <div
                         {...dragHandleProps.attributes}
                         {...dragHandleProps.listeners}
-                        className="cursor-grab p-1 hover:bg-white/5 rounded text-gray-700 hover:text-gray-400 transition-colors shrink-0"
+                        className="cursor-grab p-1 hover:bg-gray-100 dark:bg-white/5 rounded text-gray-700 hover:text-gray-500 dark:text-gray-400 transition-colors shrink-0"
                       >
                         <GripVertical className="w-4 h-4" />
                       </div>
 
                       {/* Image Thumbnail */}
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-charcoal-900 border border-white/5 shrink-0 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-50 dark:bg-charcoal-900 border border-gray-200 dark:border-white/5 shrink-0 flex items-center justify-center">
                         {cert.image_url ? (
-                          <img src={cert.image_url} alt={cert.title} className="w-full h-full object-cover" />
+                          cert.image_url.toLowerCase().endsWith('.pdf') ? (
+                            <FileText className="w-5 h-5 text-red-500" />
+                          ) : (
+                            <img src={cert.image_url} alt={cert.title} className="w-full h-full object-cover" />
+                          )
                         ) : (
                           <Award className="w-5 h-5 text-accent-cyan" />
                         )}
@@ -158,7 +162,7 @@ const CertificatesList: React.FC = () => {
 
                       {/* Info */}
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white truncate">{cert.title}</p>
+                        <p className="text-sm font-semibold text-charcoal-900 dark:text-white truncate">{cert.title}</p>
                         <p className="text-xs text-gray-500 truncate">{cert.issuer}</p>
                       </div>
 
@@ -170,8 +174,8 @@ const CertificatesList: React.FC = () => {
                       </div>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                        <button onClick={() => handleToggle(cert)} className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors">
+                      <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 mt-2 sm:mt-0 w-full sm:w-auto justify-end transition-opacity shrink-0">
+                        <button onClick={() => handleToggle(cert)} className="p-2 rounded-lg text-gray-500 hover:text-charcoal-900 dark:text-white hover:bg-gray-100 dark:bg-white/5 transition-colors">
                           {cert.visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
                         <button onClick={() => navigate(`/.admin/dashboard/certificates/${cert.id}`)} className="p-2 rounded-lg text-gray-500 hover:text-accent-cyan hover:bg-accent-cyan/5 transition-colors">

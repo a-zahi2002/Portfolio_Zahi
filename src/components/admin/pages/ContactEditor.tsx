@@ -73,8 +73,8 @@ const ContactEditor: React.FC = () => {
       )}
 
       <div className="max-w-2xl space-y-6">
-        <div className="p-5 bg-charcoal-800/40 border border-white/5 rounded-2xl space-y-4">
-          <h3 className="text-sm font-semibold text-white">Contact Details</h3>
+        <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl space-y-4">
+          <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white">Contact Details</h3>
           <FormField label="Email Address" required htmlFor="contact-email">
             <Input id="contact-email" type="email" value={form.email} onChange={e => update('email', e.target.value)} placeholder="you@example.com" />
           </FormField>
@@ -86,8 +86,8 @@ const ContactEditor: React.FC = () => {
           </FormField>
         </div>
 
-        <div className="p-5 bg-charcoal-800/40 border border-white/5 rounded-2xl space-y-4">
-          <h3 className="text-sm font-semibold text-white">Section Copy</h3>
+        <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl space-y-4">
+          <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white">Section Copy</h3>
           <FormField label="Eyebrow Text" htmlFor="contact-eyebrow" hint="Small text above the heading">
             <Input id="contact-eyebrow" value={form.section_eyebrow} onChange={e => update('section_eyebrow', e.target.value)} placeholder="What's Next?" />
           </FormField>
@@ -100,12 +100,12 @@ const ContactEditor: React.FC = () => {
         </div>
 
         {/* Preview */}
-        <div className="p-6 bg-charcoal-900/40 border border-white/5 rounded-2xl text-center">
+        <div className="p-6 bg-white dark:bg-charcoal-900/40 border border-gray-200 dark:border-white/5 rounded-2xl text-center">
           <p className="text-xs text-gray-600 uppercase tracking-wider mb-4">Section Preview</p>
           <p className="text-accent-purple text-xs font-medium uppercase tracking-widest mb-2">{form.section_eyebrow}</p>
-          <h2 className="text-3xl font-bold text-white mb-1">{form.section_heading}</h2>
+          <h2 className="text-3xl font-bold text-charcoal-900 dark:text-white mb-1">{form.section_heading}</h2>
           <h2 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-accent-cyan to-blue-500">{form.section_heading_highlight}</h2>
-          <p className="text-gray-400 text-lg font-mono mt-4">{form.email}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-lg font-mono mt-4">{form.email}</p>
         </div>
       </div>
     </div>

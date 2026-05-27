@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Award } from 'lucide-react';
+import { X, Award, FileText } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCertificates } from '../hooks/cms/useCertificates';
 import type { CMSCertificate } from '../types/cms';
@@ -58,12 +58,16 @@ const Certificates: React.FC = () => {
                 <div className="flex flex-col items-center text-center">
                   <div className="w-16 h-16 bg-blue-50 dark:bg-white/5 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 shadow-sm border border-blue-100 dark:border-white/10">
                     {certificate.image_url && !imageErrors[certificate.id] ? (
-                      <img
-                        src={certificate.image_url}
-                        alt={certificate.title}
-                        className="w-10 h-10 object-cover rounded-full"
-                        onError={() => setImageErrors(prev => ({ ...prev, [certificate.id]: true }))}
-                      />
+                      certificate.image_url.toLowerCase().endsWith('.pdf') ? (
+                        <FileText className="w-8 h-8 text-red-500" />
+                      ) : (
+                        <img
+                          src={certificate.image_url}
+                          alt={certificate.title}
+                          className="w-10 h-10 object-cover rounded-full"
+                          onError={() => setImageErrors(prev => ({ ...prev, [certificate.id]: true }))}
+                        />
+                      )
                     ) : (
                       <Award className="w-8 h-8 text-blue-500 dark:text-accent-cyan" />
                     )}
@@ -120,12 +124,19 @@ const Certificates: React.FC = () => {
 
               <div className="p-8 overflow-y-auto max-h-[calc(90vh-85px)] flex flex-col items-center">
                 {selectedCertificate.image_url && !imageErrors[selectedCertificate.id] ? (
-                  <img
-                    src={selectedCertificate.image_url}
-                    alt={selectedCertificate.title}
-                    className="max-w-full max-h-[40vh] object-contain rounded-xl shadow-lg border border-gray-100 dark:border-white/5"
-                    onError={() => setImageErrors(prev => ({ ...prev, [selectedCertificate.id]: true }))}
-                  />
+                  selectedCertificate.image_url.toLowerCase().endsWith('.pdf') ? (
+                    <div className="w-full h-48 flex flex-col items-center justify-center bg-charcoal-50 dark:bg-charcoal-950 rounded-xl border border-gray-100 dark:border-white/5">
+                      <FileText className="w-16 h-16 text-red-500 mb-4" />
+                      <a href={selectedCertificate.image_url} target="_blank" rel="noopener noreferrer" className="text-sm font-bold text-blue-600 dark:text-accent-cyan hover:underline">View PDF Document</a>
+                    </div>
+                  ) : (
+                    <img
+                      src={selectedCertificate.image_url}
+                      alt={selectedCertificate.title}
+                      className="max-w-full max-h-[40vh] object-contain rounded-xl shadow-lg border border-gray-100 dark:border-white/5"
+                      onError={() => setImageErrors(prev => ({ ...prev, [selectedCertificate.id]: true }))}
+                    />
+                  )
                 ) : (
                   <div className="w-full h-48 flex items-center justify-center bg-charcoal-50 dark:bg-charcoal-950 rounded-xl border border-gray-100 dark:border-white/5">
                     <Award className="w-16 h-16 text-blue-500/30 dark:text-accent-cyan/30" />

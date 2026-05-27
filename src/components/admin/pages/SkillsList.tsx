@@ -151,8 +151,8 @@ const SkillsList: React.FC = () => {
 
       {/* Inline form */}
       {isAdding && (
-        <div className="mb-6 p-6 bg-charcoal-800/60 border border-accent-cyan/20 rounded-2xl space-y-4">
-          <h3 className="text-sm font-semibold text-white">{editTarget ? 'Edit Skill' : 'New Skill'}</h3>
+        <div className="mb-6 p-6 bg-white dark:bg-charcoal-800/60 border border-accent-cyan/20 rounded-2xl space-y-4">
+          <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white">{editTarget ? 'Edit Skill' : 'New Skill'}</h3>
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Skill Name" required>
               <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="e.g. React" />
@@ -164,7 +164,7 @@ const SkillsList: React.FC = () => {
           <div className="grid grid-cols-3 gap-4">
             <FormField label="Color" hint="Used as the dot color">
               <div className="flex items-center gap-2">
-                <input type="color" value={form.color} onChange={e => setForm(p => ({ ...p, color: e.target.value }))} className="h-10 w-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
+                <input type="color" value={form.color} onChange={e => setForm(p => ({ ...p, color: e.target.value }))} className="h-10 w-10 rounded-lg border border-gray-300 dark:border-white/10 bg-transparent cursor-pointer" />
                 <Input value={form.color} onChange={e => setForm(p => ({ ...p, color: e.target.value }))} placeholder="#00f3ff" />
               </div>
             </FormField>
@@ -204,13 +204,13 @@ const SkillsList: React.FC = () => {
                     <div
                       ref={ref}
                       style={style}
-                      className="flex items-center gap-4 p-3 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all duration-150 group"
+                      className="flex items-center gap-4 p-3 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-xl hover:border-gray-300 dark:border-white/10 transition-all duration-150 group"
                     >
                       {/* Drag handle */}
                       <div
                         {...dragHandleProps.attributes}
                         {...dragHandleProps.listeners}
-                        className="cursor-grab p-1 hover:bg-white/5 rounded text-gray-700 hover:text-gray-400 transition-colors shrink-0"
+                        className="cursor-grab p-1 hover:bg-gray-100 dark:bg-white/5 rounded text-gray-700 hover:text-gray-500 dark:text-gray-400 transition-colors shrink-0"
                       >
                         <GripVertical className="w-4 h-4" />
                       </div>
@@ -220,11 +220,11 @@ const SkillsList: React.FC = () => {
                         style={{ backgroundColor: skill.color }}
                       />
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-white">{skill.name}</p>
+                        <p className="text-sm font-medium text-charcoal-900 dark:text-white">{skill.name}</p>
                         <p className="text-xs text-gray-600">{skill.category} · {skill.proficiency}%</p>
                       </div>
                       {!skill.visible && <span className="text-xs text-gray-600">Hidden</span>}
-                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 mt-2 sm:mt-0 w-full sm:w-auto justify-end transition-opacity">
                         <button onClick={() => openEdit(skill)} className="p-1.5 rounded-lg text-gray-600 hover:text-accent-cyan hover:bg-accent-cyan/5 transition-colors">
                           <Pencil className="w-3.5 h-3.5" />
                         </button>

@@ -108,7 +108,7 @@ const MediaLibrary: React.FC = () => {
             className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-150 ${
               selectedBucket === bucket
                 ? 'bg-accent-cyan/15 text-accent-cyan border border-accent-cyan/30'
-                : 'bg-white/5 text-gray-400 hover:text-white border border-white/5'
+                : 'bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 hover:text-charcoal-900 dark:text-white border border-gray-200 dark:border-white/5'
             }`}
           >
             {label}
@@ -128,28 +128,28 @@ const MediaLibrary: React.FC = () => {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {filteredAssets.map(asset => (
-            <div key={asset.id} className="group relative bg-charcoal-800/40 border border-white/5 rounded-xl overflow-hidden hover:border-white/10 transition-all">
+            <div key={asset.id} className="group relative bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-xl overflow-hidden hover:border-gray-300 dark:border-white/10 transition-all">
               <div className="aspect-square">
                 {asset.mime_type.startsWith('image/') ? (
                   <img src={asset.public_url} alt={asset.alt_text || asset.original_name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-charcoal-900 text-gray-600">
+                  <div className="w-full h-full flex items-center justify-center bg-gray-50 dark:bg-charcoal-900 text-gray-600">
                     <ImageIcon className="w-8 h-8" />
                   </div>
                 )}
               </div>
 
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                <button onClick={() => copyUrl(asset)} className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-white backdrop-blur transition-colors">
+                <button onClick={() => copyUrl(asset)} className="p-2 bg-white/10 hover:bg-white/20 rounded-full text-charcoal-900 dark:text-white backdrop-blur transition-colors">
                   {copiedId === asset.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </button>
-                <button onClick={() => setDeleteTarget(asset)} className="p-2 bg-red-500/40 hover:bg-red-500/60 rounded-full text-white backdrop-blur transition-colors">
+                <button onClick={() => setDeleteTarget(asset)} className="p-2 bg-red-500/40 hover:bg-red-500/60 rounded-full text-charcoal-900 dark:text-white backdrop-blur transition-colors">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
 
-              <div className="p-2 border-t border-white/5">
-                <p className="text-xs text-gray-400 truncate">{asset.original_name}</p>
+              <div className="p-2 border-t border-gray-200 dark:border-white/5">
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{asset.original_name}</p>
                 <p className="text-xs text-gray-600">{formatSize(asset.file_size)}</p>
               </div>
             </div>

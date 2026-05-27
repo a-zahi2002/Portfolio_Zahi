@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Menu, ExternalLink } from 'lucide-react';
 import AdminSidebar from './AdminSidebar';
+import DarkModeToggle from '../../DarkModeToggle';
 
 // Admin pages
 import DashboardOverview from '../pages/DashboardOverview';
@@ -48,34 +49,37 @@ const AdminLayout: React.FC = () => {
   const currentPage = breadcrumbMap[pathSegments[0] ?? ''] ?? 'Dashboard';
 
   return (
-    <div className="flex min-h-screen bg-charcoal-950 text-white">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-charcoal-950 text-charcoal-900 dark:text-white transition-colors duration-300">
       <AdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-charcoal-950/80 backdrop-blur-xl border-b border-white/5">
+        <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 bg-white/80 dark:bg-charcoal-950/80 backdrop-blur-xl border-b border-gray-200 dark:border-white/5 transition-colors duration-300">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="lg:hidden p-2 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 transition-colors"
+              className="lg:hidden p-2 rounded-xl text-gray-500 dark:text-gray-400 hover:text-charcoal-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5 transition-colors"
             >
               <Menu className="w-5 h-5" />
             </button>
             <div>
-              <p className="text-xs text-gray-600 uppercase tracking-wider">Portfolio CMS</p>
-              <h2 className="text-sm font-semibold text-white">{currentPage}</h2>
+              <p className="text-xs text-gray-500 dark:text-gray-600 uppercase tracking-wider">Portfolio CMS</p>
+              <h2 className="text-sm font-semibold text-charcoal-900 dark:text-white">{currentPage}</h2>
             </div>
           </div>
 
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-xs text-gray-500 hover:text-accent-cyan transition-colors px-3 py-2 rounded-lg hover:bg-white/5"
-          >
-            <ExternalLink className="w-3.5 h-3.5" />
-            View Portfolio
-          </a>
+          <div className="flex items-center gap-4">
+            <DarkModeToggle />
+            <a
+              href="/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-500 hover:text-blue-600 dark:hover:text-accent-cyan transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">View Portfolio</span>
+            </a>
+          </div>
         </header>
 
         {/* Main content area */}

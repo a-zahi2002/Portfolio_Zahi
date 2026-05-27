@@ -162,8 +162,8 @@ const SocialLinksList: React.FC = () => {
       />
 
       {isAdding && (
-        <div className="mb-6 p-6 bg-charcoal-800/60 border border-accent-cyan/20 rounded-2xl space-y-4">
-          <h3 className="text-sm font-semibold text-white">{editTarget ? 'Edit Link' : 'New Social Link'}</h3>
+        <div className="mb-6 p-6 bg-white dark:bg-charcoal-800/60 border border-accent-cyan/20 rounded-2xl space-y-4">
+          <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white">{editTarget ? 'Edit Link' : 'New Social Link'}</h3>
           <div className="grid grid-cols-2 gap-4">
             <FormField label="Platform" required>
               <Input value={form.platform} onChange={e => handlePlatformChange(e.target.value)} placeholder="GitHub, LinkedIn…" />
@@ -204,26 +204,26 @@ const SocialLinksList: React.FC = () => {
                     <div
                       ref={ref}
                       style={style}
-                      className="flex items-center gap-4 p-4 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all duration-150 group"
+                      className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-xl hover:border-gray-300 dark:border-white/10 transition-all duration-150 group"
                     >
                       {/* Drag handle */}
                       <div
                         {...dragHandleProps.attributes}
                         {...dragHandleProps.listeners}
-                        className="cursor-grab p-1 hover:bg-white/5 rounded text-gray-700 hover:text-gray-400 transition-colors shrink-0"
+                        className="cursor-grab p-1 hover:bg-gray-100 dark:bg-white/5 rounded text-gray-700 hover:text-gray-500 dark:text-gray-400 transition-colors shrink-0"
                       >
                         <GripVertical className="w-4 h-4" />
                       </div>
 
-                      <div className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-white/5 flex items-center justify-center shrink-0">
                         <Link2 className="w-4 h-4 text-gray-500" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-white">{link.platform}</p>
+                        <p className="text-sm font-semibold text-charcoal-900 dark:text-white">{link.platform}</p>
                         <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-xs text-gray-500 hover:text-accent-cyan truncate block transition-colors">{link.url}</a>
                       </div>
-                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => handleToggle(link)} className="p-2 rounded-lg text-gray-600 hover:text-white hover:bg-white/5 transition-colors">
+                      <div className="flex gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 mt-2 sm:mt-0 w-full sm:w-auto justify-end transition-opacity">
+                        <button onClick={() => handleToggle(link)} className="p-2 rounded-lg text-gray-600 hover:text-charcoal-900 dark:text-white hover:bg-gray-100 dark:bg-white/5 transition-colors">
                           {link.visible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                         </button>
                         <button onClick={() => openEdit(link)} className="p-2 rounded-lg text-gray-600 hover:text-accent-cyan hover:bg-accent-cyan/5 transition-colors">

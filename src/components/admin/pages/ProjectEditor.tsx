@@ -132,8 +132,8 @@ const ProjectEditor: React.FC = () => {
 
       <div className="max-w-2xl space-y-6">
         {/* Thumbnail */}
-        <div className="p-5 bg-charcoal-800/40 border border-white/5 rounded-2xl">
-          <h3 className="text-sm font-semibold text-white mb-4">Thumbnail Image</h3>
+        <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl">
+          <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white mb-4">Thumbnail Image</h3>
           <ImageUploader
             bucket="project-images"
             currentUrl={form.thumbnail_url}
@@ -200,7 +200,7 @@ const ProjectEditor: React.FC = () => {
         </div>
 
         {/* Toggles */}
-        <div className="p-5 bg-charcoal-800/40 border border-white/5 rounded-2xl space-y-4">
+        <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl space-y-4">
           <Toggle id="proj-featured" checked={form.featured} onChange={val => update('featured', val)} label="Mark as featured (wider card in bento grid)" />
           <Toggle id="proj-visible" checked={form.visible} onChange={val => update('visible', val)} label="Visible on portfolio" />
         </div>

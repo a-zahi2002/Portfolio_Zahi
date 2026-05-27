@@ -7,7 +7,7 @@ const variantClasses: Record<BadgeVariant, string> = {
   warning: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/20',
   danger:  'bg-red-500/15 text-red-400 border-red-500/20',
   info:    'bg-accent-cyan/10 text-accent-cyan border-accent-cyan/20',
-  neutral: 'bg-white/8 text-gray-400 border-white/10',
+  neutral: 'bg-white/8 text-gray-500 dark:text-gray-400 border-gray-300 dark:border-white/10',
 };
 
 interface BadgeProps {

@@ -125,7 +125,7 @@ const ProjectsList: React.FC = () => {
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           placeholder="Search projects…"
-          className="w-full max-w-sm px-4 py-2.5 bg-charcoal-800/60 border border-white/10 rounded-xl text-white placeholder-gray-600 text-sm focus:outline-none focus:border-accent-cyan/50 transition-colors"
+          className="w-full max-w-sm px-4 py-2.5 bg-white dark:bg-charcoal-800/60 border border-gray-300 dark:border-white/10 rounded-xl text-charcoal-900 dark:text-white placeholder-gray-600 text-sm focus:outline-none focus:border-accent-cyan/50 transition-colors"
         />
       </div>
 
@@ -155,19 +155,19 @@ const ProjectsList: React.FC = () => {
                     <div
                       ref={ref}
                       style={style}
-                      className="flex items-center gap-4 p-4 bg-charcoal-800/40 border border-white/5 rounded-xl hover:border-white/10 transition-all duration-150 group"
+                      className="flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-xl hover:border-gray-300 dark:border-white/10 transition-all duration-150 group"
                     >
                       {/* Drag handle */}
                       <div
                         {...dragHandleProps.attributes}
                         {...dragHandleProps.listeners}
-                        className="cursor-grab p-1 hover:bg-white/5 rounded text-gray-700 hover:text-gray-400 transition-colors shrink-0"
+                        className="cursor-grab p-1 hover:bg-gray-100 dark:bg-white/5 rounded text-gray-700 hover:text-gray-500 dark:text-gray-400 transition-colors shrink-0"
                       >
                         <GripVertical className="w-4 h-4" />
                       </div>
 
                       {/* Thumbnail */}
-                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-charcoal-900 border border-white/5 shrink-0">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-50 dark:bg-charcoal-900 border border-gray-200 dark:border-white/5 shrink-0">
                         {project.thumbnail_url ? (
                           <img src={project.thumbnail_url} alt={project.title} className="w-full h-full object-cover" />
                         ) : (
@@ -180,7 +180,7 @@ const ProjectsList: React.FC = () => {
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-sm font-medium text-white truncate">{project.title}</p>
+                          <p className="text-sm font-medium text-charcoal-900 dark:text-white truncate">{project.title}</p>
                           {project.featured && <Badge variant="info">Featured</Badge>}
                         </div>
                         <p className="text-xs text-gray-500 truncate">{project.category} · {project.technologies.slice(0, 3).join(', ')}</p>
@@ -192,11 +192,11 @@ const ProjectsList: React.FC = () => {
                       </Badge>
 
                       {/* Actions */}
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover:opacity-100 mt-2 sm:mt-0 w-full sm:w-auto justify-end transition-opacity">
                         <button
                           onClick={() => handleToggle(project)}
                           title={project.visible ? 'Hide' : 'Show'}
-                          className="p-2 rounded-lg text-gray-500 hover:text-white hover:bg-white/5 transition-colors"
+                          className="p-2 rounded-lg text-gray-500 hover:text-charcoal-900 dark:text-white hover:bg-gray-100 dark:bg-white/5 transition-colors"
                         >
                           {project.visible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>

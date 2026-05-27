@@ -8,7 +8,9 @@ interface SortableItemProps {
     ref: (node: HTMLElement | null) => void;
     style: React.CSSProperties;
     dragHandleProps: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       attributes: any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       listeners: any;
     };
     isDragging: boolean;

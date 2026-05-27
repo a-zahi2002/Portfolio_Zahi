@@ -12,10 +12,10 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variantClasses: Record<ButtonVariant, string> = {
-  primary: 'bg-accent-cyan text-charcoal-950 hover:bg-accent-cyan/90 font-bold shadow-[0_0_20px_rgba(0,243,255,0.15)]',
-  secondary: 'bg-white/8 text-white border border-white/10 hover:bg-white/12 hover:border-white/20',
-  danger: 'bg-red-500/15 text-red-400 border border-red-500/20 hover:bg-red-500/25 hover:text-red-300',
-  ghost: 'text-gray-400 hover:text-white hover:bg-white/5',
+  primary: 'bg-blue-600 dark:bg-accent-cyan text-white dark:text-charcoal-950 hover:bg-blue-700 dark:hover:bg-accent-cyan/90 font-bold shadow-[0_0_20px_rgba(37,99,235,0.15)] dark:shadow-[0_0_20px_rgba(0,243,255,0.15)]',
+  secondary: 'bg-gray-100 dark:bg-white/8 text-charcoal-900 dark:text-white border border-gray-200 dark:border-white/10 hover:bg-gray-200 dark:hover:bg-white/12 hover:border-gray-300 dark:hover:border-white/20',
+  danger: 'bg-red-50 dark:bg-red-500/15 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-500/20 hover:bg-red-100 dark:hover:bg-red-500/25 hover:text-red-700 dark:hover:text-red-300',
+  ghost: 'text-gray-500 dark:text-gray-400 hover:text-charcoal-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-white/5',
 };
 
 const sizeClasses: Record<ButtonSize, string> = {

@@ -8,7 +8,7 @@ import Button from '../ui/Button';
 import FormField from '../ui/FormField';
 import Input from '../ui/Input';
 import Toggle from '../ui/Toggle';
-import ImageUploader from '../ui/ImageUploader';
+import FileUploader from '../ui/FileUploader';
 import { SkeletonForm } from '../ui/Skeleton';
 import type { CertificateFormData } from '../../../types/cms';
 
@@ -87,9 +87,9 @@ const CertificateEditor: React.FC = () => {
       />
 
       <div className="max-w-2xl space-y-6">
-        <div className="p-5 bg-charcoal-800/40 border border-white/5 rounded-2xl">
-          <h3 className="text-sm font-semibold text-white mb-4">Certificate Image</h3>
-          <ImageUploader
+        <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl">
+          <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white mb-4">Certificate File (Image or PDF)</h3>
+          <FileUploader
             bucket="certificates"
             currentUrl={form.image_url}
             onUpload={url => update('image_url', url)}
@@ -119,7 +119,7 @@ const CertificateEditor: React.FC = () => {
           <Input type="url" value={form.credential_url} onChange={e => update('credential_url', e.target.value)} placeholder="https://..." />
         </FormField>
 
-        <div className="p-5 bg-charcoal-800/40 border border-white/5 rounded-2xl space-y-4">
+        <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl space-y-4">
           <Toggle id="cert-featured" checked={form.featured} onChange={val => update('featured', val)} label="Mark as featured" />
           <Toggle id="cert-visible" checked={form.visible} onChange={val => update('visible', val)} label="Visible on portfolio" />
         </div>

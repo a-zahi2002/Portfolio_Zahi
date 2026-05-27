@@ -39,7 +39,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-            className="w-full max-w-md bg-charcoal-800 border border-white/10 rounded-2xl p-6 shadow-2xl"
+            className="w-full max-w-md bg-charcoal-800 border border-gray-300 dark:border-white/10 rounded-2xl p-6 shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
             <div className="flex items-start justify-between mb-4">
@@ -47,17 +47,17 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 <div className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center shrink-0">
                   <AlertTriangle className="w-5 h-5 text-red-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-white">{title}</h3>
+                <h3 className="text-lg font-semibold text-charcoal-900 dark:text-white">{title}</h3>
               </div>
               <button
                 onClick={onCancel}
-                className="text-gray-500 hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-white/5"
+                className="text-gray-500 hover:text-gray-300 transition-colors p-1 rounded-lg hover:bg-gray-100 dark:bg-white/5"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <p className="text-gray-400 text-sm mb-6 leading-relaxed">{message}</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 leading-relaxed">{message}</p>
 
             <div className="flex gap-3 justify-end">
               <Button variant="secondary" onClick={onCancel} disabled={isLoading}>

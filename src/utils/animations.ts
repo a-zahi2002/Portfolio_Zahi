@@ -5,6 +5,7 @@ gsap.registerPlugin(ScrollTrigger);
 
 export const initScrollAnimations = () => {
   // Fade in animation for sections
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   gsap.utils.toArray('.fade-in').forEach((element: any) => {
     gsap.fromTo(element, 
       { opacity: 0, y: 50 },
@@ -23,6 +24,7 @@ export const initScrollAnimations = () => {
   });
 
   // Stagger animation for project cards
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   gsap.utils.toArray('.project-card').forEach((element: any, index) => {
     gsap.fromTo(element,
       { opacity: 0, y: 30, scale: 0.95 },
@@ -43,6 +45,7 @@ export const initScrollAnimations = () => {
   });
 
   // Skills animation
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   gsap.utils.toArray('.skill-item').forEach((element: any, index) => {
     gsap.fromTo(element,
       { opacity: 0, scale: 0.8 },

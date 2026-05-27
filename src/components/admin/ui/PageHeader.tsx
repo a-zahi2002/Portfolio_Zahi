@@ -8,11 +8,11 @@ interface PageHeaderProps {
 
 const PageHeader: React.FC<PageHeaderProps> = ({ title, description, action }) => {
   return (
-    <div className="flex items-start justify-between mb-8 pb-6 border-b border-white/5">
+    <div className="flex items-start justify-between mb-8 pb-6 border-b border-gray-200 dark:border-white/5 transition-colors duration-300">
       <div>
-        <h1 className="text-2xl font-bold text-white font-['Space_Grotesk']">{title}</h1>
+        <h1 className="text-2xl font-bold text-charcoal-900 dark:text-white font-['Space_Grotesk']">{title}</h1>
         {description && (
-          <p className="text-gray-400 text-sm mt-1">{description}</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{description}</p>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}

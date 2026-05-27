@@ -88,17 +88,17 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   const previewHtml = activeTab === 'preview' ? parseMarkdown(value) : '';
 
   return (
-    <div className="border border-white/10 rounded-xl overflow-hidden bg-charcoal-900/60">
+    <div className="border border-gray-300 dark:border-white/10 rounded-xl overflow-hidden bg-gray-50 dark:bg-charcoal-900/60">
       {/* Editor Header / Tab bar */}
-      <div className="flex items-center justify-between border-b border-white/10 px-4 py-2 bg-charcoal-900/40">
-        <div className="flex items-center gap-1 bg-white/5 p-1 rounded-lg">
+      <div className="flex items-center justify-between border-b border-gray-300 dark:border-white/10 px-4 py-2 bg-white dark:bg-charcoal-900/40">
+        <div className="flex items-center gap-1 bg-gray-100 dark:bg-white/5 p-1 rounded-lg">
           <button
             type="button"
             onClick={() => setActiveTab('write')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
               activeTab === 'write'
                 ? 'bg-accent-cyan/15 text-accent-cyan'
-                : 'text-gray-400 hover:text-white'
+                : 'text-gray-500 dark:text-gray-400 hover:text-charcoal-900 dark:text-white'
             }`}
           >
             <Edit2 className="w-3.5 h-3.5" />
@@ -110,7 +110,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
               activeTab === 'preview'
                 ? 'bg-accent-cyan/15 text-accent-cyan'
-                : 'text-gray-400 hover:text-white'
+                : 'text-gray-500 dark:text-gray-400 hover:text-charcoal-900 dark:text-white'
             }`}
           >
             <Eye className="w-3.5 h-3.5" />
@@ -120,12 +120,12 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
         {/* Formatting Toolbar */}
         {activeTab === 'write' && (
-          <div className="flex items-center gap-0.5 sm:gap-1 text-gray-400">
+          <div className="flex items-center gap-0.5 sm:gap-1 text-gray-500 dark:text-gray-400">
             <button
               type="button"
               onClick={() => insertMarkdown('bold')}
               title="Bold"
-              className="p-1.5 rounded hover:bg-white/5 hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-gray-100 dark:bg-white/5 hover:text-charcoal-900 dark:text-white transition-colors"
             >
               <Bold className="w-3.5 h-3.5" />
             </button>
@@ -133,7 +133,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               type="button"
               onClick={() => insertMarkdown('italic')}
               title="Italic"
-              className="p-1.5 rounded hover:bg-white/5 hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-gray-100 dark:bg-white/5 hover:text-charcoal-900 dark:text-white transition-colors"
             >
               <Italic className="w-3.5 h-3.5" />
             </button>
@@ -141,7 +141,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               type="button"
               onClick={() => insertMarkdown('heading')}
               title="Heading"
-              className="p-1.5 rounded hover:bg-white/5 hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-gray-100 dark:bg-white/5 hover:text-charcoal-900 dark:text-white transition-colors"
             >
               <Heading className="w-3.5 h-3.5" />
             </button>
@@ -150,7 +150,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               type="button"
               onClick={() => insertMarkdown('link')}
               title="Link"
-              className="p-1.5 rounded hover:bg-white/5 hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-gray-100 dark:bg-white/5 hover:text-charcoal-900 dark:text-white transition-colors"
             >
               <Link className="w-3.5 h-3.5" />
             </button>
@@ -158,7 +158,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               type="button"
               onClick={() => insertMarkdown('list-bullet')}
               title="Bullet List"
-              className="p-1.5 rounded hover:bg-white/5 hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-gray-100 dark:bg-white/5 hover:text-charcoal-900 dark:text-white transition-colors"
             >
               <List className="w-3.5 h-3.5" />
             </button>
@@ -166,7 +166,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               type="button"
               onClick={() => insertMarkdown('list-number')}
               title="Numbered List"
-              className="p-1.5 rounded hover:bg-white/5 hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-gray-100 dark:bg-white/5 hover:text-charcoal-900 dark:text-white transition-colors"
             >
               <ListOrdered className="w-3.5 h-3.5" />
             </button>
@@ -174,7 +174,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               type="button"
               onClick={() => insertMarkdown('code')}
               title="Code Block"
-              className="p-1.5 rounded hover:bg-white/5 hover:text-white transition-colors"
+              className="p-1.5 rounded hover:bg-gray-100 dark:bg-white/5 hover:text-charcoal-900 dark:text-white transition-colors"
             >
               <Code className="w-3.5 h-3.5" />
             </button>
@@ -199,14 +199,14 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           <div
             className="px-4 py-3 min-h-[164px] bg-transparent text-gray-300 text-sm overflow-auto max-h-[400px]
               prose prose-invert prose-sm max-w-none
-              prose-headings:text-white prose-headings:font-bold prose-headings:mt-4 prose-headings:mb-2
+              prose-headings:text-charcoal-900 dark:text-white prose-headings:font-bold prose-headings:mt-4 prose-headings:mb-2
               prose-p:mb-4 prose-p:leading-relaxed
               prose-a:text-accent-cyan prose-a:underline hover:prose-a:text-cyan-400
-              prose-strong:text-white prose-strong:font-bold
+              prose-strong:text-charcoal-900 dark:text-white prose-strong:font-bold
               prose-ul:list-disc prose-ul:pl-5 prose-ul:mb-4
               prose-ol:list-decimal prose-ol:pl-5 prose-ol:mb-4
-              prose-code:text-accent-cyan prose-code:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
-              prose-pre:bg-charcoal-950 prose-pre:border prose-pre:border-white/5 prose-pre:p-4 prose-pre:rounded-xl"
+              prose-code:text-accent-cyan prose-code:bg-gray-100 dark:bg-white/5 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none
+              prose-pre:bg-charcoal-950 prose-pre:border prose-pre:border-gray-200 dark:border-white/5 prose-pre:p-4 prose-pre:rounded-xl"
             dangerouslySetInnerHTML={{ __html: previewHtml || '<p class="text-gray-600 italic">Nothing to preview</p>' }}
           />
         )}

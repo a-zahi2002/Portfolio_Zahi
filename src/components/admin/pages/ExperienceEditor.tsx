@@ -106,7 +106,7 @@ const ExperienceEditor: React.FC = () => {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate('/.admin/dashboard/experiences')}
-          className="p-2 rounded-xl bg-white/5 border border-white/5 text-gray-400 hover:text-white transition-colors"
+          className="p-2 rounded-xl bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 text-gray-500 dark:text-gray-400 hover:text-charcoal-900 dark:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
         </button>

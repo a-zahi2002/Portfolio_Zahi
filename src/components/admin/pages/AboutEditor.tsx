@@ -88,8 +88,8 @@ const AboutEditor: React.FC = () => {
 
       <div className="max-w-2xl space-y-6">
         {/* Profile image */}
-        <div className="p-5 bg-charcoal-800/40 border border-white/5 rounded-2xl">
-          <h3 className="text-sm font-semibold text-white mb-4">Profile Image</h3>
+        <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl">
+          <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white mb-4">Profile Image</h3>
           <ImageUploader
             bucket="profile-images"
             currentUrl={form.profile_image_url}
@@ -132,8 +132,8 @@ const AboutEditor: React.FC = () => {
         </FormField>
 
         {/* Availability */}
-        <div className="p-5 bg-charcoal-800/40 border border-white/5 rounded-2xl space-y-4">
-          <h3 className="text-sm font-semibold text-white">Availability Badge</h3>
+        <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl space-y-4">
+          <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white">Availability Badge</h3>
           <Toggle
             id="about-availability"
             checked={form.availability_status}

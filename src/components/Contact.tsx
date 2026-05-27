@@ -87,11 +87,11 @@ const Contact: React.FC = () => {
           <button
             onClick={handleCopy}
             disabled={contactLoading}
-            className="relative z-10 text-2xl md:text-5xl font-sans font-bold text-charcoal-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-white transition-all duration-300 flex items-center gap-6 py-6 px-10 rounded-full border border-gray-200/50 dark:border-white/10 hover:border-blue-500/50 dark:hover:border-accent-cyan/50 bg-white/60 dark:bg-charcoal-900/40 backdrop-blur-xl disabled:opacity-50 shadow-xl hover:shadow-2xl hover:-translate-y-1"
+            className="relative z-10 text-base sm:text-2xl md:text-5xl font-sans font-bold text-charcoal-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-white transition-all duration-300 flex items-center justify-center gap-3 md:gap-6 py-4 md:py-6 px-6 md:px-10 w-full max-w-[90vw] sm:w-auto rounded-full border border-gray-200/50 dark:border-white/10 hover:border-blue-500/50 dark:hover:border-accent-cyan/50 bg-white/60 dark:bg-charcoal-900/40 backdrop-blur-xl disabled:opacity-50 shadow-xl hover:shadow-2xl hover:-translate-y-1"
           >
-            {contactLoading ? '…' : email}
-            <div className="p-3 md:p-4 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 group-hover:bg-blue-600 dark:group-hover:bg-accent-cyan group-hover:text-white dark:group-hover:text-charcoal-950 transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-12">
-              {copied ? <Check size={28} /> : <Copy size={28} />}
+            <span className="truncate">{contactLoading ? '…' : email}</span>
+            <div className="p-2.5 md:p-4 shrink-0 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400 group-hover:bg-blue-600 dark:group-hover:bg-accent-cyan group-hover:text-white dark:group-hover:text-charcoal-950 transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-12">
+              {copied ? <Check className="w-5 h-5 md:w-7 md:h-7" /> : <Copy className="w-5 h-5 md:w-7 md:h-7" />}
             </div>
           </button>
 

@@ -21,15 +21,15 @@ interface StatCardProps {
 const StatCard: React.FC<StatCardProps> = ({ label, value, icon, color, onClick }) => (
   <button
     onClick={onClick}
-    className="group text-left w-full bg-charcoal-800/60 border border-white/5 rounded-2xl p-6 hover:border-white/10 transition-all duration-200 hover:bg-charcoal-800/80"
+    className="group text-left w-full bg-white dark:bg-charcoal-800/60 border border-gray-200 dark:border-white/5 rounded-2xl p-6 hover:border-gray-300 dark:border-white/10 transition-all duration-200 hover:bg-gray-50 dark:bg-charcoal-800/80"
   >
     <div className="flex items-center justify-between mb-4">
       <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
         {icon}
       </div>
-      <ArrowRight className="w-4 h-4 text-gray-600 group-hover:text-gray-400 group-hover:translate-x-1 transition-all duration-200" />
+      <ArrowRight className="w-4 h-4 text-gray-600 group-hover:text-gray-500 dark:text-gray-400 group-hover:translate-x-1 transition-all duration-200" />
     </div>
-    <p className="text-3xl font-bold text-white mb-1">{value}</p>
+    <p className="text-3xl font-bold text-charcoal-900 dark:text-white mb-1">{value}</p>
     <p className="text-sm text-gray-500">{label}</p>
   </button>
 );
@@ -102,10 +102,10 @@ const DashboardOverview: React.FC = () => {
       {/* Welcome */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-white font-['Space_Grotesk']">
+          <h1 className="text-2xl font-bold text-charcoal-900 dark:text-white font-['Space_Grotesk']">
             Welcome back 👋
           </h1>
-          <p className="text-gray-400 text-sm mt-1">
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
             {settings?.site_title ?? 'Portfolio'} · Content Manager
           </p>
         </div>
@@ -123,7 +123,7 @@ const DashboardOverview: React.FC = () => {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {isLoading
           ? Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-charcoal-800/60 border border-white/5 rounded-2xl p-6">
+              <div key={i} className="bg-white dark:bg-charcoal-800/60 border border-gray-200 dark:border-white/5 rounded-2xl p-6">
                 <Skeleton className="h-10 w-10 rounded-xl mb-4" />
                 <Skeleton className="h-8 w-12 mb-1" />
                 <Skeleton className="h-4 w-20" />
@@ -141,21 +141,21 @@ const DashboardOverview: React.FC = () => {
 
       {/* Quick links */}
       <div>
-        <h2 className="text-base font-semibold text-white mb-4">Quick Actions</h2>
+        <h2 className="text-base font-semibold text-charcoal-900 dark:text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {quickLinks.map(link => (
             <button
               key={link.path}
               onClick={() => navigate(link.path)}
-              className="flex items-center gap-3 px-4 py-3 bg-charcoal-800/40 border border-white/5 rounded-xl hover:bg-charcoal-800/60 hover:border-white/10 transition-all duration-150 text-left group"
+              className="flex items-center gap-3 px-4 py-3 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-xl hover:bg-white dark:bg-charcoal-800/60 hover:border-gray-300 dark:border-white/10 transition-all duration-150 text-left group"
             >
               <span className="text-gray-500 group-hover:text-accent-cyan transition-colors">
                 {link.icon}
               </span>
-              <span className="text-sm text-gray-300 group-hover:text-white transition-colors">
+              <span className="text-sm text-gray-300 group-hover:text-charcoal-900 dark:text-white transition-colors">
                 {link.label}
               </span>
-              <ArrowRight className="w-4 h-4 text-gray-600 ml-auto group-hover:translate-x-1 group-hover:text-gray-400 transition-all duration-150" />
+              <ArrowRight className="w-4 h-4 text-gray-600 ml-auto group-hover:translate-x-1 group-hover:text-gray-500 dark:text-gray-400 transition-all duration-150" />
             </button>
           ))}
         </div>

@@ -1,7 +1,8 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowDown } from 'lucide-react';
+import { ArrowDown, FileText } from 'lucide-react';
 import { useHeroSection } from '../hooks/cms/useHeroSection';
+import { useSiteSettings } from '../hooks/cms/useSiteSettings';
 
 const MagneticButton = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => {
   const ref = useRef<HTMLButtonElement>(null);
@@ -65,6 +66,7 @@ const HeroSkeleton: React.FC = () => (
 
 const Hero: React.FC = () => {
   const { data: hero, isLoading } = useHeroSection();
+  const { data: settings } = useSiteSettings();
 
   if (isLoading) return <HeroSkeleton />;
 
@@ -136,15 +138,28 @@ const Hero: React.FC = () => {
           {subheading}
         </motion.p>
 
-        {/* Magnetic CTA Button */}
+        {/* Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+          className="flex flex-col sm:flex-row items-center gap-6"
         >
           <MagneticButton onClick={() => document.getElementById(ctaTarget)?.scrollIntoView({ behavior: 'smooth' })}>
             {ctaText}
           </MagneticButton>
+
+          {settings?.resume_url && (
+            <a
+              href={settings.resume_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-8 py-4 rounded-full font-bold text-charcoal-900 dark:text-white border-2 border-charcoal-900/10 dark:border-white/10 hover:border-charcoal-900/30 dark:hover:border-white/30 hover:bg-charcoal-900/5 dark:hover:bg-white/5 transition-all duration-300"
+            >
+              Resume
+              <FileText className="w-4 h-4" />
+            </a>
+          )}
         </motion.div>
       </div>
     </section>

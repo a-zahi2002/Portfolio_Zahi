@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber';
 import { Points, PointMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ParticleField = (props: any) => {
   const ref = useRef<THREE.Points>(null!);
   

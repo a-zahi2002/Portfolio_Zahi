@@ -9,8 +9,8 @@ import { toast } from 'react-hot-toast';
  */
 export const queryClient = new QueryClient({
   mutationCache: new MutationCache({
-    onError: (error: any) => {
-      toast.error(`Operation failed: ${error?.message || 'Unknown error'}`);
+    onError: (error: Error | unknown) => {
+      toast.error(`Operation failed: ${(error as Error)?.message || 'Unknown error'}`);
     },
   }),
   defaultOptions: {

@@ -132,8 +132,8 @@ const HeroEditor: React.FC = () => {
           </FormField>
         </div>
 
-        <div className="p-5 bg-charcoal-800/40 border border-white/5 rounded-2xl space-y-4">
-          <h3 className="text-sm font-semibold text-white">Availability Badge</h3>
+        <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl space-y-4">
+          <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white">Availability Badge</h3>
           <Toggle
             id="hero-availability"
             checked={form.availability_status}
@@ -153,14 +153,14 @@ const HeroEditor: React.FC = () => {
         </div>
 
         {/* Live preview */}
-        <div className="p-6 bg-charcoal-900/40 border border-white/5 rounded-2xl">
+        <div className="p-6 bg-white dark:bg-charcoal-900/40 border border-gray-200 dark:border-white/5 rounded-2xl">
           <p className="text-xs text-gray-600 uppercase tracking-wider mb-4">Preview</p>
-          <h1 className="text-4xl font-bold text-white font-['Space_Grotesk']">
+          <h1 className="text-4xl font-bold text-charcoal-900 dark:text-white font-['Space_Grotesk']">
             {form.heading} <span className="text-accent-cyan">{form.heading_highlight}</span>
           </h1>
-          <p className="text-gray-400 mt-3 text-sm leading-relaxed">{form.subheading}</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-3 text-sm leading-relaxed">{form.subheading}</p>
           <div className="mt-4 flex items-center gap-3">
-            <span className="px-4 py-2 rounded-full bg-white/10 text-white text-sm font-medium">{form.cta_text}</span>
+            <span className="px-4 py-2 rounded-full bg-white/10 text-charcoal-900 dark:text-white text-sm font-medium">{form.cta_text}</span>
             {form.availability_status && (
               <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-green-500/15 text-green-400 text-xs font-semibold border border-green-500/20">
                 <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />

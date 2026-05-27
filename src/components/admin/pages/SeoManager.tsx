@@ -88,7 +88,7 @@ const SeoManager: React.FC = () => {
                   className={`w-full text-left px-4 py-3 rounded-xl text-sm transition-all ${
                     selected.id === page.id
                       ? 'bg-accent-cyan/10 border border-accent-cyan/20 text-accent-cyan'
-                      : 'bg-charcoal-800/40 border border-white/5 text-gray-400 hover:text-white hover:border-white/10'
+                      : 'bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 text-gray-500 dark:text-gray-400 hover:text-charcoal-900 dark:text-white hover:border-gray-300 dark:border-white/10'
                   }`}
                 >
                   <p className="font-medium">{page.route}</p>
@@ -120,8 +120,8 @@ const SeoManager: React.FC = () => {
             <Input value={form.keywords} onChange={e => update('keywords', e.target.value)} placeholder="web developer, react, portfolio" />
           </FormField>
 
-          <div className="p-5 bg-charcoal-800/40 border border-white/5 rounded-2xl space-y-4">
-            <h3 className="text-sm font-semibold text-white">Open Graph</h3>
+          <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl space-y-4">
+            <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white">Open Graph</h3>
             <FormField label="OG Title">
               <Input value={form.og_title} onChange={e => update('og_title', e.target.value)} placeholder="Overrides page title for social sharing" />
             </FormField>

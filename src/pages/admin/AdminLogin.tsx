@@ -8,7 +8,7 @@ const AdminLogin: React.FC = () => {
   const { isAdmin, isLoading, signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: any })?.from || '/.admin/dashboard';
+  const from = (location.state as { from?: string | { pathname: string } })?.from || '/.admin/dashboard';
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
