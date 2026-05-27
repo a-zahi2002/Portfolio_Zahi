@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Download } from 'lucide-react';
 import DarkModeToggle from './DarkModeToggle';
 import { useSiteSettings } from '../hooks/cms/useSiteSettings';
 
@@ -64,6 +64,17 @@ const Navbar: React.FC = () => {
             ))}
             <div className="flex items-center space-x-4 pl-8 border-l border-gray-300 dark:border-white/10">
               <DarkModeToggle />
+              {settings?.resume_url && (
+                <a
+                  href={settings.resume_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 dark:border-white/10 hover:border-blue-500 dark:hover:border-accent-cyan/50 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-accent-cyan text-sm font-bold rounded-full transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>Resume</span>
+                </a>
+              )}
               <a href="#contact" className="px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-charcoal-950 text-sm font-bold rounded-full hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors">
                 Let's Talk
               </a>
@@ -96,6 +107,18 @@ const Navbar: React.FC = () => {
               {link.name}
             </a>
           ))}
+          {settings?.resume_url && (
+            <a
+              href={settings.resume_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-lg font-medium text-gray-800 dark:text-gray-300 hover:text-blue-600 dark:hover:text-accent-cyan hover:pl-2 transition-all duration-200"
+              onClick={() => setIsOpen(false)}
+            >
+              <Download className="w-4 h-4" />
+              Download Resume
+            </a>
+          )}
           <a
             href="#contact"
             className="block text-lg font-bold text-blue-600 dark:text-accent-cyan hover:pl-2 transition-all duration-200"

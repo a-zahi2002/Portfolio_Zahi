@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Save, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAllSeoPages, useUpsertSeoPage } from '../../../hooks/cms/useSeoPage';
+import { useSiteSettings } from '../../../hooks/cms/useSiteSettings';
 import PageHeader from '../ui/PageHeader';
 import Button from '../ui/Button';
 import FormField from '../ui/FormField';
@@ -12,6 +13,7 @@ import type { SeoPage } from '../../../types/cms';
 
 const SeoManager: React.FC = () => {
   const { data: pages, isLoading } = useAllSeoPages();
+  const { data: settings } = useSiteSettings();
   const upsertPage = useUpsertSeoPage();
 
   const [selected, setSelected] = useState<Partial<SeoPage>>({});
@@ -26,6 +28,18 @@ const SeoManager: React.FC = () => {
   });
   const [isDirty, setIsDirty] = useState(false);
 
+  // Sync og_image form state with site settings default OG image whenever settings or selected page changes
+  useEffect(() => {
+    if (settings?.og_image !== undefined) {
+      setForm(prev => {
+        if (prev.og_image !== settings.og_image) {
+          return { ...prev, og_image: settings.og_image || '' };
+        }
+        return prev;
+      });
+    }
+  }, [settings?.og_image, selected.id]);
+
   const selectPage = (page: SeoPage) => {
     setSelected(page);
     setForm({
@@ -33,7 +47,7 @@ const SeoManager: React.FC = () => {
       title: page.title,
       description: page.description,
       keywords: page.keywords,
-      og_image: page.og_image,
+      og_image: settings?.og_image || page.og_image || '',
       og_title: page.og_title,
       og_description: page.og_description,
     });
@@ -42,7 +56,15 @@ const SeoManager: React.FC = () => {
 
   const newPage = () => {
     setSelected({});
-    setForm({ route: '/', title: '', description: '', keywords: '', og_image: '', og_title: '', og_description: '' });
+    setForm({
+      route: '/',
+      title: '',
+      description: '',
+      keywords: '',
+      og_image: settings?.og_image || '',
+      og_title: '',
+      og_description: '',
+    });
     setIsDirty(false);
   };
 
@@ -128,8 +150,37 @@ const SeoManager: React.FC = () => {
             <FormField label="OG Description">
               <Textarea value={form.og_description} onChange={e => update('og_description', e.target.value)} rows={2} placeholder="Social media description…" />
             </FormField>
-            <FormField label="OG Image URL">
-              <Input type="url" value={form.og_image} onChange={e => update('og_image', e.target.value)} placeholder="https://..." />
+            <FormField label="OG Image (Synced from Site Settings)" hint="Manage this image in Site Settings">
+              <div className="space-y-3">
+                <Input
+                  type="url"
+                  value={form.og_image}
+                  readOnly
+                  className="bg-gray-50 dark:bg-charcoal-800/20 cursor-not-allowed opacity-80"
+                  placeholder="No OG Image set in Site Settings"
+                />
+                {form.og_image ? (
+                  <div className="relative w-full max-w-md h-32 rounded-xl overflow-hidden border border-gray-200 dark:border-white/5 group">
+                    <img src={form.og_image} alt="OG Image Preview" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <a
+                        href="/.admin/dashboard/settings"
+                        className="text-xs text-white bg-white/20 hover:bg-white/30 backdrop-blur-md px-3 py-1.5 rounded-lg transition-all font-medium"
+                      >
+                        Manage Image in Settings
+                      </a>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 border border-dashed border-gray-200 dark:border-white/5 rounded-xl text-center text-xs text-gray-400">
+                    No default OG image set. Go to{' '}
+                    <a href="/.admin/dashboard/settings" className="text-blue-500 hover:underline">
+                      Site Settings
+                    </a>{' '}
+                    to upload one.
+                  </div>
+                )}
+              </div>
             </FormField>
           </div>
 

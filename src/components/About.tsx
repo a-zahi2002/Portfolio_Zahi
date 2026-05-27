@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Layout, Smartphone, Code, Zap } from 'lucide-react';
+import { Download, Layout, Smartphone, Code, Zap } from 'lucide-react';
 import { useAboutSection } from '../hooks/cms/useAboutSection';
+import { useSiteSettings } from '../hooks/cms/useSiteSettings';
 import { parseMarkdown } from '../utils/markdown';
 
 // Map icon name strings to Lucide components
@@ -14,6 +15,7 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 
 const About: React.FC = () => {
   const { data: about, isLoading } = useAboutSection();
+  const { data: settings } = useSiteSettings();
 
   // Fallback values for when Supabase is not yet configured
   const title = about?.title ?? 'About';
@@ -99,6 +101,19 @@ const About: React.FC = () => {
                         prose-a:text-blue-600 dark:prose-a:text-accent-cyan prose-a:underline hover:opacity-80"
                       dangerouslySetInnerHTML={{ __html: parseMarkdown(bioSecondary) }}
                     />
+                  )}
+                  {settings?.resume_url && (
+                    <div className="mb-8 relative z-10">
+                      <a
+                        href={settings.resume_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-500 text-white font-bold rounded-full shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-accent-cyan/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-sm group"
+                      >
+                        <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
+                        Download CV / Resume
+                      </a>
+                    </div>
                   )}
 
                   {highlights.length > 0 && (

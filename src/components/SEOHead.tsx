@@ -68,7 +68,7 @@ const SEOHead: React.FC<SEOHeadProps> = ({ route }) => {
     const description = page?.description || settings?.seo_description || '';
     const ogTitle = page?.og_title || title;
     const ogDesc = page?.og_description || description;
-    const ogImage = page?.og_image || settings?.og_image || '';
+    const ogImage = settings?.og_image || page?.og_image || '';
 
     // Update document title
     document.title = title;
