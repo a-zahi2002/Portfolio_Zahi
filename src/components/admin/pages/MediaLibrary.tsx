@@ -4,6 +4,7 @@ import { Upload, Trash2, Copy, Check, Image as ImageIcon } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { storageService } from '../../../services/storageService';
 import { mediaService } from '../../../services/mediaService';
+import { supabase } from '../../../lib/supabase';
 import PageHeader from '../ui/PageHeader';
 import ConfirmDialog from '../ui/ConfirmDialog';
 import { Skeleton } from '../ui/Skeleton';
@@ -26,17 +27,46 @@ const MediaLibrary: React.FC = () => {
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const { data: assets, isLoading } = useQuery({
-    queryKey: ['media_library'],
-    queryFn: mediaService.getAll,
+    queryKey: ['media_library', selectedBucket],
+    queryFn: async () => {
+      const files = await storageService.list(selectedBucket);
+      return files.map(file => {
+        const publicUrl = storageService.getPublicUrl(selectedBucket, file.name);
+        return {
+          id: file.id || file.name,
+          filename: file.name,
+          original_name: file.name,
+          storage_path: file.name,
+          bucket: selectedBucket,
+          public_url: publicUrl,
+          file_size: file.metadata?.size || 0,
+          mime_type: file.metadata?.mimetype || 'image/jpeg',
+          alt_text: '',
+          created_at: file.created_at || new Date().toISOString(),
+        } as MediaAsset;
+      });
+    },
     staleTime: 0,
   });
 
   const deleteAsset = useMutation({
     mutationFn: async (asset: MediaAsset) => {
       await storageService.deleteByUrl(asset.bucket as StorageBucket, asset.public_url);
-      await mediaService.delete(asset.id);
+      try {
+        const { data: dbAsset } = await supabase
+          .from('media_library')
+          .select('id')
+          .eq('public_url', asset.public_url)
+          .maybeSingle();
+
+        if (dbAsset) {
+          await mediaService.delete(dbAsset.id);
+        }
+      } catch (dbErr) {
+        console.warn("Failed to delete matching tracking record from database:", dbErr);
+      }
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['media_library'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['media_library', selectedBucket] }),
   });
 
   const handleUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,16 +75,20 @@ const MediaLibrary: React.FC = () => {
     setUploading(true);
     try {
       const publicUrl = await storageService.upload(selectedBucket, file);
-      await mediaService.trackUpload({
-        filename: file.name,
-        original_name: file.name,
-        storage_path: publicUrl.split(`${selectedBucket}/`)[1] ?? file.name,
-        bucket: selectedBucket,
-        public_url: publicUrl,
-        file_size: file.size,
-        mime_type: file.type,
-      });
-      queryClient.invalidateQueries({ queryKey: ['media_library'] });
+      try {
+        await mediaService.trackUpload({
+          filename: file.name,
+          original_name: file.name,
+          storage_path: publicUrl.split(`${selectedBucket}/`)[1] ?? file.name,
+          bucket: selectedBucket,
+          public_url: publicUrl,
+          file_size: file.size,
+          mime_type: file.type,
+        });
+      } catch (dbErr) {
+        console.warn("Failed to write to media_library DB table:", dbErr);
+      }
+      queryClient.invalidateQueries({ queryKey: ['media_library', selectedBucket] });
       toast.success('File uploaded!');
     } catch {
       toast.error('Upload failed');
@@ -82,7 +116,7 @@ const MediaLibrary: React.FC = () => {
     }
   };
 
-  const filteredAssets = (assets ?? []).filter(a => a.bucket === selectedBucket);
+  const filteredAssets = assets ?? [];
   const formatSize = (bytes: number) => bytes < 1024 * 1024 ? `${(bytes / 1024).toFixed(1)}KB` : `${(bytes / 1024 / 1024).toFixed(1)}MB`;
 
   return (

@@ -36,6 +36,7 @@ const SkillsCard: React.FC<{
   const rotateY = useMotionValue(0);
 
   const cardRef = React.useRef<HTMLDivElement>(null);
+  const isHorizontal = skillGroup.items.length >= 5;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isTouchDevice || !cardRef.current) return;
@@ -92,7 +93,9 @@ const SkillsCard: React.FC<{
         transformStyle: 'preserve-3d',
         perspective: 1000,
       }}
-      className="break-inside-avoid mb-8 p-8 rounded-3xl bg-white/70 dark:bg-charcoal-900/40 backdrop-blur-md border border-gray-200/50 dark:border-white/10 hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-colors duration-300 shadow-lg hover:shadow-xl relative overflow-hidden group"
+      className={`p-8 rounded-3xl bg-white/70 dark:bg-charcoal-900/40 backdrop-blur-md border border-gray-200/50 dark:border-white/10 hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 shadow-lg hover:shadow-xl relative overflow-hidden group
+        ${isHorizontal ? 'md:col-span-2 lg:col-span-2' : 'md:col-span-1 lg:col-span-1'}
+      `}
     >
       {/* Spotlight overlay (Desktop only) */}
       {!isTouchDevice && (
@@ -143,7 +146,7 @@ const SkillsCard: React.FC<{
         </div>
 
         {/* Skill Items */}
-        <div className="space-y-5">
+        <div className={isHorizontal ? "grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5" : "space-y-5"}>
           {skillGroup.items.map((skill, index) => {
             const skillColor = skill.color || '#00f3ff';
             return (
@@ -245,7 +248,7 @@ const Skills: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-8 [column-fill:_balance]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {skillGroups.map((skillGroup, groupIndex) => (
               <SkillsCard
                 key={skillGroup.category}
