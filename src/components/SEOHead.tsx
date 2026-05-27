@@ -76,7 +76,13 @@ const SEOHead: React.FC<SEOHeadProps> = ({ route }) => {
     setMeta('name', 'description', description);
     setMeta('property', 'og:title', ogTitle);
     setMeta('property', 'og:description', ogDesc);
-    if (ogImage) setMeta('property', 'og:image', ogImage);
+    if (ogImage) {
+      setMeta('property', 'og:image', ogImage);
+      setMeta('name', 'twitter:card', 'summary_large_image');
+      setMeta('name', 'twitter:title', ogTitle);
+      setMeta('name', 'twitter:description', ogDesc);
+      setMeta('name', 'twitter:image', ogImage);
+    }
 
     // Keywords
     if (page?.keywords) {
