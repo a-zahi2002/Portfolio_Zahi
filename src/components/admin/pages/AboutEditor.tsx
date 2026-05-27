@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Save } from 'lucide-react';
+import { Save, Plus, Trash2, ArrowUp, ArrowDown, Code, Zap, Layout, Smartphone } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAboutSection, useUpdateAboutSection } from '../../../hooks/cms/useAboutSection';
 import PageHeader from '../ui/PageHeader';
@@ -10,7 +10,7 @@ import Toggle from '../ui/Toggle';
 import ImageUploader from '../ui/ImageUploader';
 import MarkdownEditor from '../ui/MarkdownEditor';
 import { SkeletonForm } from '../ui/Skeleton';
-import type { AboutSection } from '../../../types/cms';
+import type { AboutSection, HighlightCard } from '../../../types/cms';
 
 type AboutFormData = Omit<AboutSection, 'id' | 'created_at' | 'updated_at'>;
 
@@ -49,6 +49,37 @@ const AboutEditor: React.FC = () => {
   const update = (key: keyof AboutFormData, value: unknown) => {
     setForm(prev => ({ ...prev, [key]: value }));
     setIsDirty(true);
+  };
+
+  const handleAddHighlight = () => {
+    const newHighlight: HighlightCard = { icon: 'Code', title: '', subtitle: '' };
+    update('highlights', [...form.highlights, newHighlight]);
+  };
+
+  const handleRemoveHighlight = (index: number) => {
+    const updated = form.highlights.filter((_, i) => i !== index);
+    update('highlights', updated);
+  };
+
+  const handleUpdateHighlight = (index: number, key: keyof HighlightCard, value: string) => {
+    const updated = form.highlights.map((item, i) => {
+      if (i === index) {
+        return { ...item, [key]: value };
+      }
+      return item;
+    });
+    update('highlights', updated);
+  };
+
+  const handleMoveHighlight = (index: number, direction: 'up' | 'down') => {
+    const newHighlights = [...form.highlights];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex >= 0 && targetIndex < newHighlights.length) {
+      const temp = newHighlights[index];
+      newHighlights[index] = newHighlights[targetIndex];
+      newHighlights[targetIndex] = temp;
+      update('highlights', newHighlights);
+    }
   };
 
   const handleSave = async () => {
@@ -152,9 +183,125 @@ const AboutEditor: React.FC = () => {
           )}
         </div>
 
-        <p className="text-xs text-gray-600 mt-2">
-          💡 Highlight cards are configured as JSON. Advanced editing coming soon.
-        </p>
+        {/* Highlights Section */}
+        <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl space-y-4">
+          <div className="flex justify-between items-center mb-2">
+            <div>
+              <h3 className="text-sm font-semibold text-charcoal-900 dark:text-white">Highlight Cards</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Customize the highlight cards shown below your bio.</p>
+            </div>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={handleAddHighlight}
+              leftIcon={<Plus className="w-3.5 h-3.5" />}
+            >
+              Add Card
+            </Button>
+          </div>
+
+          {form.highlights.length === 0 ? (
+            <div className="text-center py-6 border border-dashed border-gray-200 dark:border-white/10 rounded-xl">
+              <p className="text-sm text-gray-500 dark:text-gray-400">No highlight cards configured.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {form.highlights.map((highlight, index) => {
+                const IconComponent =
+                  highlight.icon === 'Zap'
+                    ? Zap
+                    : highlight.icon === 'Layout'
+                    ? Layout
+                    : highlight.icon === 'Smartphone'
+                    ? Smartphone
+                    : Code;
+
+                return (
+                  <div
+                    key={index}
+                    className="flex flex-col md:flex-row gap-4 p-4 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-xl items-start md:items-center relative group"
+                  >
+                    {/* Icon representation & Selector */}
+                    <div className="flex items-center gap-3 w-full md:w-auto shrink-0">
+                      <div className="p-2.5 bg-white dark:bg-charcoal-900 border border-gray-200 dark:border-white/10 rounded-xl text-blue-600 dark:text-accent-cyan">
+                        <IconComponent className="w-5 h-5" />
+                      </div>
+                      <div className="w-full md:w-36">
+                        <label className="block text-[10px] uppercase font-bold tracking-wider text-gray-600 dark:text-gray-400 mb-1">
+                          Icon
+                        </label>
+                        <select
+                          value={highlight.icon}
+                          onChange={e => handleUpdateHighlight(index, 'icon', e.target.value)}
+                          className="w-full px-2 py-1 bg-white dark:bg-charcoal-900 border border-gray-200 dark:border-white/10 rounded-lg text-charcoal-900 dark:text-white text-xs focus:outline-none focus:ring-1 focus:border-blue-500 dark:focus:border-accent-cyan/50 focus:ring-blue-500/20 dark:focus:ring-accent-cyan/20 cursor-pointer"
+                        >
+                          <option value="Code">Code</option>
+                          <option value="Zap">Zap</option>
+                          <option value="Layout">Layout</option>
+                          <option value="Smartphone">Smartphone</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Inputs */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
+                      <div>
+                        <label className="block text-[10px] uppercase font-bold tracking-wider text-gray-600 dark:text-gray-400 mb-1">
+                          Title
+                        </label>
+                        <Input
+                          value={highlight.title}
+                          onChange={e => handleUpdateHighlight(index, 'title', e.target.value)}
+                          placeholder="e.g. Clean Code"
+                          className="py-1 px-3 text-xs rounded-lg"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[10px] uppercase font-bold tracking-wider text-gray-600 dark:text-gray-400 mb-1">
+                          Subtitle
+                        </label>
+                        <Input
+                          value={highlight.subtitle}
+                          onChange={e => handleUpdateHighlight(index, 'subtitle', e.target.value)}
+                          placeholder="e.g. Scalable & Maintainable"
+                          className="py-1 px-3 text-xs rounded-lg"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-1 self-end md:self-center shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => handleMoveHighlight(index, 'up')}
+                        disabled={index === 0}
+                        className="p-1.5 rounded-lg text-gray-600 hover:text-accent-cyan dark:text-gray-400 hover:bg-accent-cyan/10 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+                      >
+                        <ArrowUp className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleMoveHighlight(index, 'down')}
+                        disabled={index === form.highlights.length - 1}
+                        className="p-1.5 rounded-lg text-gray-600 hover:text-accent-cyan dark:text-gray-400 hover:bg-accent-cyan/10 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+                      >
+                        <ArrowDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveHighlight(index)}
+                        className="p-1.5 rounded-lg text-gray-600 hover:text-red-400 dark:text-gray-400 hover:bg-red-500/10 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
