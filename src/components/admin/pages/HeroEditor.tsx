@@ -158,7 +158,7 @@ const HeroEditor: React.FC = () => {
           <h1 className="text-4xl font-bold text-charcoal-900 dark:text-white font-['Space_Grotesk']">
             {form.heading} <span className="text-accent-cyan">{form.heading_highlight}</span>
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-3 text-sm leading-relaxed">{form.subheading}</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-3 text-sm leading-relaxed whitespace-pre-line">{form.subheading}</p>
           <div className="mt-4 flex items-center gap-3">
             <span className="px-4 py-2 rounded-full bg-white/10 text-charcoal-900 dark:text-white text-sm font-medium">{form.cta_text}</span>
             {form.availability_status && (

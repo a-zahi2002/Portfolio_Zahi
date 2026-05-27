@@ -133,7 +133,7 @@ const Hero: React.FC = () => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="text-lg md:text-2xl text-charcoal-600 dark:text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed font-sans"
+          className="text-lg md:text-2xl text-charcoal-600 dark:text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed font-sans whitespace-pre-line"
         >
           {subheading}
         </motion.p>
