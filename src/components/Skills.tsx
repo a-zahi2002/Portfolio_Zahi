@@ -93,8 +93,11 @@ const SkillsCard: React.FC<{
         transformStyle: 'preserve-3d',
         perspective: 1000,
       }}
-      className={`p-8 rounded-3xl bg-white/70 dark:bg-charcoal-900/40 backdrop-blur-md border border-gray-200/50 dark:border-white/10 hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 shadow-lg hover:shadow-xl relative overflow-hidden group
-        ${isHorizontal ? 'md:col-span-2 lg:col-span-2' : 'md:col-span-1 lg:col-span-1'}
+      className={`p-8 rounded-3xl bg-white/70 dark:bg-charcoal-900/40 backdrop-blur-md border border-gray-200/50 dark:border-white/10 hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 shadow-lg hover:shadow-xl relative overflow-hidden group flex-grow
+        ${isHorizontal 
+          ? 'w-full md:w-full lg:w-[calc(66.666%-1.5rem)]' 
+          : 'w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]'
+        }
       `}
     >
       {/* Spotlight overlay (Desktop only) */}
@@ -146,7 +149,7 @@ const SkillsCard: React.FC<{
         </div>
 
         {/* Skill Items */}
-        <div className={isHorizontal ? "grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5" : "space-y-5"}>
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-x-8 gap-y-5">
           {skillGroup.items.map((skill, index) => {
             const skillColor = skill.color || '#00f3ff';
             return (
@@ -242,13 +245,13 @@ const Skills: React.FC = () => {
         </motion.div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="flex flex-wrap gap-8">
             {[1, 2, 3].map(i => (
-              <div key={i} className="h-72 rounded-3xl bg-white/50 dark:bg-charcoal-800/50 border border-gray-200 dark:border-white/5 animate-pulse" />
+              <div key={i} className="h-72 rounded-3xl bg-white/50 dark:bg-charcoal-800/50 border border-gray-200 dark:border-white/5 animate-pulse w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="flex flex-wrap gap-8 items-stretch">
             {skillGroups.map((skillGroup, groupIndex) => (
               <SkillsCard
                 key={skillGroup.category}
