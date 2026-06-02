@@ -33,9 +33,9 @@ const Certificates: React.FC = () => {
         </motion.div>
 
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="flex overflow-x-auto gap-6 pb-12 pt-4 snap-x snap-mandatory hide-scrollbar -mx-6 px-6 lg:-mx-12 lg:px-12">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="px-6 py-8 rounded-3xl bg-charcoal-900/5 dark:bg-white/5 animate-pulse border border-charcoal-900/10 dark:border-white/5">
+              <div key={i} className="w-[85vw] sm:w-[320px] shrink-0 snap-center px-6 py-8 rounded-3xl bg-charcoal-900/5 dark:bg-white/5 animate-pulse border border-charcoal-900/10 dark:border-white/5">
                 <div className="flex flex-col items-center">
                   <div className="w-16 h-16 rounded-full bg-charcoal-900/10 dark:bg-white/10 mb-6" />
                   <div className="h-4 bg-charcoal-900/10 dark:bg-white/10 rounded w-3/4 mb-3" />
@@ -45,7 +45,7 @@ const Certificates: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="flex overflow-x-auto gap-6 pb-12 pt-4 snap-x snap-mandatory hide-scrollbar -mx-6 px-6 lg:-mx-12 lg:px-12">
             {(certificates ?? []).map((certificate, index) => (
               <motion.div
                 key={certificate.id}
@@ -53,7 +53,7 @@ const Certificates: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
                 viewport={{ once: true, margin: "-50px" }}
-                className="group cursor-pointer rounded-3xl bg-white dark:bg-charcoal-800/50 p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-200 dark:border-white/10 hover:border-blue-500/30 dark:hover:border-accent-cyan/50"
+                className="group w-[85vw] sm:w-[320px] shrink-0 snap-center cursor-pointer rounded-3xl bg-white dark:bg-charcoal-800/50 p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-200 dark:border-white/10 hover:border-blue-500/30 dark:hover:border-accent-cyan/50"
                 onClick={() => setSelectedCertificate(certificate)}
               >
                 <div className="flex flex-col items-center text-center">
