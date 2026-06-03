@@ -5,7 +5,7 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto; /* Lenis handles smooth scroll */
     /* Default light mode text */
     @apply text-gray-900;
   }
@@ -154,5 +154,138 @@
   .parallax-glow {
     transform: translate3d(calc(var(--mouse-x) * -60px), calc(var(--mouse-y) * -60px), 0);
     transition: transform 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+/* ─── Custom Cursor ─────────────────────────────────── */
+.cursor-none-global,
+.cursor-none-global * {
+  cursor: none !important;
+}
+
+/* ─── Hero Ambient Mesh Gradient ────────────────────── */
+@keyframes meshMove1 {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  33%  { transform: translate(6%, -8%) scale(1.08); }
+  66%  { transform: translate(-4%, 6%) scale(0.96); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+@keyframes meshMove2 {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  40%  { transform: translate(-8%, 10%) scale(1.12); }
+  80%  { transform: translate(5%, -5%) scale(0.94); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+@keyframes meshMove3 {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  50%  { transform: translate(10%, 4%) scale(1.06); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+@keyframes meshMove4 {
+  0%   { transform: translate(0%, 0%) scale(1); }
+  25%  { transform: translate(-6%, -10%) scale(1.1); }
+  75%  { transform: translate(8%, 8%) scale(0.92); }
+  100% { transform: translate(0%, 0%) scale(1); }
+}
+
+.hero-mesh-gradient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hero-mesh-gradient::before,
+.hero-mesh-gradient::after,
+.mesh-blob-3,
+.mesh-blob-4 {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  mix-blend-mode: screen;
+  filter: blur(80px);
+  opacity: 0.35;
+}
+
+.dark .hero-mesh-gradient::before,
+.dark .hero-mesh-gradient::after,
+.dark .mesh-blob-3,
+.dark .mesh-blob-4 {
+  mix-blend-mode: screen;
+  opacity: 0.25;
+}
+
+.hero-mesh-gradient::before {
+  width: 60vw;
+  height: 60vw;
+  top: -20%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(59,130,246,0.5) 0%, transparent 70%);
+  animation: meshMove1 14s ease-in-out infinite;
+}
+
+.hero-mesh-gradient::after {
+  width: 50vw;
+  height: 50vw;
+  bottom: -15%;
+  right: -10%;
+  background: radial-gradient(circle, rgba(157,0,255,0.4) 0%, transparent 70%);
+  animation: meshMove2 18s ease-in-out infinite;
+}
+
+.mesh-blob-3 {
+  content: '';
+  width: 40vw;
+  height: 40vw;
+  top: 30%;
+  right: 20%;
+  background: radial-gradient(circle, rgba(0,243,255,0.35) 0%, transparent 70%);
+  animation: meshMove3 12s ease-in-out infinite;
+}
+
+.mesh-blob-4 {
+  content: '';
+  width: 35vw;
+  height: 35vw;
+  bottom: 10%;
+  left: 25%;
+  background: radial-gradient(circle, rgba(139,92,246,0.3) 0%, transparent 70%);
+  animation: meshMove4 22s ease-in-out infinite;
+}
+
+/* ─── Section connector line ────────────────────────── */
+.section-connector-line {
+  stroke-dasharray: 1440;
+  stroke-dashoffset: 1440;
+}
+
+/* ─── Scroll Indicator ──────────────────────────────── */
+.scroll-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 1;
+  transition: opacity 0.4s;
+}
+
+.scroll-indicator .indicator-line {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(to bottom, rgba(0,243,255,0.8), transparent);
+  transform-origin: top center;
+}
+
+/* ─── prefers-reduced-motion: skip all GSAP-triggered animation ── */
+@media (prefers-reduced-motion: reduce) {
+  .hero-mesh-gradient::before,
+  .hero-mesh-gradient::after,
+  .mesh-blob-3,
+  .mesh-blob-4 {
+    animation: none;
+  }
+  .scroll-indicator .indicator-line {
+    animation: none;
   }
 }

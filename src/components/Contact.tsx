@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Github, Linkedin, Copy, Check, Mail } from 'lucide-react';
 import { useContactInfo } from '../hooks/cms/useContactInfo';
 import { useSocialLinks } from '../hooks/cms/useSocialLinks';
+import { useContactAnimation } from '../hooks/animations/useContactAnimation';
 
 // Map icon name strings to Lucide components
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -14,6 +15,12 @@ const Contact: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const { data: contact, isLoading: contactLoading } = useContactInfo();
   const { data: socialLinks, isLoading: socialLoading } = useSocialLinks();
+
+  // ── Animation refs ──────────────────────────────────────────
+  const sectionRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  useContactAnimation({ sectionRef, headingRef }, contactLoading ?? false);
 
   const email = contact?.email ?? 'a.zahi2002@gmail.com';
   const eyebrow = contact?.section_eyebrow ?? "What's Next?";
@@ -27,7 +34,7 @@ const Contact: React.FC = () => {
   };
 
   return (
-    <section id="contact" className="py-32 relative overflow-hidden flex flex-col items-center justify-center min-h-[60vh]">
+    <section id="contact" ref={sectionRef} className="py-32 relative overflow-hidden flex flex-col items-center justify-center min-h-[60vh]">
       
       {/* Massive Immersive Glow with Parallax */}
       <div className="absolute top-1/2 left-1/2 w-[600px] h-[600px] -translate-x-1/2 -translate-y-1/2 pointer-events-none parallax-glow">
@@ -59,6 +66,7 @@ const Contact: React.FC = () => {
         </motion.div>
 
         <motion.h2
+          ref={headingRef}
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}

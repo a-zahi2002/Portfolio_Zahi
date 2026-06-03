@@ -3,6 +3,7 @@ import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { Code2, Database, Layout, Wrench, Cpu, Layers, Globe, Palette, Terminal, Settings } from 'lucide-react';
 import { useSkills } from '../hooks/cms/useSkills';
 import type { CMSSkill } from '../types/cms';
+import { useSkillsAnimation } from '../hooks/animations/useSkillsAnimation';
 
 // Map icon name strings to Lucide components with themed colors
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -81,6 +82,7 @@ const SkillsCard: React.FC<{
   return (
     <motion.div
       ref={cardRef}
+      data-skill-item
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       initial={{ opacity: 0, y: 25 }}
@@ -191,6 +193,12 @@ const Skills: React.FC = () => {
   const { data: skills, isLoading } = useSkills();
   const [isTouchDevice, setIsTouchDevice] = React.useState(false);
 
+  // ── Animation refs ──────────────────────────────────────────
+  const sectionRef = React.useRef<HTMLElement>(null);
+  const headingRef = React.useRef<HTMLHeadingElement>(null);
+
+  useSkillsAnimation({ sectionRef, headingRef }, isLoading ?? false);
+
   React.useEffect(() => {
     const mediaQuery = window.matchMedia('(hover: none)');
     setIsTouchDevice(mediaQuery.matches);
@@ -223,7 +231,7 @@ const Skills: React.FC = () => {
   }, [skills]);
 
   return (
-    <section id="skills" className="py-32 relative overflow-hidden">
+    <section id="skills" ref={sectionRef} className="py-32 relative overflow-hidden">
       
       {/* Decorative Background Blur */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-purple-500/5 dark:bg-accent-purple/5 rounded-full blur-[120px] pointer-events-none" />
@@ -236,7 +244,7 @@ const Skills: React.FC = () => {
           transition={{ duration: 0.6 }}
           className="mb-16 text-center"
         >
-          <h2 className="text-4xl lg:text-5xl font-display font-bold mb-4 text-charcoal-900 dark:text-white">
+          <h2 ref={headingRef} className="text-4xl lg:text-5xl font-display font-bold mb-4 text-charcoal-900 dark:text-white">
             Technical <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 dark:from-accent-purple dark:to-pink-400">Arsenal</span>
           </h2>
           <p className="text-charcoal-600 dark:text-gray-400 max-w-2xl mx-auto text-lg font-sans">

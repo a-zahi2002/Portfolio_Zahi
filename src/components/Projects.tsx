@@ -3,6 +3,7 @@ import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
 import { useProjects } from '../hooks/cms/useProjects';
 import type { CMSProject } from '../types/cms';
+import { useProjectsAnimation } from '../hooks/animations/useProjectsAnimation';
 
 // ── Skeleton card ─────────────────────────────────────────────────────────────
 const ProjectCardSkeleton: React.FC<{ wide?: boolean }> = ({ wide }) => (
@@ -25,6 +26,7 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
 
   return (
     <motion.div
+      data-project-card
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, duration: 0.5, ease: "easeOut" }}
@@ -97,8 +99,15 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
 const Projects: React.FC = () => {
   const { data: projects, isLoading } = useProjects();
 
+  // ── Animation refs ──────────────────────────────────────────
+  const sectionRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
+
+  useProjectsAnimation({ sectionRef, containerRef, marqueeRef }, isLoading ?? false);
+
   return (
-    <section id="projects" className="py-32 relative">
+    <section id="projects" ref={sectionRef} className="py-32 relative">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -116,7 +125,7 @@ const Projects: React.FC = () => {
         </motion.div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[400px]">
+        <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[400px]">
           {isLoading
             ? [true, false, false, true, false, false].map((wide, i) => <ProjectCardSkeleton key={i} wide={wide} />)
             : (projects ?? []).map((project, index) => (
@@ -129,6 +138,31 @@ const Projects: React.FC = () => {
               ))
           }
         </div>
+
+        {/* ── Tech Marquee ── shown if there are projects and at least one has technologies */}
+        {!isLoading && (projects ?? []).some(p => p.technologies?.length > 0) && (
+          <div
+            ref={marqueeRef}
+            className="mt-12 overflow-hidden relative"
+            aria-hidden="true"
+          >
+            <div className="marquee-inner flex gap-6 whitespace-nowrap w-max">
+              {/* Duplicate items twice so the seamless loop works */}
+              {[0, 1].flatMap((dupIdx) =>
+                (projects ?? []).flatMap((project) =>
+                  project.technologies.slice(0, 4).map((tech, i) => (
+                    <span
+                      key={`dup${dupIdx}-${project.id}-${tech}-${i}`}
+                      className="inline-flex items-center px-4 py-1.5 text-xs font-bold uppercase tracking-widest rounded-full border border-gray-200/50 dark:border-white/10 bg-white/60 dark:bg-white/5 text-charcoal-600 dark:text-gray-400 backdrop-blur-sm"
+                    >
+                      {tech}
+                    </span>
+                  ))
+                )
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   );

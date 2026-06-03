@@ -19,6 +19,13 @@ const AdminLayout = lazy(() => import('./components/admin/layout/AdminLayout.tsx
 
 import AuroraBackground from './components/ui/AuroraBackground';
 
+// ── Animation Layer — additive, no CMS/data changes ──────────────────────────
+import SmoothScrollProvider from './components/SmoothScrollProvider';
+import ScrollProgressBar from './components/ScrollProgressBar';
+import CustomCursor from './components/CustomCursor';
+import SectionReveal from './components/SectionReveal';
+import SectionConnector from './components/SectionConnector';
+
 /** Portfolio single-page layout (unchanged) */
 const Portfolio: React.FC = () => {
   useEffect(() => {
@@ -57,12 +64,44 @@ const Portfolio: React.FC = () => {
       <SEOHead route="/" />
       <Navbar />
       <main className="relative z-10">
+        {/* Hero — has its own internal animation hook, no SectionReveal wrapper needed */}
         <Hero />
-        <About />
-        <Journey />
-        <Projects />
-        <Certificates />
-        <Skills />
+
+        <SectionConnector />
+
+        <SectionReveal>
+          <About />
+        </SectionReveal>
+
+        <SectionConnector />
+
+        <SectionReveal>
+          <Journey />
+        </SectionReveal>
+
+        <SectionConnector />
+
+        {/* Projects has its own internal animation hook */}
+        <SectionReveal>
+          <Projects />
+        </SectionReveal>
+
+        <SectionConnector />
+
+        <SectionReveal>
+          <Certificates />
+        </SectionReveal>
+
+        <SectionConnector />
+
+        {/* Skills has its own internal animation hook */}
+        <SectionReveal>
+          <Skills />
+        </SectionReveal>
+
+        <SectionConnector />
+
+        {/* Contact has its own 1.4s slow fade internally — no additional SectionReveal */}
         <Contact />
       </main>
       <Footer />
@@ -80,8 +119,17 @@ const App: React.FC = () => {
       }
     >
       <Routes>
-        {/* Portfolio */}
-        <Route path="/" element={<Portfolio />} />
+        {/* Portfolio — wrapped with animation providers */}
+        <Route
+          path="/"
+          element={
+            <SmoothScrollProvider>
+              <ScrollProgressBar />
+              <CustomCursor />
+              <Portfolio />
+            </SmoothScrollProvider>
+          }
+        />
 
         {/* Admin Login */}
         <Route path="/.admin" element={<Navigate to="/.admin/login" replace />} />

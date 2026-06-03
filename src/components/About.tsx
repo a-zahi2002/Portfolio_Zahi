@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { Download, Layout, Smartphone, Code, Zap } from 'lucide-react';
 import { useAboutSection } from '../hooks/cms/useAboutSection';
 import { useSiteSettings } from '../hooks/cms/useSiteSettings';
 import { parseMarkdown } from '../utils/markdown';
+import { useAboutAnimation } from '../hooks/animations/useAboutAnimation';
 
 // Map icon name strings to Lucide components
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -16,6 +17,14 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 const About: React.FC = () => {
   const { data: about, isLoading } = useAboutSection();
   const { data: settings } = useSiteSettings();
+
+  // ── Animation refs ─────────────────────────────────────────────────
+  const sectionRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const bioRef = useRef<HTMLDivElement>(null);
+  const bioSecRef = useRef<HTMLDivElement>(null);
+
+  useAboutAnimation({ sectionRef, headingRef, bioRef, bioSecRef }, isLoading ?? false);
 
   // Fallback values for when Supabase is not yet configured
   const title = about?.title ?? 'About';
@@ -31,7 +40,7 @@ const About: React.FC = () => {
   ];
 
   return (
-    <section id="about" className="relative py-32 overflow-hidden">
+    <section id="about" ref={sectionRef} className="relative py-32 overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-blue-500/20 dark:bg-accent-purple/20 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none parallax-glow" />
 
@@ -71,7 +80,7 @@ const About: React.FC = () => {
 
           {/* Text Column */}
           <div>
-            <h2 className="text-4xl lg:text-5xl font-bold mb-8 text-gray-900 dark:text-white">
+            <h2 ref={headingRef} className="text-4xl lg:text-5xl font-bold mb-8 text-gray-900 dark:text-white">
               {title} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-500">{titleHighlight}</span>
             </h2>
 
@@ -85,6 +94,7 @@ const About: React.FC = () => {
               ) : (
                 <>
                   <div
+                    ref={bioRef}
                     className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-6 relative z-10
                       prose prose-sm dark:prose-invert max-w-none
                       prose-p:mb-4 prose-p:leading-relaxed
@@ -94,6 +104,8 @@ const About: React.FC = () => {
                   />
                   {bioSecondary && (
                     <div
+                      ref={bioSecRef}
+                      data-about-bio
                       className="text-gray-500 dark:text-gray-400 text-base leading-relaxed mb-8 relative z-10
                         prose prose-sm dark:prose-invert max-w-none
                         prose-p:mb-4 prose-p:leading-relaxed

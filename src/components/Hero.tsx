@@ -1,8 +1,13 @@
+// ANIMATION ONLY — does not modify data, props, or CMS logic
+// Hero.tsx — original component props, handlers, and CMS data unchanged.
+// Animation layer is additive via data attributes + useHeroAnimation hook.
+
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown, FileText } from 'lucide-react';
 import { useHeroSection } from '../hooks/cms/useHeroSection';
 import { useSiteSettings } from '../hooks/cms/useSiteSettings';
+import { useHeroAnimation } from '../hooks/animations/useHeroAnimation';
 
 const MagneticButton = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => {
   const ref = useRef<HTMLButtonElement>(null);
@@ -68,6 +73,19 @@ const Hero: React.FC = () => {
   const { data: hero, isLoading } = useHeroSection();
   const { data: settings } = useSiteSettings();
 
+  // ── Animation refs ─────────────────────────────────────────────────────
+  const sectionRef = useRef<HTMLElement>(null);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const subheadingRef = useRef<HTMLParagraphElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const scrollIndicatorRef = useRef<HTMLDivElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  useHeroAnimation(
+    { sectionRef, headingRef, subheadingRef, contentRef, scrollIndicatorRef, overlayRef },
+    isLoading ?? false,
+  );
+
   if (isLoading) return <HeroSkeleton />;
 
   const heading = hero?.heading ?? 'A. Zahi';
@@ -79,8 +97,32 @@ const Hero: React.FC = () => {
   const availabilityLabel = hero?.availability_label ?? 'OPEN TO WORK';
 
   return (
-    <section id="hero" className="relative min-h-[95vh] flex items-center justify-center overflow-hidden">
-      
+    <section
+      id="hero"
+      ref={sectionRef}
+      className="relative min-h-[95vh] flex items-center justify-center overflow-hidden"
+    >
+      {/* ── Ambient Mesh Gradient (CSS only, pure additive) ── */}
+      <div className="hero-mesh-gradient" aria-hidden="true">
+        <div className="mesh-blob-3" />
+        <div className="mesh-blob-4" />
+      </div>
+
+      {/* ── Blur overlay that fades IN as hero exits (pin phase) ── */}
+      <div
+        ref={overlayRef}
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          opacity: 0,
+          pointerEvents: 'none',
+          zIndex: 5,
+        }}
+      />
+
       {/* Floating Glass Shapes with Antigravity Parallax */}
       <div className="absolute top-[20%] left-[10%] w-32 h-32 parallax-slow pointer-events-none">
         <FloatingShape className="w-full h-full bg-blue-500/10 dark:bg-white/5 rotate-12" delay={0} yOffset={30} />
@@ -95,8 +137,8 @@ const Hero: React.FC = () => {
       {/* Grid Pattern */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(0,0,0,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(0,0,0,0.02)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px] pointer-events-none opacity-50" />
 
-      {/* Main Content */}
-      <div className="relative z-10 text-center px-6 max-w-5xl mx-auto flex flex-col items-center">
+      {/* Main Content — this entire div is the parallax target */}
+      <div ref={contentRef} className="relative z-10 text-center px-6 max-w-5xl mx-auto flex flex-col items-center" style={{ willChange: 'transform, opacity' }}>
         
         {/* Availability Badge */}
         {availabilityStatus && (
@@ -113,9 +155,11 @@ const Hero: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Heading with Mask Reveal */}
+        {/* Heading with Mask Reveal — data-hero-heading for GSAP ScrambleText */}
         <div className="mb-6 overflow-hidden py-2">
           <motion.h1
+            ref={headingRef}
+            data-hero-heading
             initial={{ y: "100%", opacity: 0, rotateZ: 5 }}
             animate={{ y: 0, opacity: 1, rotateZ: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
@@ -128,8 +172,10 @@ const Hero: React.FC = () => {
           </motion.h1>
         </div>
 
-        {/* Subheading */}
+        {/* Subheading — data-hero-subheading for ScrambleText */}
         <motion.p
+          ref={subheadingRef}
+          data-hero-subheading
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
@@ -161,6 +207,16 @@ const Hero: React.FC = () => {
             </a>
           )}
         </motion.div>
+      </div>
+
+      {/* ── Scroll Indicator (animated via useHeroAnimation) ── */}
+      <div
+        ref={scrollIndicatorRef}
+        className="scroll-indicator absolute bottom-10 left-1/2 -translate-x-1/2 z-10"
+        aria-hidden="true"
+      >
+        <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-charcoal-400 dark:text-gray-500">Scroll</span>
+        <div className="indicator-line" />
       </div>
     </section>
   );
