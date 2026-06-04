@@ -8,10 +8,10 @@ import { useAboutAnimation } from '../hooks/animations/useAboutAnimation';
 
 // Map icon name strings to Lucide components
 const ICON_MAP: Record<string, React.ReactNode> = {
-  Code: <Code className="text-blue-600 dark:text-accent-cyan shrink-0" />,
-  Zap: <Zap className="text-purple-600 dark:text-accent-purple shrink-0" />,
-  Layout: <Layout className="text-blue-600 dark:text-accent-cyan shrink-0" />,
-  Smartphone: <Smartphone className="text-purple-600 dark:text-accent-purple shrink-0" />,
+  Code: <Code className="shrink-0 w-5 h-5" />,
+  Zap: <Zap className="shrink-0 w-5 h-5" />,
+  Layout: <Layout className="shrink-0 w-5 h-5" />,
+  Smartphone: <Smartphone className="shrink-0 w-5 h-5" />,
 };
 
 const About: React.FC = () => {
@@ -40,9 +40,9 @@ const About: React.FC = () => {
   ];
 
   return (
-    <section id="about" ref={sectionRef} className="relative py-32 overflow-hidden">
+    <section id="about" ref={sectionRef} className="relative py-32 overflow-hidden bg-transparent">
       {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-blue-500/20 dark:bg-accent-purple/20 rounded-full blur-[100px] -translate-y-1/2 pointer-events-none parallax-glow" />
+      <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-blue-500/10 dark:bg-accent-purple/10 rounded-full blur-[120px] -translate-y-1/2 pointer-events-none parallax-glow" />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         <motion.div
@@ -52,39 +52,94 @@ const About: React.FC = () => {
           transition={{ duration: 0.8 }}
           className="grid lg:grid-cols-2 gap-16 items-center"
         >
-          {/* Image Column */}
-          <div className="relative group parallax-card">
-            <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple rounded-2xl blur opacity-20 group-hover:opacity-60 transition duration-1000 group-hover:duration-200" />
-            <div className="relative glass-panel p-2 rounded-2xl overflow-hidden aspect-square max-w-md mx-auto lg:mx-0">
-              {isLoading ? (
-                <div className="w-full h-full bg-white/5 animate-pulse rounded-xl" />
-              ) : (
-                <img
-                  src={profileImageUrl}
-                  alt={`${title} ${titleHighlight}`}
-                  className="w-full h-full object-cover rounded-xl filter grayscale group-hover:grayscale-0 transition-all duration-500"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80';
-                  }}
-                />
-              )}
-              {availabilityStatus && (
-                <div className="absolute bottom-6 right-6 glass-panel px-4 py-2 flex items-center gap-2 border border-gray-200 dark:border-white/20">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                  <span className="text-xs font-semibold tracking-wider text-gray-900 dark:text-white">{availabilityLabel}</span>
-                </div>
-              )}
+          {/* Solar System / Orbital Column */}
+          <div className="relative group parallax-card flex justify-center items-center">
+            
+            {/* Pulsing Central Star (User CMS Profile Image) */}
+            <div className="relative w-[300px] h-[300px] md:w-[380px] md:h-[380px] flex items-center justify-center animate-cosmic-float">
+              
+              {/* Elliptical Orbit Lines (SVG) */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-40 dark:opacity-60" viewBox="0 0 100 100">
+                {/* Orbit 1 */}
+                <ellipse cx="50" cy="50" rx="36" ry="24" fill="none" stroke="var(--universe-accent)" strokeWidth="0.2" strokeDasharray="2 3" transform="rotate(-15 50 50)" />
+                {/* Orbit 2 */}
+                <ellipse cx="50" cy="50" rx="46" ry="32" fill="none" stroke="var(--universe-accent-secondary)" strokeWidth="0.2" strokeDasharray="1 4" transform="rotate(-15 50 50)" />
+              </svg>
+              
+              {/* Pulse Flare Corona behind the photo */}
+              <div className="absolute w-[180px] h-[180px] md:w-[240px] md:h-[240px] rounded-full animate-solar-flare pointer-events-none opacity-80" />
+              
+              {/* Circular profile image (The Star Core) */}
+              <div className="relative w-[170px] h-[170px] md:w-[220px] md:h-[220px] rounded-full overflow-hidden border border-white/20 shadow-inner z-10 bg-white dark:bg-[#050505]">
+                {isLoading ? (
+                  <div className="w-full h-full bg-white/5 animate-pulse" />
+                ) : (
+                  <img
+                    src={profileImageUrl}
+                    alt={`${title} ${titleHighlight}`}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=774&q=80';
+                    }}
+                  />
+                )}
+                {/* Gentle cosmic light sweep overlay */}
+                <div className="absolute inset-0 bg-gradient-to-tr from-[var(--universe-accent)]/10 via-transparent to-[var(--universe-accent-secondary)]/15 pointer-events-none mix-blend-overlay" />
+              </div>
             </div>
+
+            {/* Orbiting Satellite Highlight 1 (Desktop absolute, positioned on Orbit 1) */}
+            {!isLoading && highlights.length > 0 && (
+              <div 
+                className="absolute top-[10%] left-[2%] z-20 hidden lg:flex items-start gap-4 p-4 rounded-2xl backdrop-blur-md bg-white/80 dark:bg-charcoal-950/45 border border-gray-200/50 dark:border-[var(--universe-accent)]/15 shadow-[0_8px_32px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(var(--universe-accent-rgb),0.06)] hover:bg-gray-50 dark:hover:bg-charcoal-900/40 hover:border-[var(--universe-accent)]/30 transition-all duration-500 w-60 animate-cosmic-float pointer-events-auto"
+              >
+                <div className="p-2 rounded-lg bg-[var(--universe-accent)]/10 text-[var(--universe-accent)]">
+                  {ICON_MAP[highlights[0].icon] ?? <Code className="shrink-0 w-5 h-5" />}
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">{highlights[0].title}</h4>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{highlights[0].subtitle}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Orbiting Satellite Highlight 2 (Desktop absolute, positioned on Orbit 2) */}
+            {!isLoading && highlights.length > 1 && (
+              <div 
+                className="absolute bottom-[8%] right-[-4%] z-20 hidden lg:flex items-start gap-4 p-4 rounded-2xl backdrop-blur-md bg-white/80 dark:bg-charcoal-950/45 border border-gray-200/50 dark:border-[var(--universe-accent-secondary)]/15 shadow-[0_8px_32px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(var(--universe-accent-secondary-rgb),0.06)] hover:bg-gray-50 dark:hover:bg-charcoal-900/40 hover:border-[var(--universe-accent-secondary)]/30 transition-all duration-500 w-60 animate-cosmic-float-delay pointer-events-auto"
+              >
+                <div className="p-2 rounded-lg bg-[var(--universe-accent-secondary)]/10 text-[var(--universe-accent-secondary)]">
+                  {ICON_MAP[highlights[1].icon] ?? <Code className="shrink-0 w-5 h-5" />}
+                </div>
+                <div>
+                  <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">{highlights[1].title}</h4>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{highlights[1].subtitle}</p>
+                </div>
+              </div>
+            )}
+
           </div>
 
-          {/* Text Column */}
-          <div>
+          {/* Text Column / Cyber-Card */}
+          <div className="relative flex flex-col justify-center">
+            
+            {/* Cosmic Header Status Tag */}
+            <div className="mb-4 inline-flex items-center gap-2 font-mono text-[10px] tracking-[0.25em] text-[var(--universe-accent-secondary)] select-none">
+              <span className="w-1.5 h-1.5 rounded-full bg-[var(--universe-accent-secondary)] animate-ping" />
+              <span>[ STELLAR CORE DETECTED ]</span>
+            </div>
+
             <h2 ref={headingRef} className="text-4xl lg:text-5xl font-bold mb-8 text-gray-900 dark:text-white">
-              {title} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-500">{titleHighlight}</span>
+              {title} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--universe-accent)] to-[var(--universe-accent-secondary)]">{titleHighlight}</span>
             </h2>
 
-            <div className="glass-panel p-8 md:p-10 relative overflow-hidden group border-gray-200 dark:border-white/5 hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-colors duration-500 parallax-card">
+            {/* Organic Cosmic Bio Card */}
+            <div className="relative rounded-3xl bg-white/80 dark:bg-charcoal-900/30 backdrop-blur-xl p-8 md:p-10 border border-white/20 dark:border-[var(--universe-accent)]/15 shadow-[0_8px_32px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(var(--universe-accent-rgb),0.05)] hover:shadow-[0_12px_48px_rgba(var(--universe-accent-rgb),0.1)] hover:border-[var(--universe-accent)]/30 transition-all duration-700">
+              
+              {/* Soft galaxy backlight inside the card */}
+              <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-[var(--universe-accent)]/10 to-transparent blur-3xl pointer-events-none rounded-full" />
+              
               {isLoading ? (
                 <div className="space-y-3 animate-pulse">
                   <div className="h-4 bg-white/5 rounded w-full" />
@@ -98,8 +153,8 @@ const About: React.FC = () => {
                     className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-6 relative z-10
                       prose prose-sm dark:prose-invert max-w-none
                       prose-p:mb-4 prose-p:leading-relaxed
-                      prose-strong:text-blue-600 dark:prose-strong:text-accent-cyan prose-strong:font-semibold
-                      prose-a:text-blue-600 dark:prose-a:text-accent-cyan prose-a:underline hover:opacity-80"
+                      prose-strong:text-[var(--universe-accent)] prose-strong:font-semibold
+                      prose-a:text-[var(--universe-accent)] prose-a:underline hover:opacity-80"
                     dangerouslySetInnerHTML={{ __html: parseMarkdown(bioPrimary) }}
                   />
                   {bioSecondary && (
@@ -110,17 +165,26 @@ const About: React.FC = () => {
                         prose prose-sm dark:prose-invert max-w-none
                         prose-p:mb-4 prose-p:leading-relaxed
                         prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:font-semibold
-                        prose-a:text-blue-600 dark:prose-a:text-accent-cyan prose-a:underline hover:opacity-80"
+                        prose-a:text-[var(--universe-accent)] prose-a:underline hover:opacity-80"
                       dangerouslySetInnerHTML={{ __html: parseMarkdown(bioSecondary) }}
                     />
                   )}
+                  
+                  {/* Availability badge inside card for mobile */}
+                  {availabilityStatus && (
+                    <div className="inline-flex items-center gap-2 mb-6 px-3.5 py-1.5 rounded-full bg-[var(--universe-accent)]/10 border border-[var(--universe-accent)]/20 font-mono text-xs tracking-wider text-[var(--universe-accent)] select-none">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                      <span>{availabilityLabel}</span>
+                    </div>
+                  )}
+
                   {settings?.resume_url && (
-                    <div className="mb-8 relative z-10">
+                    <div className="mb-4 relative z-10">
                       <a
                         href={settings.resume_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-500 text-white font-bold rounded-full shadow-lg hover:shadow-blue-500/20 dark:hover:shadow-accent-cyan/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-sm group"
+                        className="inline-flex items-center gap-2 px-6 py-3.5 bg-gradient-to-r from-[var(--universe-accent)] to-[var(--universe-accent-secondary)] text-white font-bold rounded-full shadow-lg hover:shadow-[var(--universe-accent)]/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 text-sm group"
                       >
                         <Download className="w-4 h-4 group-hover:translate-y-0.5 transition-transform" />
                         Download CV / Resume
@@ -128,11 +192,14 @@ const About: React.FC = () => {
                     </div>
                   )}
 
+                  {/* Highlights Grid inside card for Mobile / Tablet */}
                   {highlights.length > 0 && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative z-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8 lg:hidden">
                       {highlights.map((highlight, i) => (
-                        <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
-                          {ICON_MAP[highlight.icon] ?? <Code className="text-blue-600 dark:text-accent-cyan shrink-0" />}
+                        <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-gray-50/50 dark:bg-white/5 border border-gray-100 dark:border-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-colors">
+                          <div className="p-2 rounded-lg bg-[var(--universe-accent)]/10 text-[var(--universe-accent)]">
+                            {ICON_MAP[highlight.icon] ?? <Code className="shrink-0 w-5 h-5" />}
+                          </div>
                           <div>
                             <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">{highlight.title}</h4>
                             <p className="text-xs text-gray-500 dark:text-gray-400">{highlight.subtitle}</p>
@@ -144,6 +211,7 @@ const About: React.FC = () => {
                 </>
               )}
             </div>
+
           </div>
         </motion.div>
       </div>

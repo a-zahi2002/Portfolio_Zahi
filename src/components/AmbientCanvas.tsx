@@ -83,19 +83,34 @@ const AmbientCanvas: React.FC = () => {
         if (this.y > height) this.y = 0;
       }
 
-      draw() {
+      draw(scrollVelocity: number) {
         if (!ctx) return;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         
+        const absoluteVelocity = Math.abs(scrollVelocity);
+
         if (isDark) {
-          // white/ice-blue
+          ctx.strokeStyle = this.isWarm ? `rgba(255, 255, 255, ${this.opacity})` : `rgba(200, 230, 255, ${this.opacity})`;
           ctx.fillStyle = this.isWarm ? `rgba(255, 255, 255, ${this.opacity})` : `rgba(200, 230, 255, ${this.opacity})`;
         } else {
-          // deep-indigo/gold
+          ctx.strokeStyle = this.isWarm ? `rgba(218, 165, 32, ${this.opacity})` : `rgba(75, 0, 130, ${this.opacity})`;
           ctx.fillStyle = this.isWarm ? `rgba(218, 165, 32, ${this.opacity})` : `rgba(75, 0, 130, ${this.opacity})`;
         }
-        ctx.fill();
+
+        // Draw as speed line if scrolling fast (starfield warp speed)
+        if (absoluteVelocity > 1.5 && !isMobile) {
+          ctx.beginPath();
+          ctx.lineWidth = this.size;
+          ctx.lineCap = 'round';
+          ctx.moveTo(this.x, this.y);
+          // Stretch along the scroll axis (negative velocity stretches upwards when scrolling down)
+          const stretch = Math.max(-60, Math.min(60, -scrollVelocity * 0.5 * (this.size / 1.2)));
+          ctx.lineTo(this.x, this.y + stretch);
+          ctx.stroke();
+        } else {
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
     }
 
@@ -118,7 +133,7 @@ const AmbientCanvas: React.FC = () => {
 
       for (let i = 0; i < particleCount; i++) {
         particles[i].update(scrollVelocity);
-        particles[i].draw();
+        particles[i].draw(scrollVelocity);
       }
 
       animationFrameId = requestAnimationFrame(render);

@@ -45,7 +45,14 @@ const Footer: React.FC = () => {
   useFooterAnimation(sectionRef);
 
   return (
-    <footer ref={sectionRef} className="bg-charcoal-950 text-white py-12 border-t border-white/5 relative">
+    <footer 
+      ref={sectionRef} 
+      className="bg-transparent text-white py-16 border-t relative"
+      style={{ 
+        borderTopColor: 'var(--universe-accent)', 
+        boxShadow: '0 -15px 40px -15px rgba(var(--universe-accent-rgb), 0.12)' 
+      }}
+    >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center mb-4">

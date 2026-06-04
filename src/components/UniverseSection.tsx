@@ -3,7 +3,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import { gsap, ScrollTrigger } from '../lib/gsap-init';
 
-export type UniverseTheme = 'void' | 'nebula' | 'constellation' | 'artifact' | 'signal' | 'frequency';
+export type UniverseTheme = 'void' | 'nebula' | 'constellation' | 'artifact' | 'signal' | 'frequency' | 'abyss';
 
 interface UniverseSectionProps {
   id?: string;
@@ -60,7 +60,46 @@ const themeConfigs: Record<UniverseTheme, { darkBg: string, lightBg: string, dar
     lightAccent: '#7c3aed', // purple-600
     darkAccentSec: '#818cf8', // indigo-400
     lightAccentSec: '#4f46e5', // indigo-600
+  },
+  abyss: {
+    darkBg: '#050505',
+    lightBg: '#fafafa',
+    darkAccent: '#ffffff',
+    lightAccent: '#0a0a0a',
+    darkAccentSec: '#3b82f6',
+    lightAccentSec: '#2563eb',
   }
+};
+
+const animateThemeColors = (targetAccent: string, targetAccentSec: string) => {
+  if (typeof window === 'undefined') return;
+  const rootStyle = getComputedStyle(document.documentElement);
+  const currentAccent = rootStyle.getPropertyValue('--universe-accent').trim() || '#ffffff';
+  const currentAccentSec = rootStyle.getPropertyValue('--universe-accent-secondary').trim() || '#22d3ee';
+  
+  const colorObj = {
+    accent: currentAccent,
+    accentSec: currentAccentSec
+  };
+
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '0, 243, 255';
+  };
+
+  gsap.to(colorObj, {
+    accent: targetAccent,
+    accentSec: targetAccentSec,
+    duration: 1.2,
+    ease: 'power2.out',
+    overwrite: 'auto',
+    onUpdate: () => {
+      document.documentElement.style.setProperty('--universe-accent', colorObj.accent);
+      document.documentElement.style.setProperty('--universe-accent-secondary', colorObj.accentSec);
+      document.documentElement.style.setProperty('--universe-accent-rgb', hexToRgb(colorObj.accent));
+      document.documentElement.style.setProperty('--universe-accent-secondary-rgb', hexToRgb(colorObj.accentSec));
+    }
+  });
 };
 
 // Global theme change listener to keep the active universe properties in sync
@@ -70,7 +109,7 @@ if (typeof window !== 'undefined') {
     const isDark = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark');
     const config = themeConfigs[activeTheme];
     if (config) {
-      const bgColor = isDark ? config.darkBg : config.lightBg;
+      const bgColor = isDark ? '#050505' : '#fafafa';
       gsap.to(document.body, {
         backgroundColor: bgColor,
         duration: 0.5,
@@ -81,14 +120,7 @@ if (typeof window !== 'undefined') {
       const accentColor = isDark ? config.darkAccent : config.lightAccent;
       const accentSecColor = isDark ? config.darkAccentSec : config.lightAccentSec;
 
-      document.documentElement.style.setProperty('--universe-accent', accentColor);
-      document.documentElement.style.setProperty('--universe-accent-secondary', accentSecColor);
-
-      const hexToRgb = (hex: string) => {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '0, 243, 255';
-      };
-      document.documentElement.style.setProperty('--universe-accent-rgb', hexToRgb(accentColor));
+      animateThemeColors(accentColor, accentSecColor);
       
       // Notify components like AmbientCanvas of the live update
       window.dispatchEvent(new CustomEvent('universe:change', { detail: { theme: activeTheme, isDark } }));
@@ -141,29 +173,20 @@ const UniverseSection: React.FC<UniverseSectionProps> = ({ id, theme, children, 
     document.body.setAttribute('data-active-universe', newTheme);
     const isDark = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark');
     const config = themeConfigs[newTheme];
-    const bgColor = isDark ? config.darkBg : config.lightBg;
+    const bgColor = isDark ? '#050505' : '#fafafa';
 
-    // Cross-fade body background color
+    // Cross-fade body background color (keeps base color consistent, only fades on theme mode toggle)
     gsap.to(document.body, {
       backgroundColor: bgColor,
-      duration: 1.2,
-      ease: 'drift',
+      duration: 0.8,
+      ease: 'power2.out',
       overwrite: 'auto'
     });
 
     const accentColor = isDark ? config.darkAccent : config.lightAccent;
     const accentSecColor = isDark ? config.darkAccentSec : config.lightAccentSec;
 
-    // Update CSS custom properties for accents
-    document.documentElement.style.setProperty('--universe-accent', accentColor);
-    document.documentElement.style.setProperty('--universe-accent-secondary', accentSecColor);
-
-    // Convert hex to rgb for rgba() usage
-    const hexToRgb = (hex: string) => {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '0, 243, 255';
-    };
-    document.documentElement.style.setProperty('--universe-accent-rgb', hexToRgb(accentColor));
+    animateThemeColors(accentColor, accentSecColor);
 
     // Dispatch event for AmbientCanvas or others
     const event = new CustomEvent('universe:change', { detail: { theme: newTheme, isDark } });
@@ -176,7 +199,7 @@ const UniverseSection: React.FC<UniverseSectionProps> = ({ id, theme, children, 
       ref={sectionRef} 
       data-universe={theme} 
       className={`relative w-full overflow-hidden ${className}`}
-      style={{ minHeight: '100vh' }}
+      style={{ minHeight: theme === 'abyss' ? 'auto' : '100vh' }}
     >
       {/* Light theme grain for void */}
       {theme === 'void' && (

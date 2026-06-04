@@ -128,10 +128,21 @@
   }
 }
 
-/* Antigravity Global Mouse Parallax */
+/* Antigravity Global Mouse Parallax & Connectors */
 :root {
   --mouse-x: 0;
   --mouse-y: 0;
+  --connector-glow-opacity: 0.32;
+  --aurora-opacity-1: 0.28;
+  --aurora-opacity-2: 0.24;
+  --aurora-opacity-3: 0.20;
+}
+
+.dark {
+  --connector-glow-opacity: 0.12;
+  --aurora-opacity-1: 0.15;
+  --aurora-opacity-2: 0.12;
+  --aurora-opacity-3: 0.10;
 }
 
 @media (hover: hover) {
@@ -288,4 +299,55 @@
   .scroll-indicator .indicator-line {
     animation: none;
   }
+}
+
+/* ─── Cosmic Animations & Styles ────────────────────────── */
+@keyframes spin-clockwise {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes spin-counter-clockwise {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes cosmic-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(0.5deg); }
+}
+@keyframes cosmic-float-delayed {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(-0.5deg); }
+}
+@keyframes solar-flare {
+  0%, 100% {
+    box-shadow: 0 0 35px 2px rgba(var(--universe-accent-rgb), 0.2), 
+                0 0 65px 6px rgba(var(--universe-accent-secondary-rgb), 0.15);
+  }
+  50% {
+    box-shadow: 0 0 55px 8px rgba(var(--universe-accent-rgb), 0.45), 
+                0 0 95px 16px rgba(var(--universe-accent-secondary-rgb), 0.3);
+  }
+}
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.animate-spin-slow {
+  animation: spin-clockwise 35s linear infinite;
+}
+.animate-spin-reverse-slow {
+  animation: spin-counter-clockwise 24s linear infinite;
+}
+.animate-cosmic-float {
+  animation: cosmic-float 7s ease-in-out infinite;
+}
+.animate-cosmic-float-delay {
+  animation: cosmic-float-delayed 9s ease-in-out infinite;
+}
+.animate-solar-flare {
+  animation: solar-flare 6s ease-in-out infinite;
+}
+.animate-scanline {
+  animation: scanline 6s linear infinite;
 }

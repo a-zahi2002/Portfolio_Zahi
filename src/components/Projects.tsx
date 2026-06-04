@@ -24,6 +24,8 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
     mouseY.set(clientY - top);
   }
 
+  const isEven = index % 2 === 0;
+
   return (
     <motion.div
       data-project-card
@@ -33,62 +35,93 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
       viewport={{ once: true, margin: "-50px" }}
       onMouseMove={handleMouseMove}
       ref={cardRef}
-      className={`group relative rounded-3xl overflow-hidden bg-white/60 dark:bg-charcoal-900/40 backdrop-blur-md border border-gray-200/50 dark:border-white/10 hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 ${wide ? 'md:col-span-2' : ''}`}
+      className={`group relative rounded-3xl overflow-hidden bg-white/70 dark:bg-[#07070a]/30 border border-gray-200/50 dark:border-white/10 hover:border-[var(--universe-accent)]/30 hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 flex flex-col justify-between p-6 ${wide ? 'md:col-span-2' : ''}`}
     >
-      {/* Spotlight Effect */}
+      {/* Spotlight Effect (Dynamic Glow) */}
       <motion.div
-        className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover:opacity-100 z-20 mix-blend-overlay dark:mix-blend-screen"
+        className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 transition duration-300 group-hover:opacity-100 z-0 mix-blend-overlay dark:mix-blend-screen"
         style={{
           background: useMotionTemplate`
             radial-gradient(
-              600px circle at ${mouseX}px ${mouseY}px,
-              rgba(59, 130, 246, 0.15),
+              400px circle at ${mouseX}px ${mouseY}px,
+              rgba(var(--universe-accent-rgb), 0.12),
               transparent 80%
             )
           `,
         }}
       />
 
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <img
-          src={project.thumbnail_url}
-          alt={project.title}
-          className="w-full h-full object-cover opacity-90 dark:opacity-50 group-hover:opacity-100 dark:group-hover:opacity-80 group-hover:scale-110 transition-transform duration-1000 ease-out"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=800';
-          }}
+      {/* Star Grid Background Overlay */}
+      <div className="absolute inset-0 bg-[radial-gradient(rgba(var(--universe-accent-rgb),0.08)_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none opacity-60 z-0" />
+
+      {/* Visual Space Object Center */}
+      <div className="relative w-full flex items-center justify-center py-4 z-10 flex-1">
+        
+        {/* Swirling Gravitational Lensing Glow behind the orb (Black Hole accretion disk) */}
+        <div 
+          className="absolute w-[240px] h-[240px] rounded-full blur-[30px] opacity-10 group-hover:opacity-50 transition-opacity duration-700 pointer-events-none animate-spin-slow"
+          style={{ background: 'radial-gradient(circle, var(--universe-accent) 0%, var(--universe-accent-secondary) 50%, transparent 70%)' }}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-charcoal-950 via-charcoal-950/40 to-transparent dark:from-charcoal-950 dark:via-charcoal-950/70 dark:to-transparent pointer-events-none opacity-80 group-hover:opacity-60 transition-opacity duration-500" />
+
+        {/* Orbit Lines */}
+        <svg className="absolute w-[220px] h-[220px] pointer-events-none opacity-40 group-hover:opacity-75 transition-opacity" viewBox="0 0 100 100">
+          <ellipse cx="50" cy="50" rx="38" ry="18" fill="none" stroke="var(--universe-accent)" strokeWidth="0.2" strokeDasharray="2 3" transform="rotate(-15 50 50)" />
+          <ellipse cx="50" cy="50" rx="44" ry="22" fill="none" stroke="var(--universe-accent-secondary)" strokeWidth="0.2" strokeDasharray="1 4" transform="rotate(-15 50 50)" />
+        </svg>
+
+        {/* The Planet/Stellar Core Image (The Object) */}
+        <div 
+          className={`relative w-[130px] h-[130px] md:w-[150px] md:h-[150px] rounded-full overflow-hidden border border-white/20 shadow-[0_0_20px_rgba(var(--universe-accent-rgb),0.1)] group-hover:shadow-[0_0_30px_rgba(var(--universe-accent-rgb),0.25)] bg-white dark:bg-[#050505] transition-all duration-500 z-10 group-hover:scale-105
+            ${isEven ? 'animate-cosmic-float' : 'animate-cosmic-float-delay'}`}
+        >
+          <img
+            src={project.thumbnail_url}
+            alt={project.title}
+            className="w-full h-full object-cover opacity-80 group-hover:opacity-95 transition-opacity duration-500"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=800';
+            }}
+          />
+          {/* Gravitational lensing overlay ring inside core */}
+          <div className="absolute inset-0 bg-radial-gradient(circle, transparent 65%, rgba(0,0,0,0.5) 100%) pointer-events-none" />
+        </div>
       </div>
 
-      <div className="absolute inset-0 z-10 p-8 flex flex-col justify-end pointer-events-none">
-        <div className="transform transition-transform duration-500 translate-y-4 group-hover:translate-y-0">
-          <div className="flex justify-between items-start mb-4 pointer-events-auto">
-            <div className="flex gap-2 flex-wrap">
-              {project.technologies.slice(0, 3).map(tech => (
-                <span key={tech} className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white bg-white/10 border border-white/20 backdrop-blur-md rounded-full shadow-sm">
-                  {tech}
-                </span>
-              ))}
-              {project.technologies.length > 3 && (
-                <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white bg-white/10 border border-white/20 backdrop-blur-md rounded-full shadow-sm">
-                  +{project.technologies.length - 3}
-                </span>
-              )}
-            </div>
-            <div className="flex gap-2">
-              {(project.live_url || project.github_url) && (
-                <a href={project.live_url || project.github_url} target="_blank" rel="noopener noreferrer" className="p-3 bg-white/10 hover:bg-white/30 border border-white/20 rounded-full text-white backdrop-blur-md transition-all shadow-sm group-hover:bg-blue-600 dark:group-hover:bg-accent-cyan dark:group-hover:text-charcoal-900 group-hover:border-transparent group-hover:scale-110">
-                  <ArrowUpRight size={18} />
-                </a>
-              )}
-            </div>
+      {/* Meta Text details at the bottom */}
+      <div className="relative z-10 mt-auto pt-4 border-t border-gray-100 dark:border-white/5 bg-transparent w-full">
+        <div className="flex justify-between items-start mb-2.5">
+          <h3 className="text-xl font-display font-bold text-charcoal-900 dark:text-white group-hover:text-[var(--universe-accent)] transition-colors duration-300">
+            {project.title}
+          </h3>
+          <div className="flex gap-2 shrink-0">
+            {(project.live_url || project.github_url) && (
+              <a 
+                href={project.live_url || project.github_url} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="p-2.5 bg-gray-100 dark:bg-white/5 border border-gray-200/50 dark:border-white/10 rounded-full text-charcoal-600 dark:text-white hover:text-white dark:hover:text-charcoal-900 hover:bg-[var(--universe-accent)] dark:hover:bg-[var(--universe-accent)] hover:border-transparent transition-all shadow-sm duration-300 hover:scale-105"
+              >
+                <ArrowUpRight size={15} />
+              </a>
+            )}
           </div>
+        </div>
 
-          <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-2 pointer-events-auto">{project.title}</h3>
-          <p className="text-gray-300 dark:text-gray-400 line-clamp-2 text-sm md:text-base opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100 pointer-events-auto">
-            {project.description}
-          </p>
+        <p className="text-charcoal-600 dark:text-gray-400 text-xs md:text-sm line-clamp-2 leading-relaxed mb-4 font-sans">
+          {project.description}
+        </p>
+
+        <div className="flex gap-2 flex-wrap">
+          {project.technologies.slice(0, 3).map(tech => (
+            <span key={tech} className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-charcoal-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-full">
+              {tech}
+            </span>
+          ))}
+          {project.technologies.length > 3 && (
+            <span className="px-2.5 py-1 text-[9px] font-bold uppercase tracking-widest text-charcoal-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 border border-gray-100 dark:border-white/5 rounded-full">
+              +{project.technologies.length - 3}
+            </span>
+          )}
         </div>
       </div>
     </motion.div>

@@ -166,7 +166,7 @@ const SkillsCard: React.FC<{
                 </div>
                 
                 {/* Progress Bar */}
-                <div className="h-2 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden relative">
+                <div className="h-1.5 w-full bg-gray-100 dark:bg-white/5 rounded-full relative">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${skill.proficiency}%` }}
@@ -176,9 +176,19 @@ const SkillsCard: React.FC<{
                     data-proficiency={skill.proficiency}
                     style={{ 
                       backgroundColor: skillColor,
-                      boxShadow: `0 0 6px ${skillColor}60`,
+                      boxShadow: `0 0 8px ${skillColor}80`,
                     }}
-                  />
+                  >
+                    {/* Glowing planetary dot slider at the edge */}
+                    <div 
+                      className="absolute right-0 top-1/2 w-3.5 h-3.5 rounded-full border border-white z-20 pointer-events-none"
+                      style={{ 
+                        backgroundColor: skillColor, 
+                        boxShadow: `0 0 10px ${skillColor}, 0 0 4px #ffffff`,
+                        transform: 'translate(50%, -50%)'
+                      }}
+                    />
+                  </motion.div>
                 </div>
               </div>
             );

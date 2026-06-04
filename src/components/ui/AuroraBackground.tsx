@@ -15,7 +15,8 @@ const AuroraBackground: React.FC = () => {
             ],
           }}
           transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-blue-400/30 dark:bg-accent-cyan/20 blur-[120px]"
+          className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[120px] transition-colors duration-1000 ease-in-out"
+          style={{ backgroundColor: 'var(--universe-accent)', opacity: 'var(--aurora-opacity-1)' }}
         />
         <motion.div
           animate={{
@@ -27,7 +28,8 @@ const AuroraBackground: React.FC = () => {
             ],
           }}
           transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full bg-purple-400/30 dark:bg-accent-purple/20 blur-[150px]"
+          className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full blur-[150px] transition-colors duration-1000 ease-in-out"
+          style={{ backgroundColor: 'var(--universe-accent-secondary)', opacity: 'var(--aurora-opacity-2)' }}
         />
         <motion.div
           animate={{
@@ -39,11 +41,17 @@ const AuroraBackground: React.FC = () => {
             ],
           }}
           transition={{ duration: 22, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[20%] right-[10%] w-[40%] h-[40%] rounded-full bg-cyan-400/20 dark:bg-blue-500/20 blur-[100px]"
+          className="absolute top-[20%] right-[10%] w-[40%] h-[40%] rounded-full blur-[100px] transition-colors duration-1000 ease-in-out"
+          style={{ backgroundColor: 'var(--universe-accent)', opacity: 'var(--aurora-opacity-3)' }}
         />
       </div>
-      {/* Light Noise Overlay for Texture */}
-      <div className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      {/* Native SVG Noise Overlay for Texture (Replaces broken external URL) */}
+      <svg className="absolute inset-0 w-full h-full opacity-[0.015] dark:opacity-[0.035] mix-blend-overlay pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <filter id="noiseFilterBg">
+          <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="3" stitchTiles="stitch" />
+        </filter>
+        <rect width="100%" height="100%" filter="url(#noiseFilterBg)" />
+      </svg>
     </div>
   );
 };
