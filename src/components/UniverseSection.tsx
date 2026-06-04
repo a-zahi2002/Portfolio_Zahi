@@ -76,16 +76,25 @@ const animateThemeColors = (targetAccent: string, targetAccentSec: string) => {
   const rootStyle = getComputedStyle(document.documentElement);
   const currentAccent = rootStyle.getPropertyValue('--universe-accent').trim() || '#ffffff';
   const currentAccentSec = rootStyle.getPropertyValue('--universe-accent-secondary').trim() || '#22d3ee';
-  
+
   const colorObj = {
     accent: currentAccent,
     accentSec: currentAccentSec
   };
 
+  // ✅ PERF: Memoize hexToRgb — regex only runs once per unique hex value
+  const hexRgbCache = new Map<string, string>();
   const hexToRgb = (hex: string) => {
+    if (hexRgbCache.has(hex)) return hexRgbCache.get(hex)!;
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '0, 243, 255';
+    const rgb = result ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}` : '0, 243, 255';
+    hexRgbCache.set(hex, rgb);
+    return rgb;
   };
+
+  // ✅ PERF: rAF gate on onUpdate — coalesces multiple GSAP tick callbacks within
+  // the same animation frame into a single DOM write (setProperty).
+  let rafPending = false;
 
   gsap.to(colorObj, {
     accent: targetAccent,
@@ -94,10 +103,16 @@ const animateThemeColors = (targetAccent: string, targetAccentSec: string) => {
     ease: 'power2.out',
     overwrite: 'auto',
     onUpdate: () => {
-      document.documentElement.style.setProperty('--universe-accent', colorObj.accent);
-      document.documentElement.style.setProperty('--universe-accent-secondary', colorObj.accentSec);
-      document.documentElement.style.setProperty('--universe-accent-rgb', hexToRgb(colorObj.accent));
-      document.documentElement.style.setProperty('--universe-accent-secondary-rgb', hexToRgb(colorObj.accentSec));
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(() => {
+          document.documentElement.style.setProperty('--universe-accent', colorObj.accent);
+          document.documentElement.style.setProperty('--universe-accent-secondary', colorObj.accentSec);
+          document.documentElement.style.setProperty('--universe-accent-rgb', hexToRgb(colorObj.accent));
+          document.documentElement.style.setProperty('--universe-accent-secondary-rgb', hexToRgb(colorObj.accentSec));
+          rafPending = false;
+        });
+      }
     }
   });
 };

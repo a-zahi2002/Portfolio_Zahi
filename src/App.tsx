@@ -38,14 +38,27 @@ const Portfolio: React.FC = () => {
     const mediaQuery = window.matchMedia('(hover: hover)');
     if (!mediaQuery.matches) return () => clearTimeout(timer);
 
+    // ✅ PERF: rAF gate — CSS vars written at most once per animation frame,
+    // not on every pixel of mouse movement (which triggers cascading style recalcs).
+    let rafPending = false;
+    let pendingX = 0;
+    let pendingY = 0;
+
     const handleMouseMove = (e: MouseEvent) => {
-      const x = (e.clientX / window.innerWidth) - 0.5;
-      const y = (e.clientY / window.innerHeight) - 0.5;
-      document.documentElement.style.setProperty('--mouse-x', x.toString());
-      document.documentElement.style.setProperty('--mouse-y', y.toString());
+      pendingX = (e.clientX / window.innerWidth) - 0.5;
+      pendingY = (e.clientY / window.innerHeight) - 0.5;
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(() => {
+          document.documentElement.style.setProperty('--mouse-x', pendingX.toString());
+          document.documentElement.style.setProperty('--mouse-y', pendingY.toString());
+          rafPending = false;
+        });
+      }
     };
 
     const handleMouseLeave = () => {
+      rafPending = false;
       document.documentElement.style.setProperty('--mouse-x', '0');
       document.documentElement.style.setProperty('--mouse-y', '0');
     };

@@ -16,28 +16,42 @@ const AmbientCanvas: React.FC = () => {
     let animationFrameId: number;
     let width = window.innerWidth;
     let height = window.innerHeight;
-    
-    let isMobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
-    let particleCount = isMobile ? 180 : 280;
 
-    let mouseX = width / 2;
-    let mouseY = height / 2;
-    
-    // Theme colors
-    let isDark = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark') || document.documentElement.getAttribute('data-theme') === 'dark';
-    
-    // Default to dark since we didn't initially check
-    // We'll update in loop if needed, but a MutationObserver is better
+    let isMobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
+    // ✅ PERF: Reduced particle count — 280→140 desktop, 180→70 mobile
+    let particleCount = isMobile ? 70 : 140;
+
+    let mouseX = -9999;
+    let mouseY = -9999;
+
+    // ✅ PERF: Pre-build color strings once per mode change — not per particle per frame
+    let isDark = document.documentElement.classList.contains('dark');
+    let warmColor = isDark ? 'rgba(255,255,255,' : 'rgba(218,165,32,';
+    let coolColor = isDark ? 'rgba(200,230,255,' : 'rgba(75,0,130,';
+
     const observer = new MutationObserver(() => {
       isDark = document.documentElement.classList.contains('dark');
+      warmColor = isDark ? 'rgba(255,255,255,' : 'rgba(218,165,32,';
+      coolColor = isDark ? 'rgba(200,230,255,' : 'rgba(75,0,130,';
     });
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'data-theme'] });
+
+    // ✅ PERF: Pause animation when tab is hidden
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(animationFrameId);
+      } else {
+        render();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // ✅ PERF: Mobile frame-skip counter
+    let frameCount = 0;
 
     class Particle {
       x: number;
       y: number;
-      baseX: number;
-      baseY: number;
       size: number;
       speedX: number;
       speedY: number;
@@ -47,9 +61,7 @@ const AmbientCanvas: React.FC = () => {
       constructor() {
         this.x = Math.random() * width;
         this.y = Math.random() * height;
-        this.baseX = this.x;
-        this.baseY = this.y;
-        this.size = Math.random() * 2 + 0.5; // 0.5px to 2.5px
+        this.size = Math.random() * 2 + 0.5;
         this.speedX = (Math.random() - 0.5) * 0.2;
         this.speedY = (Math.random() - 0.5) * 0.2;
         this.opacity = Math.random() * 0.6 + 0.2;
@@ -57,23 +69,19 @@ const AmbientCanvas: React.FC = () => {
       }
 
       update(scrollVelocity: number) {
-        // Repel from mouse
+        // ✅ PERF: Use squared distance — avoids Math.sqrt entirely
         const dx = mouseX - this.x;
         const dy = mouseY - this.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        let forceDirectionX = dx / distance;
-        let forceDirectionY = dy / distance;
-        
-        // Max distance 120px
-        if (distance < 120 && !isMobile) {
-          const force = (120 - distance) / 120;
-          this.x -= forceDirectionX * force * 2;
-          this.y -= forceDirectionY * force * 2;
+        const distSq = dx * dx + dy * dy;
+
+        if (distSq < 14400 && !isMobile) { // 120² = 14400
+          const dist = Math.sqrt(distSq); // only called when within range (~10% of particles)
+          const force = (120 - dist) / 120;
+          this.x -= (dx / dist) * force * 2;
+          this.y -= (dy / dist) * force * 2;
         } else {
-          // Return to base slightly
           this.x += this.speedX;
-          this.y += this.speedY + (scrollVelocity * 0.05 * (this.size / 2)); // Parallax effect
+          this.y += this.speedY + (scrollVelocity * 0.05 * (this.size / 2));
         }
 
         // Screen wrap
@@ -85,25 +93,19 @@ const AmbientCanvas: React.FC = () => {
 
       draw(scrollVelocity: number) {
         if (!ctx) return;
-        
         const absoluteVelocity = Math.abs(scrollVelocity);
+        // ✅ PERF: Use pre-built color prefix strings
+        const colorBase = this.isWarm ? warmColor : coolColor;
 
-        if (isDark) {
-          ctx.strokeStyle = this.isWarm ? `rgba(255, 255, 255, ${this.opacity})` : `rgba(200, 230, 255, ${this.opacity})`;
-          ctx.fillStyle = this.isWarm ? `rgba(255, 255, 255, ${this.opacity})` : `rgba(200, 230, 255, ${this.opacity})`;
-        } else {
-          ctx.strokeStyle = this.isWarm ? `rgba(218, 165, 32, ${this.opacity})` : `rgba(75, 0, 130, ${this.opacity})`;
-          ctx.fillStyle = this.isWarm ? `rgba(218, 165, 32, ${this.opacity})` : `rgba(75, 0, 130, ${this.opacity})`;
-        }
+        ctx.fillStyle = colorBase + this.opacity + ')';
 
-        // Draw as speed line if scrolling fast (starfield warp speed)
         if (absoluteVelocity > 1.5 && !isMobile) {
-          ctx.beginPath();
+          const stretch = Math.max(-60, Math.min(60, -scrollVelocity * 0.5 * (this.size / 1.2)));
+          ctx.strokeStyle = colorBase + this.opacity + ')';
           ctx.lineWidth = this.size;
           ctx.lineCap = 'round';
+          ctx.beginPath();
           ctx.moveTo(this.x, this.y);
-          // Stretch along the scroll axis (negative velocity stretches upwards when scrolling down)
-          const stretch = Math.max(-60, Math.min(60, -scrollVelocity * 0.5 * (this.size / 1.2)));
           ctx.lineTo(this.x, this.y + stretch);
           ctx.stroke();
         } else {
@@ -124,11 +126,19 @@ const AmbientCanvas: React.FC = () => {
     let lastScrollY = window.scrollY;
 
     const render = () => {
+      if (document.hidden) return;
+
+      // ✅ PERF: Skip every other frame on mobile (30fps cap)
+      frameCount++;
+      if (isMobile && frameCount % 2 !== 0) {
+        animationFrameId = requestAnimationFrame(render);
+        return;
+      }
+
       const currentScrollY = window.scrollY;
       const scrollVelocity = currentScrollY - lastScrollY;
       lastScrollY = currentScrollY;
 
-      // Use clearRect for performance as instructed
       ctx.clearRect(0, 0, width, height);
 
       for (let i = 0; i < particleCount; i++) {
@@ -146,10 +156,10 @@ const AmbientCanvas: React.FC = () => {
       height = newHeight;
       canvas.width = width;
       canvas.height = height;
-      
+
       isMobile = window.matchMedia('(pointer: coarse)').matches || width < 768;
-      particleCount = isMobile ? 180 : 280;
-      
+      particleCount = isMobile ? 70 : 140;
+
       initParticles();
     };
 
@@ -159,15 +169,27 @@ const AmbientCanvas: React.FC = () => {
       resizeTimeout = setTimeout(handleResize, 200);
     };
 
+    // ✅ PERF: rAF-gate mousemove — at most one update per frame
+    let mousePending = false;
+    let pendingX = -9999;
+    let pendingY = -9999;
+
     const handleMouseMove = (e: MouseEvent) => {
-      mouseX = e.clientX;
-      mouseY = e.clientY;
+      pendingX = e.clientX;
+      pendingY = e.clientY;
+      if (!mousePending) {
+        mousePending = true;
+        requestAnimationFrame(() => {
+          mouseX = pendingX;
+          mouseY = pendingY;
+          mousePending = false;
+        });
+      }
     };
 
     const handleMouseLeave = () => {
-      // Move mouse off screen so repel stops
-      mouseX = -1000;
-      mouseY = -1000;
+      mouseX = -9999;
+      mouseY = -9999;
     };
 
     // Initial setup
@@ -185,6 +207,7 @@ const AmbientCanvas: React.FC = () => {
       window.removeEventListener('resize', debounceResize);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       observer.disconnect();
     };
   }, []);

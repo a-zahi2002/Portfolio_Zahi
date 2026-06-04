@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Code2, Database, Layout, Wrench, Cpu, Layers, Globe, Palette, Terminal, Settings } from 'lucide-react';
 import { useSkills } from '../hooks/cms/useSkills';
 import type { CMSSkill } from '../types/cms';
@@ -31,12 +31,13 @@ const SkillsCard: React.FC<{
   index: number;
   isTouchDevice: boolean;
 }> = ({ skillGroup, index, isTouchDevice }) => {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const rotateX = useMotionValue(0);
-  const rotateY = useMotionValue(0);
-
+  // ✅ PERF: Replaced useMotionValue + useMotionTemplate (Framer reconciliation on every pixel)
+  // with plain refs + inline style written directly in onMouseMove handler.
   const cardRef = React.useRef<HTMLDivElement>(null);
+  const spotlightRef = React.useRef<HTMLDivElement>(null);
+  const borderGlowRef = React.useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = React.useState({ rotateX: 0, rotateY: 0 });
+
   const isHorizontal = skillGroup.items.length >= 5;
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -45,39 +46,28 @@ const SkillsCard: React.FC<{
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
-    // Set spotlight coordinates
-    mouseX.set(x);
-    mouseY.set(y);
 
-    // Calculate 3D tilt angles (max tilt: 4 degrees)
-    const cardWidth = rect.width;
-    const cardHeight = rect.height;
-    const centerX = cardWidth / 2;
-    const centerY = cardHeight / 2;
-    
-    const rotateXValue = ((y - centerY) / centerY) * -4;
-    const rotateYValue = ((x - centerX) / centerX) * 4;
+    // ✅ Write spotlight gradient directly to DOM — no motion value reconciliation
+    const grad = `radial-gradient(350px circle at ${x}px ${y}px, rgba(var(--universe-accent-rgb, 0, 243, 255), 0.06) 0%, rgba(var(--universe-accent-secondary-rgb, 139, 92, 246), 0.02) 50%, transparent 100%)`;
+    if (spotlightRef.current) spotlightRef.current.style.background = grad;
 
-    rotateX.set(rotateXValue);
-    rotateY.set(rotateYValue);
+    const borderGrad = `radial-gradient(200px circle at ${x}px ${y}px, rgba(var(--universe-accent-rgb, 0, 243, 255), 0.25), transparent 80%)`;
+    if (borderGlowRef.current) borderGlowRef.current.style.background = borderGrad;
+
+    // 3D tilt (max 4 degrees)
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rX = ((y - centerY) / centerY) * -4;
+    const rY = ((x - centerX) / centerX) * 4;
+    setTilt({ rotateX: rX, rotateY: rY });
   };
 
   const handleMouseLeave = () => {
     if (isTouchDevice) return;
-    rotateX.set(0);
-    rotateY.set(0);
+    if (spotlightRef.current) spotlightRef.current.style.background = '';
+    if (borderGlowRef.current) borderGlowRef.current.style.background = '';
+    setTilt({ rotateX: 0, rotateY: 0 });
   };
-
-  // Combine spotlight background gradient
-  const backgroundSpotlight = useMotionTemplate`
-    radial-gradient(
-      350px circle at ${mouseX}px ${mouseY}px,
-      rgba(var(--universe-accent-rgb, 0, 243, 255), 0.06) 0%,
-      rgba(var(--universe-accent-secondary-rgb, 139, 92, 246), 0.02) 50%,
-      transparent 100%
-    )
-  `;
 
   return (
     <motion.div
@@ -90,40 +80,34 @@ const SkillsCard: React.FC<{
       viewport={{ once: true, margin: "-30px" }}
       transition={{ duration: 0.5, delay: index * 0.08 }}
       style={{
-        rotateX: isTouchDevice ? 0 : rotateX,
-        rotateY: isTouchDevice ? 0 : rotateY,
+        rotateX: isTouchDevice ? 0 : tilt.rotateX,
+        rotateY: isTouchDevice ? 0 : tilt.rotateY,
         transformStyle: 'preserve-3d',
         perspective: 1000,
       }}
       className={`p-8 rounded-3xl bg-white/80 dark:bg-charcoal-900/35 backdrop-blur-md border border-gray-200/50 dark:border-white/5 hover:border-[var(--universe-accent)]/30 transition-all duration-300 shadow-lg hover:shadow-xl relative overflow-hidden group flex-grow
-        ${isHorizontal 
-          ? 'w-full md:w-full lg:w-[calc(66.666%-1.5rem)]' 
+        ${isHorizontal
+          ? 'w-full md:w-full lg:w-[calc(66.666%-1.5rem)]'
           : 'w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]'
         }
       `}
     >
-      {/* Spotlight overlay (Desktop only) */}
+      {/* Spotlight overlay (Desktop only) — plain div, style written in handler */}
       {!isTouchDevice && (
-        <motion.div
+        <div
+          ref={spotlightRef}
           className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-0"
-          style={{ background: backgroundSpotlight }}
         />
       )}
 
-      {/* Subtle border shine glow */}
+      {/* Border shine glow */}
       {isTouchDevice ? (
         <div className="absolute inset-0 bg-gradient-to-tr from-accent-cyan/5 via-transparent to-accent-purple/5 opacity-40 pointer-events-none z-0" />
       ) : (
-        <motion.div
+        <div
+          ref={borderGlowRef}
           className="pointer-events-none absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 border border-accent-cyan/20 z-10"
           style={{
-            background: useMotionTemplate`
-              radial-gradient(
-                200px circle at ${mouseX}px ${mouseY}px,
-                rgba(var(--universe-accent-rgb, 0, 243, 255), 0.25),
-                transparent 80%
-              )
-            `,
             WebkitMaskImage: 'linear-gradient(black, black)',
             maskImage: 'linear-gradient(black, black)',
           }}
