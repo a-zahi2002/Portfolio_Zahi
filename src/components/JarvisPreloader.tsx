@@ -142,7 +142,7 @@ const JarvisPreloader: React.FC<JarvisPreloaderProps> = ({ onComplete }) => {
     }, containerRef);
 
     return () => ctx.revert();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const splitReveal = () => {
@@ -241,7 +241,7 @@ const JarvisPreloader: React.FC<JarvisPreloaderProps> = ({ onComplete }) => {
       if (titleEl) {
         tl.to(titleEl, {
           scrambleText: {
-            text: 'INITIALIZING J.A.R.V.I.S PORTFOLIO OS v2.1.0',
+            text: 'INITIALIZING A.ZAHI PORTFOLIO OS v2.1.0',
             chars: 'upperCase',
             speed: 0.8,
           },
@@ -279,7 +279,7 @@ const JarvisPreloader: React.FC<JarvisPreloaderProps> = ({ onComplete }) => {
         width: '100%',
         duration: 1.5,
         ease: 'power1.inOut',
-        onUpdate: function() {
+        onUpdate: function () {
           const pct = Math.round(this.progress() * 100);
           if (counterRef.current) {
             counterRef.current.textContent = String(pct).padStart(3, '0') + '%';

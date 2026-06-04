@@ -351,12 +351,19 @@ const Hero: React.FC = () => {
               ))}
             </span>
             {' '}
-            <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple drop-shadow-sm">
+            <span className="inline-block drop-shadow-sm">
               {headingHighlight.split('').map((char, i) => (
                 <span
                   key={i}
-                  className="j-name-char inline-block"
-                  style={{ display: 'inline-block', minWidth: char === ' ' ? '0.25em' : 'auto' }}
+                  className="j-name-char inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple"
+                  style={{
+                    display: 'inline-block',
+                    minWidth: char === ' ' ? '0.25em' : 'auto',
+                    backgroundSize: `${headingHighlight.length * 100}% 100%`,
+                    backgroundPosition: headingHighlight.length > 1
+                      ? `${(i / (headingHighlight.length - 1)) * 100}% 0%`
+                      : '0% 0%',
+                  }}
                 >
                   {char}
                 </span>

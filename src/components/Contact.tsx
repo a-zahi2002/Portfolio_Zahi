@@ -159,12 +159,19 @@ const Contact: React.FC = () => {
                 ))}
               </span>
               <br />
-              <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-400">
+              <span className="inline-block">
                 {headingHighlight.split('').map((char, i) => (
                   <span
                     key={i}
-                    className="j-contact-char inline-block"
-                    style={{ display: 'inline-block', minWidth: char === ' ' ? '0.25em' : 'auto' }}
+                    className="j-contact-char inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-400"
+                    style={{
+                      display: 'inline-block',
+                      minWidth: char === ' ' ? '0.25em' : 'auto',
+                      backgroundSize: `${headingHighlight.length * 100}% 100%`,
+                      backgroundPosition: headingHighlight.length > 1
+                        ? `${(i / (headingHighlight.length - 1)) * 100}% 0%`
+                        : '0% 0%',
+                    }}
                   >
                     {char}
                   </span>
