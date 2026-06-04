@@ -73,8 +73,8 @@ const SkillsCard: React.FC<{
   const backgroundSpotlight = useMotionTemplate`
     radial-gradient(
       350px circle at ${mouseX}px ${mouseY}px,
-      rgba(0, 243, 255, 0.06) 0%,
-      rgba(139, 92, 246, 0.02) 50%,
+      rgba(var(--universe-accent-rgb, 0, 243, 255), 0.06) 0%,
+      rgba(var(--universe-accent-secondary-rgb, 139, 92, 246), 0.02) 50%,
       transparent 100%
     )
   `;
@@ -95,7 +95,7 @@ const SkillsCard: React.FC<{
         transformStyle: 'preserve-3d',
         perspective: 1000,
       }}
-      className={`p-8 rounded-3xl bg-white/70 dark:bg-charcoal-900/40 backdrop-blur-md border border-gray-200/50 dark:border-white/10 hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 shadow-lg hover:shadow-xl relative overflow-hidden group flex-grow
+      className={`p-8 rounded-3xl bg-white/80 dark:bg-charcoal-900/35 backdrop-blur-md border border-gray-200/50 dark:border-white/5 hover:border-[var(--universe-accent)]/30 transition-all duration-300 shadow-lg hover:shadow-xl relative overflow-hidden group flex-grow
         ${isHorizontal 
           ? 'w-full md:w-full lg:w-[calc(66.666%-1.5rem)]' 
           : 'w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]'
@@ -110,7 +110,7 @@ const SkillsCard: React.FC<{
         />
       )}
 
-      {/* Subtle border shine glow (Mobile gets a static soft corner glow, Desktop gets dynamic) */}
+      {/* Subtle border shine glow */}
       {isTouchDevice ? (
         <div className="absolute inset-0 bg-gradient-to-tr from-accent-cyan/5 via-transparent to-accent-purple/5 opacity-40 pointer-events-none z-0" />
       ) : (
@@ -120,7 +120,7 @@ const SkillsCard: React.FC<{
             background: useMotionTemplate`
               radial-gradient(
                 200px circle at ${mouseX}px ${mouseY}px,
-                rgba(0, 243, 255, 0.3),
+                rgba(var(--universe-accent-rgb, 0, 243, 255), 0.25),
                 transparent 80%
               )
             `,
@@ -138,26 +138,35 @@ const SkillsCard: React.FC<{
         {/* Category Header */}
         <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-white/5">
           <div className="flex items-center gap-3.5">
-            <div className="p-2.5 rounded-2xl bg-gray-100 dark:bg-white/5 group-hover:scale-110 transition-transform duration-300">
+            {/* Spinning decorative core behind icon */}
+            <div className="relative w-11 h-11 flex items-center justify-center bg-gray-100 dark:bg-white/5 rounded-2xl group-hover:scale-105 transition-transform duration-500">
+              <div className="absolute inset-0 bg-[var(--universe-accent)]/5 rounded-2xl group-hover:bg-[var(--universe-accent)]/15 group-hover:blur-[4px] transition-all" />
+              <div className="absolute inset-0.5 rounded-2xl border border-dashed border-[var(--universe-accent)]/30 group-hover:border-[var(--universe-accent)]/60 animate-spin" style={{ animationDuration: '9s' }} />
               {ICON_MAP[skillGroup.icon] ?? <Code2 className="text-blue-500 shrink-0" size={22} />}
             </div>
-            <h3 className="text-lg font-bold text-gray-900 dark:text-white font-display leading-none">
-              {skillGroup.category}
-            </h3>
+            <div>
+              {/* Sector tag */}
+              <span className="block font-mono text-[7px] tracking-[0.2em] text-gray-400 dark:text-gray-500 uppercase leading-none mb-1">
+                [ REACTOR CORE 0{index + 1} ]
+              </span>
+              <h3 className="text-base font-bold text-gray-900 dark:text-white font-display leading-none group-hover:text-[var(--universe-accent)] transition-colors">
+                {skillGroup.category}
+              </h3>
+            </div>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-gray-100 dark:bg-white/5 text-gray-500 dark:text-gray-400">
-            {skillGroup.items.length} {skillGroup.items.length === 1 ? 'Skill' : 'Skills'}
+          <span className="text-[10px] font-mono tracking-wider px-2.5 py-1 rounded-full bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/5 text-gray-500 dark:text-gray-400">
+            {skillGroup.items.length} SPECTRA
           </span>
         </div>
 
         {/* Skill Items */}
         <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-x-8 gap-y-5">
           {skillGroup.items.map((skill, index) => {
-            const skillColor = skill.color || '#00f3ff';
+            const skillColor = skill.color || 'var(--universe-accent)';
             return (
               <div key={skill.id} className="space-y-2 group/item" data-skill-item-inner>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="font-medium text-gray-800 dark:text-gray-200 group-hover/item:text-blue-600 dark:group-hover/item:text-accent-cyan transition-colors">
+                  <span className="font-medium text-gray-800 dark:text-gray-200 group-hover/item:text-[var(--universe-accent)] transition-colors">
                     {skill.name}
                   </span>
                   <span className="text-xs text-gray-500 dark:text-gray-400 font-mono font-semibold">
@@ -165,8 +174,8 @@ const SkillsCard: React.FC<{
                   </span>
                 </div>
                 
-                {/* Progress Bar */}
-                <div className="h-1.5 w-full bg-gray-100 dark:bg-white/5 rounded-full relative">
+                {/* Progress Bar (translucent channel) */}
+                <div className="h-1.5 w-full bg-gray-100 dark:bg-white/5 rounded-full relative overflow-visible">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${skill.proficiency}%` }}
@@ -176,15 +185,24 @@ const SkillsCard: React.FC<{
                     data-proficiency={skill.proficiency}
                     style={{ 
                       backgroundColor: skillColor,
-                      boxShadow: `0 0 8px ${skillColor}80`,
+                      boxShadow: `0 0 8px ${skillColor}aa`,
                     }}
                   >
+                    {/* Glowing outer corona ring */}
+                    <div 
+                      className="absolute right-0 top-1/2 w-4.5 h-4.5 rounded-full border border-white/20 bg-white/5 pointer-events-none animate-ping z-10" 
+                      style={{ 
+                        transform: 'translate(50%, -50%)',
+                        animationDuration: '3.5s'
+                      }} 
+                    />
+                    
                     {/* Glowing planetary dot slider at the edge */}
                     <div 
-                      className="absolute right-0 top-1/2 w-3.5 h-3.5 rounded-full border border-white z-20 pointer-events-none"
+                      className="absolute right-0 top-1/2 w-3.5 h-3.5 rounded-full border border-white z-20 pointer-events-none shadow-[0_0_8px_#ffffff]"
                       style={{ 
                         backgroundColor: skillColor, 
-                        boxShadow: `0 0 10px ${skillColor}, 0 0 4px #ffffff`,
+                        boxShadow: `0 0 12px ${skillColor}, 0 0 4px #ffffff`,
                         transform: 'translate(50%, -50%)'
                       }}
                     />
@@ -242,10 +260,21 @@ const Skills: React.FC = () => {
   }, [skills]);
 
   return (
-    <section id="skills" ref={sectionRef} className="py-32 relative overflow-hidden">
+    <section id="skills" ref={sectionRef} className="py-32 relative overflow-hidden bg-transparent">
       
+      {/* Decorative Star Constellation Lines & Concentric Orbits in background */}
+      <div className="absolute inset-0 opacity-20 dark:opacity-40 pointer-events-none z-0">
+        <svg className="w-full h-full" style={{ overflow: 'visible' }}>
+          <ellipse cx="80%" cy="20%" rx="220" ry="110" fill="none" stroke="var(--universe-accent, #00f3ff)" strokeWidth="0.5" strokeDasharray="3 7" transform="rotate(-15)" />
+          <ellipse cx="20%" cy="80%" rx="280" ry="140" fill="none" stroke="var(--universe-accent-secondary, #fcd34d)" strokeWidth="0.5" strokeDasharray="1 6" transform="rotate(10)" />
+          
+          {/* Wave line spectra indicators */}
+          <path d="M 5% 50% Q 25% 40%, 50% 50% T 95% 50%" fill="none" stroke="var(--universe-accent, #00f3ff)" strokeWidth="0.25" strokeDasharray="2 8" opacity="0.3" />
+        </svg>
+      </div>
+
       {/* Decorative Background Blur */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-purple-500/5 dark:bg-accent-purple/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-purple-500/5 dark:bg-accent-purple/5 rounded-full blur-[120px] pointer-events-none z-0" />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
         <motion.div
@@ -255,6 +284,12 @@ const Skills: React.FC = () => {
           transition={{ duration: 0.6 }}
           className="mb-16 text-center"
         >
+          {/* Status Indicator Tag */}
+          <div className="mb-4 inline-flex items-center gap-2 font-mono text-[9px] tracking-[0.25em] text-[var(--universe-accent-secondary)] select-none uppercase">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--universe-accent-secondary)] animate-ping" />
+            <span>[ SYSTEM TECH MATRIX DETECTED ]</span>
+          </div>
+
           <h2 ref={headingRef} className="text-4xl lg:text-5xl font-display font-bold mb-4 text-charcoal-900 dark:text-white">
             Technical <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500 dark:from-accent-purple dark:to-pink-400">Arsenal</span>
           </h2>

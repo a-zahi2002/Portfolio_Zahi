@@ -120,19 +120,18 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
 };
 
 // ── Solar System Position Utility ─────────────────────────────────────────────
-const getProjectPosition = (index: number, total: number) => {
+const getProjectPosition = (project: CMSProject, index: number) => {
   // Distribute projects across the 3 orbits
   const orbit = (index % 3) + 1; // 1, 2, or 3
   
-  // Count how many projects are in this specific orbit
-  const projectsInThisOrbit = Math.ceil((total - (orbit - 1)) / 3);
-  const positionInOrbit = Math.floor(index / 3);
-  
-  // Calculate angle spacing for this orbit
-  const angleStep = 360 / Math.max(1, projectsInThisOrbit);
-  // Add a stagger offset based on orbit index to make the system look organic
-  const angleOffset = orbit * 55; 
-  const angle = (positionInOrbit * angleStep) + angleOffset;
+  // Deterministic pseudo-random angle based on project ID/slug to keep positions stable
+  let hash = 0;
+  const idStr = project.id || index.toString();
+  for (let i = 0; i < idStr.length; i++) {
+    hash = idStr.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const seed = Math.abs(hash);
+  const angle = seed % 360;
   
   // Convert to radians
   const rad = (angle * Math.PI) / 180;
@@ -151,7 +150,7 @@ const getProjectPosition = (index: number, total: number) => {
   const x = Math.cos(rad) * rx;
   const y = Math.sin(rad) * ry;
   
-  return { x, y, orbit };
+  return { x, y, orbit, angle };
 };
 
 // ── Solar System Card (Desktop Layout) ────────────────────────────────────────
@@ -160,8 +159,9 @@ const SolarSystemCard: React.FC<{
   x: number;
   y: number;
   orbit: number;
+  angle: number;
   index: number;
-}> = ({ project, x, y, orbit, index }) => {
+}> = ({ project, x, y, orbit, angle, index }) => {
   const isEven = index % 2 === 0;
 
   return (
@@ -169,6 +169,8 @@ const SolarSystemCard: React.FC<{
       data-project-card
       data-x={x}
       data-y={y}
+      data-angle={angle}
+      data-orbit={orbit}
       className="absolute w-[240px] z-20 group pointer-events-auto"
       style={{
         left: '50%',
@@ -328,7 +330,7 @@ const Projects: React.FC = () => {
 
             {/* Projects mapped as Orbiting Planet Cards */}
             {(projects ?? []).map((project, index) => {
-              const { x, y, orbit } = getProjectPosition(index, projects?.length ?? 0);
+              const { x, y, orbit, angle } = getProjectPosition(project, index);
               
               return (
                 <SolarSystemCard
@@ -337,6 +339,7 @@ const Projects: React.FC = () => {
                   x={x}
                   y={y}
                   orbit={orbit}
+                  angle={angle}
                   index={index}
                 />
               );

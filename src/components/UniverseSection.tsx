@@ -130,13 +130,10 @@ if (typeof window !== 'undefined') {
 
 const UniverseSection: React.FC<UniverseSectionProps> = ({ id, theme, children, className = '' }) => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const beamRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
-
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
@@ -146,24 +143,6 @@ const UniverseSection: React.FC<UniverseSectionProps> = ({ id, theme, children, 
         onEnter: () => dispatchUniverseChange(theme),
         onEnterBack: () => dispatchUniverseChange(theme),
       });
-
-      // Artifact theme scanning beam
-      if (theme === 'artifact' && beamRef.current && !prefersReduced) {
-        const beam = beamRef.current;
-        const isMobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
-        if (!isMobile) {
-          gsap.fromTo(beam, 
-            { yPercent: 0 }, 
-            { 
-              yPercent: 10000, 
-              y: () => section.offsetHeight,
-              duration: 3, 
-              repeat: -1, 
-              ease: 'none' 
-            }
-          );
-        }
-      }
     }, section);
 
     return () => ctx.revert();
@@ -175,7 +154,7 @@ const UniverseSection: React.FC<UniverseSectionProps> = ({ id, theme, children, 
     const config = themeConfigs[newTheme];
     const bgColor = isDark ? '#050505' : '#fafafa';
 
-    // Cross-fade body background color (keeps base color consistent, only fades on theme mode toggle)
+    // Cross-fade body background color
     gsap.to(document.body, {
       backgroundColor: bgColor,
       duration: 0.8,
@@ -217,12 +196,6 @@ const UniverseSection: React.FC<UniverseSectionProps> = ({ id, theme, children, 
       {theme === 'nebula' && (
         <div className="absolute top-1/2 left-1/2 w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] rounded-full pointer-events-none -translate-x-1/2 -translate-y-1/2 mix-blend-screen opacity-30 z-0 animate-nebula-drift"
              style={{ background: 'radial-gradient(circle, var(--universe-accent) 0%, transparent 70%)' }} />
-      )}
-
-      {/* Artifact Scanning Beam */}
-      {theme === 'artifact' && (
-        <div ref={beamRef} className="absolute top-0 left-0 w-full h-[2px] pointer-events-none z-10 hidden md:block"
-             style={{ backgroundColor: 'var(--universe-accent)', opacity: 0.6, boxShadow: '0 0 10px var(--universe-accent)' }} />
       )}
 
       {/* Signal Rings */}

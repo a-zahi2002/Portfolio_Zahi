@@ -9,7 +9,7 @@ import { useHeroSection } from '../hooks/cms/useHeroSection';
 import { useSiteSettings } from '../hooks/cms/useSiteSettings';
 import { useHeroAnimation } from '../hooks/animations/useHeroAnimation';
 
-const MagneticButton = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => {
+const MagneticButton = ({ onClick }: { onClick: () => void }) => {
   const ref = useRef<HTMLButtonElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
@@ -18,7 +18,7 @@ const MagneticButton = ({ children, onClick }: { children: React.ReactNode; onCl
     const { height, width, left, top } = ref.current!.getBoundingClientRect();
     const middleX = clientX - (left + width / 2);
     const middleY = clientY - (top + height / 2);
-    setPosition({ x: middleX * 0.2, y: middleY * 0.2 });
+    setPosition({ x: middleX * 0.25, y: middleY * 0.25 });
   };
 
   const reset = () => {
@@ -34,10 +34,20 @@ const MagneticButton = ({ children, onClick }: { children: React.ReactNode; onCl
       animate={{ x, y }}
       transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
       onClick={onClick}
-      className="group relative flex items-center justify-center gap-3 px-10 py-5 bg-charcoal-900 dark:bg-white text-white dark:text-charcoal-900 rounded-full font-bold tracking-wide overflow-hidden hover:scale-105 shadow-[0_0_40px_rgba(0,0,0,0.1)] dark:shadow-[0_0_40px_rgba(255,255,255,0.1)]"
+      className="group relative w-32 h-32 md:w-36 md:h-36 rounded-full flex flex-col items-center justify-center p-4 border border-charcoal-900/10 dark:border-white/10 hover:border-charcoal-900/30 dark:hover:border-white/30 bg-white/20 dark:bg-white/5 backdrop-blur-md transition-all duration-300 hover:scale-105 shadow-[0_0_30px_rgba(0,0,0,0.03)] dark:shadow-[0_0_30px_rgba(255,255,255,0.02)] overflow-hidden"
     >
-      <span className="relative z-10">{children}</span>
-      <ArrowDown className="relative z-10 w-4 h-4 group-hover:translate-y-1 transition-transform" />
+      <div className="absolute inset-0 bg-gradient-to-tr from-[var(--universe-accent)]/10 to-[var(--universe-accent-secondary)]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
+      <span className="font-mono text-[9px] font-bold tracking-[0.25em] text-charcoal-800 dark:text-gray-300 group-hover:text-[var(--universe-accent)] transition-colors mb-1 uppercase leading-none">
+        Explore
+      </span>
+      <span className="font-display text-[10px] font-bold tracking-[0.3em] text-charcoal-900 dark:text-white group-hover:text-[var(--universe-accent)] transition-colors uppercase leading-none">
+        Work
+      </span>
+      
+      <div className="absolute w-[82%] h-[82%] rounded-full border border-dashed border-charcoal-900/10 dark:border-white/10 group-hover:border-[var(--universe-accent)]/30 group-hover:animate-spin pointer-events-none" style={{ animationDuration: '18s' }} />
+
+      <ArrowDown className="w-3.5 h-3.5 mt-2 text-charcoal-600 dark:text-gray-400 group-hover:text-[var(--universe-accent)] group-hover:translate-y-1 transition-all duration-300" />
     </motion.button>
   );
 };
@@ -91,7 +101,6 @@ const Hero: React.FC = () => {
   const heading = hero?.heading ?? 'A. Zahi';
   const headingHighlight = hero?.heading_highlight ?? 'Faleel';
   const subheading = hero?.subheading ?? 'Crafting intuitive and immersive digital experiences bridging robust engineering with elegant design.';
-  const ctaText = hero?.cta_text ?? 'Explore Work';
   const ctaTarget = hero?.cta_scroll_target ?? 'projects';
   const availabilityStatus = hero?.availability_status ?? true;
   const availabilityLabel = hero?.availability_label ?? 'OPEN TO WORK';
@@ -100,7 +109,7 @@ const Hero: React.FC = () => {
     <section
       id="hero"
       ref={sectionRef}
-      className="relative min-h-[95vh] flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-transparent"
     >
       {/* ── Ambient Mesh Gradient (CSS only, pure additive) ── */}
       <div className="hero-mesh-gradient" aria-hidden="true">
@@ -122,6 +131,38 @@ const Hero: React.FC = () => {
           zIndex: 5,
         }}
       />
+
+      {/* ── Stellar Planet Sphere Behind Content ── */}
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0 overflow-visible" aria-hidden="true">
+        {/* Atmospheric Backing Glow */}
+        <div 
+          className="absolute w-[300px] h-[300px] md:w-[475px] md:h-[475px] lg:w-[580px] lg:h-[580px] rounded-full pointer-events-none blur-[40px] opacity-75 dark:opacity-90 transition-all duration-700 parallax-slow"
+          style={{
+            background: 'radial-gradient(circle at 75% 25%, var(--universe-accent) 0%, var(--universe-accent-secondary) 35%, transparent 70%)'
+          }}
+        />
+
+        {/* Central Planet Body (Quartz-glass on light mode, Eclipse on dark mode) */}
+        <div className="absolute w-[260px] h-[260px] md:w-[420px] md:h-[420px] lg:w-[500px] lg:h-[500px] rounded-full overflow-hidden border border-charcoal-200/20 dark:border-white/5 
+          bg-gradient-to-tr from-white/30 via-white/80 to-white/10 dark:bg-[#020204] 
+          backdrop-blur-[8px] dark:backdrop-blur-none
+          shadow-[inset_-12px_12px_30px_rgba(255,255,255,0.7),_inset_12px_-12px_30px_rgba(var(--universe-accent-rgb),0.12),_0_20px_50px_rgba(0,0,0,0.06)] 
+          dark:shadow-[inset_-12px_12px_50px_rgba(255,255,255,0.04),_inset_35px_-35px_80px_rgba(var(--universe-accent-rgb),0.35)] 
+          transition-all duration-700 parallax-slow"
+        >
+          {/* Internal space gas/clouds */}
+          <div className="absolute inset-0 opacity-20 dark:opacity-35 mix-blend-color-dodge animate-spin-slow" 
+               style={{ 
+                 animationDuration: '180s',
+                 backgroundImage: 'radial-gradient(circle, var(--universe-accent) 0%, transparent 60%), repeating-radial-gradient(circle, transparent, transparent 15px, rgba(255,255,255,0.03) 15px, rgba(255,255,255,0.03) 30px)' 
+               }} 
+          />
+          {/* Eclipse shading for dark mode */}
+          <div className="absolute inset-0 bg-gradient-to-tr from-black via-black/85 to-transparent pointer-events-none hidden dark:block" />
+          {/* Subtle starry points in the shadow */}
+          <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none opacity-40 mix-blend-screen hidden dark:block" />
+        </div>
+      </div>
 
       {/* Floating Glass Shapes with Antigravity Parallax */}
       <div className="absolute top-[20%] left-[10%] w-32 h-32 parallax-slow pointer-events-none">
@@ -146,7 +187,7 @@ const Hero: React.FC = () => {
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/60 dark:bg-white/5 border border-charcoal-900/10 dark:border-white/10 backdrop-blur-md shadow-sm"
+            className="mb-6 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/60 dark:bg-white/5 border border-charcoal-900/10 dark:border-white/10 backdrop-blur-md shadow-sm"
           >
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
             <span className="text-xs font-bold uppercase tracking-widest text-charcoal-700 dark:text-gray-300">
@@ -156,12 +197,12 @@ const Hero: React.FC = () => {
         )}
 
         {/* Heading with Mask Reveal — data-hero-heading for GSAP ScrambleText */}
-        <div className="mb-6 overflow-hidden py-2">
+        <div className="mb-4 overflow-hidden py-2">
           <h1
             ref={headingRef}
             data-hero-heading
             style={{ opacity: 0 }}
-            className="text-6xl md:text-8xl lg:text-[7rem] font-display font-bold tracking-tighter text-charcoal-900 dark:text-white leading-[1.1]"
+            className="text-5xl md:text-7xl lg:text-8xl font-display font-bold tracking-[0.1em] text-charcoal-900 dark:text-white leading-[1.1] uppercase"
           >
             <span className="hero-name-base">{heading}</span>{' '}
             <span className="hero-name-highlight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple drop-shadow-sm">
@@ -175,7 +216,7 @@ const Hero: React.FC = () => {
           ref={subheadingRef}
           data-hero-subheading
           style={{ opacity: 0 }}
-          className="text-lg md:text-2xl text-charcoal-600 dark:text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed font-sans whitespace-pre-line"
+          className="text-lg md:text-xl text-charcoal-600 dark:text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed font-sans whitespace-pre-line"
         >
           {subheading}
         </p>
@@ -184,21 +225,19 @@ const Hero: React.FC = () => {
         <div
           data-hero-buttons
           style={{ opacity: 0 }}
-          className="flex flex-col sm:flex-row items-center gap-6"
+          className="flex flex-row items-center gap-6 md:gap-10 mt-2"
         >
-          <MagneticButton onClick={() => document.getElementById(ctaTarget)?.scrollIntoView({ behavior: 'smooth' })}>
-            {ctaText}
-          </MagneticButton>
+          <MagneticButton onClick={() => document.getElementById(ctaTarget)?.scrollIntoView({ behavior: 'smooth' })} />
 
           {settings?.resume_url && (
             <a
               href={settings.resume_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 px-8 py-4 rounded-full font-bold text-charcoal-900 dark:text-white border-2 border-charcoal-900/10 dark:border-white/10 hover:border-charcoal-900/30 dark:hover:border-white/30 hover:bg-charcoal-900/5 dark:hover:bg-white/5 transition-all duration-300"
+              className="flex items-center gap-2 px-6 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest text-charcoal-700 dark:text-gray-300 border border-charcoal-900/10 dark:border-white/10 hover:border-[var(--universe-accent)]/30 hover:text-[var(--universe-accent)] hover:bg-charcoal-900/5 dark:hover:bg-white/5 transition-all duration-300 shadow-sm"
             >
               Resume
-              <FileText className="w-4 h-4" />
+              <FileText className="w-3.5 h-3.5" />
             </a>
           )}
         </div>

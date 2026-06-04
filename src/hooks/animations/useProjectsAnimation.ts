@@ -96,24 +96,52 @@ export function useProjectsAnimation(
           stagger: 0.08,
           ease: 'back.out(1.15)',
           onComplete: () => {
-            // Setup card float / zero-g bobbing
-            cards.forEach((card, i) => {
-              const targetX = parseFloat(card.getAttribute('data-x') || '0');
-              const targetY = parseFloat(card.getAttribute('data-y') || '0');
-
-              const floatTween = gsap.fromTo(card,
-                { x: targetX, y: targetY },
-                {
-                  y: targetY + 8,
-                  x: targetX + (i % 2 === 0 ? 4 : -4),
-                  duration: 5 + i * 0.8,
-                  repeat: -1,
-                  yoyo: true,
-                  ease: 'sine.inOut',
-                  overwrite: 'auto'
+            // Setup card continuous circular orbit rotation!
+            ctx.add(() => {
+              cards.forEach((card, i) => {
+                // Kill any pre-existing tween to avoid leaks
+                if ((card as any)._orbitTween) {
+                  (card as any)._orbitTween.kill();
                 }
-              );
-              (card as any)._floatTween = floatTween;
+
+                const initialAngle = parseFloat(card.getAttribute('data-angle') || '0');
+                const orbit = parseInt(card.getAttribute('data-orbit') || '1');
+                
+                const state = { angle: initialAngle };
+                // Inner orbits rotate faster, outer orbits rotate slower
+                const duration = 65 + orbit * 35 + (i * 6);
+
+                const orbitTween = gsap.to(state, {
+                  angle: initialAngle + 360,
+                  duration: duration,
+                  repeat: -1,
+                  ease: 'none',
+                  onUpdate: () => {
+                    const rad = (state.angle * Math.PI) / 180;
+                    
+                    // Radii for orbits (keep in sync with Projects.tsx)
+                    let rx = 180;
+                    let ry = 100;
+                    if (orbit === 2) {
+                      rx = 330;
+                      ry = 175;
+                    } else if (orbit === 3) {
+                      rx = 480;
+                      ry = 250;
+                    }
+                    
+                    const x = Math.cos(rad) * rx;
+                    const y = Math.sin(rad) * ry;
+                    
+                    gsap.set(card, {
+                      x,
+                      y,
+                      attr: { 'data-x': x, 'data-y': y }
+                    });
+                  }
+                });
+                (card as any)._orbitTween = orbitTween;
+              });
             });
           }
         }, 0.3);
@@ -121,14 +149,13 @@ export function useProjectsAnimation(
         // Hover animations
         cards.forEach((card) => {
           card.addEventListener('mouseenter', () => {
-            // Pause float
-            if ((card as any)._floatTween) {
-              (card as any)._floatTween.pause();
+            if ((card as any)._orbitTween) {
+              (card as any)._orbitTween.pause();
             }
 
-            // Animate scale
+            // Animate scale & bring to front
             gsap.to(card, {
-              scale: 1.05,
+              scale: 1.08,
               zIndex: 50,
               duration: 0.35,
               ease: 'power2.out',
@@ -145,9 +172,9 @@ export function useProjectsAnimation(
               ease: 'power2.out',
               overwrite: 'auto',
               onComplete: () => {
-                // Resume float
-                if ((card as any)._floatTween) {
-                  (card as any)._floatTween.play();
+                // Resume orbit
+                if ((card as any)._orbitTween) {
+                  (card as any)._orbitTween.play();
                 }
               }
             });
@@ -232,6 +259,9 @@ export function useProjectsAnimation(
       return () => {
         if (chapterLabel.parentNode) chapterLabel.parentNode.removeChild(chapterLabel);
         cards.forEach((card) => {
+          if ((card as any)._orbitTween) {
+            (card as any)._orbitTween.kill();
+          }
           if ((card as any)._floatTween) {
             (card as any)._floatTween.kill();
           }
