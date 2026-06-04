@@ -1,4 +1,9 @@
-import React, { useEffect, lazy, Suspense } from 'react';
+// JARVIS-OS THEME — animation layer rewired.
+// App.tsx: Replaces AuroraBackground→JarvisGrid, CustomCursor→JarvisCursor,
+// SectionReveal+SectionConnector→OsModule+SystemHandoff.
+// Adds JarvisPreloader and HudFrame. CMS/routing/data: UNTOUCHED.
+
+import React, { useEffect, lazy, Suspense, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
@@ -17,17 +22,21 @@ import { initScrollAnimations } from './utils/animations';
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'));
 const AdminLayout = lazy(() => import('./components/admin/layout/AdminLayout.tsx'));
 
-import AuroraBackground from './components/ui/AuroraBackground';
-
-// ── Animation Layer — additive, no CMS/data changes ──────────────────────────
+// ── JARVIS-OS Animation Layer ─────────────────────────────────────────────────
 import SmoothScrollProvider from './components/SmoothScrollProvider';
 import ScrollProgressBar from './components/ScrollProgressBar';
-import CustomCursor from './components/CustomCursor';
-import SectionReveal from './components/SectionReveal';
-import SectionConnector from './components/SectionConnector';
+import JarvisGrid from './components/JarvisGrid';
+import JarvisPreloader from './components/JarvisPreloader';
+import HudFrame from './components/HudFrame';
+import JarvisCursor from './components/JarvisCursor';
+import OsModule from './components/OsModule';
+import SystemHandoff from './components/SystemHandoff';
+import { JarvisAudio } from './lib/JarvisAudio';
 
-/** Portfolio single-page layout (unchanged) */
+/** Portfolio single-page layout */
 const Portfolio: React.FC = () => {
+  const [preloaderDone, setPreloaderDone] = useState(false);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       initScrollAnimations();
@@ -51,59 +60,80 @@ const Portfolio: React.FC = () => {
     window.addEventListener('mousemove', handleMouseMove, { passive: true });
     window.addEventListener('mouseleave', handleMouseLeave, { passive: true });
 
+    // Attach JARVIS audio global delegation
+    const detachAudio = JarvisAudio.attachGlobalDelegation();
+
     return () => {
       clearTimeout(timer);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseleave', handleMouseLeave);
+      detachAudio();
     };
   }, []);
 
   return (
     <div className="min-h-screen text-charcoal-900 dark:text-white selection:bg-accent-cyan selection:text-charcoal-950">
-      <AuroraBackground />
+      {/* ── JARVIS Ambient Background (replaces AuroraBackground) ── */}
+      <JarvisGrid />
+
+      {/* ── JARVIS Boot Preloader ─────────────────────────────────── */}
+      <JarvisPreloader onComplete={() => setPreloaderDone(true)} />
+
+      {/* ── HUD Frame — fades in after preloader ─────────────────── */}
+      <HudFrame isVisible={preloaderDone} />
+
       <SEOHead route="/" />
       <Navbar />
+
       <main className="relative z-10">
-        {/* Hero — has its own internal animation hook, no SectionReveal wrapper needed */}
-        <Hero />
+        {/* ── MODULE 01: IDENTITY_SCAN (Hero) ─────────────────────── */}
+        <OsModule moduleId="MODULE_01" protocolName="IDENTITY_SCAN">
+          <Hero />
+        </OsModule>
 
-        <SectionConnector />
+        <SystemHandoff from="MODULE_01" to="MODULE_02" />
 
-        <SectionReveal>
+        {/* ── MODULE 02: BIO_ANALYSIS (About) ─────────────────────── */}
+        <OsModule moduleId="MODULE_02" protocolName="BIO_ANALYSIS">
           <About />
-        </SectionReveal>
+        </OsModule>
 
-        <SectionConnector />
+        <SystemHandoff from="MODULE_02" to="MODULE_03" />
 
-        <SectionReveal>
+        {/* ── MODULE 03: MISSION_LOG (Journey) ────────────────────── */}
+        <OsModule moduleId="MODULE_03" protocolName="MISSION_LOG">
           <Journey />
-        </SectionReveal>
+        </OsModule>
 
-        <SectionConnector />
+        <SystemHandoff from="MODULE_03" to="MODULE_04" />
 
-        {/* Projects has its own internal animation hook */}
-        <SectionReveal>
-          <Projects />
-        </SectionReveal>
-
-        <SectionConnector />
-
-        <SectionReveal>
+        {/* ── MODULE 04: CREDENTIAL_MAP (Certificates) ────────────── */}
+        <OsModule moduleId="MODULE_04" protocolName="CREDENTIAL_MAP">
           <Certificates />
-        </SectionReveal>
+        </OsModule>
 
-        <SectionConnector />
+        <SystemHandoff from="MODULE_04" to="MODULE_05" />
 
-        {/* Skills has its own internal animation hook */}
-        <SectionReveal>
+        {/* ── MODULE 05: ARTIFACT_REGISTRY (Projects) ─────────────── */}
+        <OsModule moduleId="MODULE_05" protocolName="ARTIFACT_REGISTRY">
+          <Projects />
+        </OsModule>
+
+        <SystemHandoff from="MODULE_05" to="MODULE_06" />
+
+        {/* ── MODULE 06: CAPABILITY_INDEX (Skills) ─────────────────── */}
+        <OsModule moduleId="MODULE_06" protocolName="CAPABILITY_INDEX">
           <Skills />
-        </SectionReveal>
+        </OsModule>
 
-        <SectionConnector />
+        <SystemHandoff from="MODULE_06" to="MODULE_07" />
 
-        {/* Contact has its own 1.4s slow fade internally — no additional SectionReveal */}
-        <Contact />
+        {/* ── MODULE 07: COMM_CHANNEL (Contact) ────────────────────── */}
+        <OsModule moduleId="MODULE_07" protocolName="COMM_CHANNEL">
+          <Contact />
+        </OsModule>
       </main>
+
       <Footer />
     </div>
   );
@@ -125,7 +155,7 @@ const App: React.FC = () => {
           element={
             <SmoothScrollProvider>
               <ScrollProgressBar />
-              <CustomCursor />
+              <JarvisCursor />
               <Portfolio />
             </SmoothScrollProvider>
           }

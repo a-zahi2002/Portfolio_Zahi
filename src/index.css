@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -289,3 +289,258 @@
     animation: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   JARVIS-OS THEME — animation only
+   Design tokens, keyframes, and utility classes for the
+   JARVIS / Holographic AR Operating System theme.
+   All variables consumed by JarvisGrid, JarvisPreloader,
+   HudFrame, OsModule, JarvisCursor, and section components.
+═══════════════════════════════════════════════════════════════ */
+
+/* ─── JARVIS Design Tokens — Dark (default) ─────────────────── */
+:root {
+  --j-bg:           #020b18;
+  --j-bg-panel:     #030f1e;
+  --j-cyan:         #00d4ff;
+  --j-cyan-dim:     rgba(0,212,255,0.15);
+  --j-cyan-glow:    rgba(0,212,255,0.4);
+  --j-amber:        #ffb000;
+  --j-amber-dim:    rgba(255,176,0,0.15);
+  --j-red:          #ff3333;
+  --j-green:        #00ff88;
+  --j-grid:         rgba(0,212,255,0.04);
+  --j-scanline:     rgba(0,212,255,0.03);
+  --j-text:         #a8d8ea;
+  --j-text-dim:     rgba(168,216,234,0.5);
+  --j-font-mono:    'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  --j-font-ui:      'Inter', system-ui, sans-serif;
+  --j-border:       rgba(0,212,255,0.25);
+  --j-border-hot:   rgba(0,212,255,0.7);
+  /* Grid drift speed (JS can override via setProperty) */
+  --j-grid-speed:   12s;
+}
+
+/* ─── JARVIS Design Tokens — Light (blueprint mode) ─────────── */
+html:not(.dark) {
+  --j-bg:           #f0f4f8;
+  --j-bg-panel:     #e8eef5;
+  --j-cyan:         #0066cc;
+  --j-cyan-dim:     rgba(0,102,204,0.1);
+  --j-cyan-glow:    rgba(0,102,204,0.3);
+  --j-amber:        #cc6600;
+  --j-amber-dim:    rgba(204,102,0,0.1);
+  --j-red:          #cc0000;
+  --j-green:        #007744;
+  --j-grid:         rgba(0,102,204,0.05);
+  --j-scanline:     rgba(0,102,204,0.015);
+  --j-text:         #1a2a3a;
+  --j-text-dim:     rgba(26,42,58,0.55);
+  --j-border:       rgba(0,102,204,0.2);
+  --j-border-hot:   rgba(0,102,204,0.6);
+}
+
+/* ─── JARVIS Keyframes ───────────────────────────────────────── */
+
+/* Background grid drift */
+@keyframes jarvis-grid-drift {
+  0%   { background-position: 0 0, 0 0; }
+  100% { background-position: 48px 48px, 48px 48px; }
+}
+
+/* Typing cursor blink */
+@keyframes jarvis-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* Bio/image scan sweep */
+@keyframes jarvis-scan-sweep {
+  0%   { transform: translateY(-100%); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 1; }
+  100% { transform: translateY(200%); opacity: 0; }
+}
+
+/* Heartbeat line (bottom-left HUD) */
+@keyframes jarvis-heartbeat {
+  0%   { transform: scaleX(0); opacity: 0; }
+  10%  { transform: scaleX(1); opacity: 1; }
+  20%  { transform: scaleX(1) scaleY(3); }
+  30%  { transform: scaleX(1) scaleY(1); }
+  40%  { transform: scaleX(1) scaleY(2.5); }
+  50%  { transform: scaleX(1) scaleY(1); }
+  100% { transform: scaleX(1); opacity: 0.4; }
+}
+
+/* Radar diagnostic rotate (pure CSS — GPU composited) */
+@keyframes jarvis-radar-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Sonar ring pulse (contact section diamonds) */
+@keyframes jarvis-sonar {
+  0%   { transform: rotate(45deg) scale(0); opacity: 0.5; }
+  100% { transform: rotate(45deg) scale(3); opacity: 0; }
+}
+
+/* Arc Reactor spin */
+@keyframes jarvis-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ─── JARVIS Utility Classes ─────────────────────────────────── */
+
+.j-mono {
+  font-family: var(--j-font-mono);
+}
+
+.j-text-dim {
+  color: var(--j-text-dim);
+}
+
+/* Module header bar */
+.j-module-header {
+  font-family: var(--j-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--j-text-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  margin-bottom: 8px;
+  opacity: 0; /* GSAP animates in */
+}
+
+.j-module-header .j-bracket {
+  color: var(--j-cyan);
+}
+
+/* HUD corner bracket base */
+.j-corner {
+  position: fixed;
+  pointer-events: none;
+  z-index: 100;
+  opacity: 0.75;
+}
+
+/* Data panel corner accents */
+.j-panel-corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-color: var(--j-cyan);
+  border-style: solid;
+  pointer-events: none;
+}
+.j-panel-corner.tl { top: -1px; left: -1px; border-width: 1.5px 0 0 1.5px; }
+.j-panel-corner.tr { top: -1px; right: -1px; border-width: 1.5px 1.5px 0 0; }
+.j-panel-corner.bl { bottom: -1px; left: -1px; border-width: 0 0 1.5px 1.5px; }
+.j-panel-corner.br { bottom: -1px; right: -1px; border-width: 0 1.5px 1.5px 0; }
+
+/* Typing cursor on hero role line */
+.j-typing-cursor::after {
+  content: '▊';
+  color: var(--j-cyan);
+  animation: jarvis-cursor-blink 0.7s step-end infinite;
+  margin-left: 2px;
+}
+.j-typing-done::after {
+  animation: none;
+  opacity: 0;
+}
+
+/* Bio image scan overlay */
+.j-image-scan-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+}
+.j-image-scan-overlay::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--j-cyan-dim) 50%,
+    transparent 100%
+  );
+  animation: jarvis-scan-sweep 3s ease-in-out infinite;
+}
+
+/* Heartbeat visualization */
+.j-heartbeat {
+  width: 40px;
+  height: 2px;
+  background: var(--j-green);
+  transform-origin: left center;
+  animation: jarvis-heartbeat 1.8s ease-in-out infinite;
+}
+
+/* Sonar ring (contact section) */
+.j-sonar-ring {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--j-cyan);
+  transform: rotate(45deg) scale(0);
+  animation: jarvis-sonar 2.4s ease-out infinite;
+  pointer-events: none;
+}
+
+/* Record card (Journey) metadata bars */
+.j-record-bar {
+  font-family: var(--j-font-mono);
+  font-size: 10px;
+  color: var(--j-text-dim);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+.j-record-bar .j-accent {
+  color: var(--j-cyan);
+}
+
+/* Skills data row */
+.j-skill-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--j-font-mono);
+  font-size: 11px;
+}
+.j-skill-dots {
+  flex: 1;
+  border-bottom: 1px dotted var(--j-border);
+  margin: 0 6px;
+}
+
+/* Native cursor suppressed when JARVIS cursor is active */
+.cursor-none-global,
+.cursor-none-global * {
+  cursor: none !important;
+}
+
+/* ─── prefers-reduced-motion: JARVIS overrides ───────────────── */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes jarvis-grid-drift  { to { background-position: 0 0, 0 0; } }
+  @keyframes jarvis-cursor-blink { to { opacity: 1; } }
+  @keyframes jarvis-scan-sweep  { to { transform: translateY(0); opacity: 0; } }
+  @keyframes jarvis-heartbeat   { to { transform: scaleX(1); opacity: 0.4; } }
+  @keyframes jarvis-radar-rotate { to { transform: rotate(0deg); } }
+  @keyframes jarvis-sonar       { to { transform: rotate(45deg) scale(3); opacity: 0; } }
+  @keyframes jarvis-spin        { to { transform: rotate(0deg); } }
+  .j-typing-cursor::after       { animation: none; }
+  .j-image-scan-overlay::after  { animation: none; }
+  .j-heartbeat                  { animation: none; }
+  .j-sonar-ring                 { animation: none; }
+}

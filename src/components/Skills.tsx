@@ -1,9 +1,17 @@
-import React from 'react';
+// JARVIS-OS THEME — animation only
+// Skills.tsx — additive JARVIS enhancements:
+//   - Section header ScrambleText: "RUNNING CAPABILITY_INDEX..."
+//   - Category header clip-path wipe left-to-right
+//   - Skill items stagger in (opacity + x)
+//   - "CAPABILITY_INDEX COMPILED" status line after all skills revealed
+// CMS hooks, data, 3D tilt, spotlight: UNTOUCHED.
+
+import React, { useLayoutEffect, useRef } from 'react';
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { Code2, Database, Layout, Wrench, Cpu, Layers, Globe, Palette, Terminal, Settings } from 'lucide-react';
 import { useSkills } from '../hooks/cms/useSkills';
 import type { CMSSkill } from '../types/cms';
-import { useSkillsAnimation } from '../hooks/animations/useSkillsAnimation';
+import { gsap, ScrollTrigger } from '../lib/gsap-config';
 
 // Map icon name strings to Lucide components with themed colors
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -37,7 +45,58 @@ const SkillsCard: React.FC<{
   const rotateY = useMotionValue(0);
 
   const cardRef = React.useRef<HTMLDivElement>(null);
+  const headerRef = React.useRef<HTMLDivElement>(null);
+  const itemsRef = React.useRef<HTMLDivElement>(null);
   const isHorizontal = skillGroup.items.length >= 5;
+
+  // ── JARVIS: Category wipe and items stagger ────────────────────────────────
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    const header = headerRef.current;
+    const items = itemsRef.current;
+    if (!card || !header || !items) return;
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const ctx = gsap.context(() => {
+      if (prefersReduced) {
+        gsap.set([header, items], { clipPath: 'inset(0 0% 0 0)', opacity: 1, x: 0 });
+        return;
+      }
+
+      gsap.set(header, { clipPath: 'inset(0 100% 0 0)', opacity: 0 });
+      const skillItems = items.querySelectorAll('.skill-item-row');
+      gsap.set(skillItems, { opacity: 0, x: -10 });
+
+      ScrollTrigger.create({
+        trigger: card,
+        start: 'top 80%',
+        once: true,
+        onEnter: () => {
+          // Category header wipe
+          gsap.to(header, {
+            clipPath: 'inset(0 0% 0 0)',
+            opacity: 1,
+            duration: 0.4,
+            delay: index * 0.1,
+            ease: 'power3.out',
+          });
+          // Items stagger
+          gsap.to(skillItems, {
+            opacity: 1,
+            x: 0,
+            stagger: 0.04,
+            duration: 0.3,
+            delay: index * 0.1 + 0.2,
+            ease: 'power2.out',
+          });
+        },
+      });
+    }, card);
+
+    return () => ctx.revert();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [index]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isTouchDevice || !cardRef.current) return;
@@ -45,22 +104,14 @@ const SkillsCard: React.FC<{
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
-    // Set spotlight coordinates
     mouseX.set(x);
     mouseY.set(y);
-
-    // Calculate 3D tilt angles (max tilt: 4 degrees)
     const cardWidth = rect.width;
     const cardHeight = rect.height;
     const centerX = cardWidth / 2;
     const centerY = cardHeight / 2;
-    
-    const rotateXValue = ((y - centerY) / centerY) * -4;
-    const rotateYValue = ((x - centerX) / centerX) * 4;
-
-    rotateX.set(rotateXValue);
-    rotateY.set(rotateYValue);
+    rotateX.set(((y - centerY) / centerY) * -4);
+    rotateY.set(((x - centerX) / centerX) * 4);
   };
 
   const handleMouseLeave = () => {
@@ -69,7 +120,6 @@ const SkillsCard: React.FC<{
     rotateY.set(0);
   };
 
-  // Combine spotlight background gradient
   const backgroundSpotlight = useMotionTemplate`
     radial-gradient(
       350px circle at ${mouseX}px ${mouseY}px,
@@ -87,7 +137,7 @@ const SkillsCard: React.FC<{
       onMouseLeave={handleMouseLeave}
       initial={{ opacity: 0, y: 25 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-30px" }}
+      viewport={{ once: true, margin: '-30px' }}
       transition={{ duration: 0.5, delay: index * 0.08 }}
       style={{
         rotateX: isTouchDevice ? 0 : rotateX,
@@ -96,8 +146,8 @@ const SkillsCard: React.FC<{
         perspective: 1000,
       }}
       className={`p-8 rounded-3xl bg-white/70 dark:bg-charcoal-900/40 backdrop-blur-md border border-gray-200/50 dark:border-white/10 hover:border-blue-500/30 dark:hover:border-accent-cyan/30 transition-all duration-300 shadow-lg hover:shadow-xl relative overflow-hidden group flex-grow
-        ${isHorizontal 
-          ? 'w-full md:w-full lg:w-[calc(66.666%-1.5rem)]' 
+        ${isHorizontal
+          ? 'w-full md:w-full lg:w-[calc(66.666%-1.5rem)]'
           : 'w-full md:w-[calc(50%-1rem)] lg:w-[calc(33.333%-1.5rem)]'
         }
       `}
@@ -110,7 +160,6 @@ const SkillsCard: React.FC<{
         />
       )}
 
-      {/* Subtle border shine glow (Mobile gets a static soft corner glow, Desktop gets dynamic) */}
       {isTouchDevice ? (
         <div className="absolute inset-0 bg-gradient-to-tr from-accent-cyan/5 via-transparent to-accent-purple/5 opacity-40 pointer-events-none z-0" />
       ) : (
@@ -130,13 +179,17 @@ const SkillsCard: React.FC<{
         />
       )}
 
-      {/* Content wrapper with translate-z to separate it from background tilt */}
-      <div 
+      {/* Content wrapper */}
+      <div
         className="relative z-10"
         style={{ transform: isTouchDevice ? 'none' : 'translateZ(20px)' }}
       >
-        {/* Category Header */}
-        <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-white/5">
+        {/* ── JARVIS: Category Header with clip-path wipe ────────────── */}
+        <div
+          ref={headerRef}
+          className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100 dark:border-white/5"
+          style={{ clipPath: 'inset(0 100% 0 0)', opacity: 0 }}
+        >
           <div className="flex items-center gap-3.5">
             <div className="p-2.5 rounded-2xl bg-gray-100 dark:bg-white/5 group-hover:scale-110 transition-transform duration-300">
               {ICON_MAP[skillGroup.icon] ?? <Code2 className="text-blue-500 shrink-0" size={22} />}
@@ -150,12 +203,12 @@ const SkillsCard: React.FC<{
           </span>
         </div>
 
-        {/* Skill Items */}
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-x-8 gap-y-5">
-          {skillGroup.items.map((skill, index) => {
+        {/* ── Skill Items ──────────────────────────────────────────────── */}
+        <div ref={itemsRef} className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-x-8 gap-y-5">
+          {skillGroup.items.map((skill, i) => {
             const skillColor = skill.color || '#00f3ff';
             return (
-              <div key={skill.id} className="space-y-2 group/item">
+              <div key={skill.id} className="skill-item-row space-y-2 group/item">
                 <div className="flex justify-between items-center text-sm">
                   <span className="font-medium text-gray-800 dark:text-gray-200 group-hover/item:text-blue-600 dark:group-hover/item:text-accent-cyan transition-colors">
                     {skill.name}
@@ -164,18 +217,18 @@ const SkillsCard: React.FC<{
                     {skill.proficiency}%
                   </span>
                 </div>
-                
+
                 {/* Progress Bar */}
                 <div className="h-2 w-full bg-gray-100 dark:bg-white/5 rounded-full overflow-hidden relative">
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: `${skill.proficiency}%` }}
                     viewport={{ once: true }}
-                    transition={{ duration: 1.2, ease: "easeOut", delay: index * 0.08 }}
+                    transition={{ duration: 1.2, ease: 'easeOut', delay: i * 0.08 }}
                     className="h-full rounded-full absolute left-0 top-0"
-                    style={{ 
+                    style={{
                       backgroundColor: skillColor,
-                      boxShadow: `0 0 6px ${skillColor}60` 
+                      boxShadow: `0 0 6px ${skillColor}60`,
                     }}
                   />
                 </div>
@@ -193,11 +246,69 @@ const Skills: React.FC = () => {
   const { data: skills, isLoading } = useSkills();
   const [isTouchDevice, setIsTouchDevice] = React.useState(false);
 
-  // ── Animation refs ──────────────────────────────────────────
   const sectionRef = React.useRef<HTMLElement>(null);
   const headingRef = React.useRef<HTMLHeadingElement>(null);
+  const headerStatusRef = React.useRef<HTMLDivElement>(null);
+  const compiledRef = React.useRef<HTMLDivElement>(null);
 
-  useSkillsAnimation({ sectionRef, headingRef }, isLoading ?? false);
+  // ── JARVIS: Section header ScrambleText + compiled status ──────────────────
+  useLayoutEffect(() => {
+    const section = sectionRef.current;
+    const headerStatus = headerStatusRef.current;
+    const compiled = compiledRef.current;
+    if (!section) return;
+
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const ctx = gsap.context(() => {
+      if (prefersReduced) {
+        if (headerStatus) gsap.set(headerStatus, { opacity: 1 });
+        return;
+      }
+
+      if (headerStatus) {
+        gsap.set(headerStatus, { opacity: 0 });
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top 70%',
+          once: true,
+          onEnter: () => {
+            gsap.to(headerStatus, { opacity: 1, duration: 0.1 });
+            gsap.to(headerStatus, {
+              scrambleText: {
+                text: '[ RUNNING CAPABILITY_INDEX... ]',
+                chars: 'upperCase',
+                speed: 1,
+              },
+              duration: 0.5,
+            });
+          },
+        });
+      }
+
+      if (compiled) {
+        gsap.set(compiled, { opacity: 0 });
+        ScrollTrigger.create({
+          trigger: compiled,
+          start: 'top 90%',
+          once: true,
+          onEnter: () => {
+            gsap.to(compiled, { opacity: 1, duration: 0.1 });
+            gsap.to(compiled, {
+              scrambleText: {
+                text: '[ CAPABILITY_INDEX COMPILED — ALL SYSTEMS INDEXED ]',
+                chars: 'upperCase',
+                speed: 1,
+              },
+              duration: 0.6,
+            });
+          },
+        });
+      }
+    }, section);
+
+    return () => ctx.revert();
+  }, [isLoading]);
 
   React.useEffect(() => {
     const mediaQuery = window.matchMedia('(hover: none)');
@@ -212,31 +323,38 @@ const Skills: React.FC = () => {
     const grouped = (skills ?? []).reduce<Record<string, GroupedSkill>>((acc, skill) => {
       if (!skill.visible) return acc;
       if (!acc[skill.category]) {
-        acc[skill.category] = {
-          category: skill.category,
-          icon: skill.icon || 'Code2',
-          items: []
-        };
+        acc[skill.category] = { category: skill.category, icon: skill.icon || 'Code2', items: [] };
       }
       acc[skill.category].items.push(skill);
       return acc;
     }, {});
-
-    // Sort items within each category by display_order
     const groups = Object.values(grouped);
-    groups.forEach(g => {
-      g.items.sort((a, b) => a.display_order - b.display_order);
-    });
+    groups.forEach(g => { g.items.sort((a, b) => a.display_order - b.display_order); });
     return groups;
   }, [skills]);
 
   return (
     <section id="skills" ref={sectionRef} className="py-32 relative overflow-hidden">
-      
       {/* Decorative Background Blur */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[60vw] max-w-[600px] max-h-[600px] bg-purple-500/5 dark:bg-accent-purple/5 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-10">
+        {/* ── JARVIS: Status header ──────────────────────────────────── */}
+        <div
+          ref={headerStatusRef}
+          aria-hidden="true"
+          style={{
+            fontFamily: 'var(--j-font-mono)',
+            fontSize: 11,
+            color: 'var(--j-cyan)',
+            letterSpacing: '0.1em',
+            marginBottom: 12,
+            opacity: 0,
+          }}
+        >
+          &nbsp;
+        </div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -259,16 +377,35 @@ const Skills: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-wrap gap-8 items-stretch">
-            {skillGroups.map((skillGroup, groupIndex) => (
-              <SkillsCard
-                key={skillGroup.category}
-                skillGroup={skillGroup}
-                index={groupIndex}
-                isTouchDevice={isTouchDevice}
-              />
-            ))}
-          </div>
+          <>
+            <div className="flex flex-wrap gap-8 items-stretch">
+              {skillGroups.map((skillGroup, groupIndex) => (
+                <SkillsCard
+                  key={skillGroup.category}
+                  skillGroup={skillGroup}
+                  index={groupIndex}
+                  isTouchDevice={isTouchDevice}
+                />
+              ))}
+            </div>
+
+            {/* ── JARVIS: Compiled status ─────────────────────────────── */}
+            <div
+              ref={compiledRef}
+              aria-hidden="true"
+              style={{
+                fontFamily: 'var(--j-font-mono)',
+                fontSize: 11,
+                color: 'var(--j-green)',
+                letterSpacing: '0.1em',
+                marginTop: 24,
+                opacity: 0,
+                textAlign: 'center',
+              }}
+            >
+              &nbsp;
+            </div>
+          </>
         )}
       </div>
     </section>
