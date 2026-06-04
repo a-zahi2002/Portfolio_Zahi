@@ -66,7 +66,8 @@ export function useSkillsAnimation(refs: SkillsAnimationRefs, isLoading: boolean
               scrollTrigger: {
                 trigger: heading,
                 start: 'top 85%',
-                toggleActions: 'play reverse play reverse',
+                // 'play none none none' — reveal once, never re-hide
+                toggleActions: 'play none none none',
               },
             }
           );
@@ -74,6 +75,9 @@ export function useSkillsAnimation(refs: SkillsAnimationRefs, isLoading: boolean
       }
 
       // ── 2. Skill Items Stagger Entrance ──────────────────────────────────
+      // Items animate in once on enter and STAY visible.
+      // Hiding on leave/leaveBack caused items to stay invisible on scroll-back
+      // because the trigger threshold (85%) is already passed for top items.
       const items = section.querySelectorAll<HTMLElement>('[data-skill-item-inner]');
       if (items.length > 0) {
         gsap.set(items, { opacity: 0, y: 20 });
@@ -89,41 +93,20 @@ export function useSkillsAnimation(refs: SkillsAnimationRefs, isLoading: boolean
               overwrite: 'auto'
             });
           },
-          onLeave: (elements) => {
-            gsap.to(elements, {
-              opacity: 0,
-              y: 20,
-              overwrite: 'auto'
-            });
-          },
-          onEnterBack: (elements) => {
-            gsap.to(elements, {
-              opacity: 1,
-              y: 0,
-              stagger: 0.05,
-              duration: 0.7,
-              ease: 'power3.out',
-              overwrite: 'auto'
-            });
-          },
-          onLeaveBack: (elements) => {
-            gsap.to(elements, {
-              opacity: 0,
-              y: 20,
-              overwrite: 'auto'
-            });
-          }
+          // No onLeave / onLeaveBack — items stay visible once revealed
         });
       }
 
       // ── 3. Progress Bars Fill ────────────────────────────────────────────
+      // Bars fill once on enter. 'play none none none' avoids bars draining
+      // back to 0 when scrolling up (which looked broken in dark mode).
       const bars = section.querySelectorAll<HTMLElement>('.progress-bar-inner');
       bars.forEach((bar) => {
         const profStr = bar.getAttribute('data-proficiency');
         if (!profStr) return;
         const targetProficiency = parseFloat(profStr);
         
-        // Reset width to 0 forcefully against framer-motion
+        // Start at 0
         bar.style.width = '0%';
         
         const proxy = { width: 0 };
@@ -138,7 +121,8 @@ export function useSkillsAnimation(refs: SkillsAnimationRefs, isLoading: boolean
           scrollTrigger: {
             trigger: bar,
             start: 'top 90%',
-            toggleActions: 'play reverse play reverse'
+            // Fill once — never reverse back to 0
+            toggleActions: 'play none none none'
           }
         });
       });
