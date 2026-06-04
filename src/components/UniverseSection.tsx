@@ -178,7 +178,7 @@ const UniverseSection: React.FC<UniverseSectionProps> = ({ id, theme, children, 
       ref={sectionRef} 
       data-universe={theme} 
       className={`relative w-full overflow-hidden ${className}`}
-      style={{ minHeight: theme === 'abyss' ? 'auto' : '100vh' }}
+      style={{ minHeight: ['void','nebula','constellation','artifact'].includes(theme) ? '100vh' : 'auto' }}
     >
       {/* Light theme grain for void */}
       {theme === 'void' && (

@@ -50,7 +50,7 @@ export function useJourneyAnimation(
       if (!isMobile) {
         const svgNS = "http://www.w3.org/2000/svg";
         const constellationSvg = document.createElementNS(svgNS, "svg");
-        const svgId = "constellation-bg-" + Date.now();
+        const svgId = "constellation-bg-" + Math.floor(Math.random() * 1e9);
         constellationSvg.setAttribute("id", svgId);
         constellationSvg.setAttribute("class", "absolute inset-0 w-full h-full pointer-events-none z-0 opacity-40");
         
@@ -169,13 +169,8 @@ export function useJourneyAnimation(
               overwrite: 'auto'
             });
           },
-          onLeave: (elements) => {
-            gsap.to(elements, {
-              opacity: 0,
-              scale: 0.85,
-              clipPath: 'circle(30% at 50% 50%)',
-              overwrite: 'auto'
-            });
+          onLeave: (_elements) => {
+            // Keep cards visible when scrolling past — journey section is compact
           },
           onEnterBack: (elements) => {
             gsap.to(elements, {
@@ -188,13 +183,8 @@ export function useJourneyAnimation(
               overwrite: 'auto'
             });
           },
-          onLeaveBack: (elements) => {
-            gsap.to(elements, {
-              opacity: 0,
-              scale: 0.85,
-              clipPath: 'circle(30% at 50% 50%)',
-              overwrite: 'auto'
-            });
+          onLeaveBack: (_elements) => {
+            // Keep cards visible when scrolling back past top
           }
         });
       }
@@ -217,25 +207,12 @@ export function useJourneyAnimation(
         );
       }
 
-      // ── 4. SECTION PIN ─────────────────────────────────────────────────
-      if (!isMobile && cards.length >= 4) {
-        const headingArea = section.querySelector('.text-center.mb-16');
-        if (headingArea) {
-          ScrollTrigger.create({
-            trigger: headingArea,
-            start: 'top 10%',
-            endTrigger: section,
-            end: 'bottom 80%',
-            pin: true,
-            pinSpacing: false,
-          });
-        }
-      }
+      // ── 4. SECTION PIN — REMOVED ────────────────────────────────────────
+      // The heading pin was causing card occlusion on tab switches.
+      // The section heading is now a standard in-flow element.
 
       return () => {
         if (chapterLabel.parentNode) chapterLabel.parentNode.removeChild(chapterLabel);
-        const svg = document.getElementById("constellation-bg-" + Date.now().toString());
-        if (svg && svg.parentNode) svg.parentNode.removeChild(svg);
         // Ensure any dynamic SVGs are cleaned up
         const dynamicSvgs = section.querySelectorAll('svg[id^="constellation-bg-"]');
         dynamicSvgs.forEach(s => s.parentNode?.removeChild(s));

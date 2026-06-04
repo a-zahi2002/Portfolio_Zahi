@@ -19,9 +19,10 @@ export function initLenis(): Lenis | null {
   if (lenisInstance) return lenisInstance;
 
   lenisInstance = new Lenis({
-    lerp: 0.08,
+    lerp: 0.12,          // slightly snappier — still silky smooth
     smoothWheel: true,
-    syncTouch: false, // touch devices use native scroll
+    syncTouch: false,    // touch devices use native scroll
+    duration: 1.2,       // governs how long a single scroll impulse lasts
   });
 
   // Wire Lenis into GSAP ticker

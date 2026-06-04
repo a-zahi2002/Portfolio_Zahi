@@ -30,7 +30,8 @@ const WormholeConnector: React.FC = () => {
         rotation: 360,
         duration: 35,
         repeat: -1,
-        ease: "none"
+        ease: "none",
+        transformOrigin: '50 50',  // SVG user-units center
       });
 
       // Scroll-driven zoom and rotation timeline
@@ -49,12 +50,12 @@ const WormholeConnector: React.FC = () => {
 
       // Galaxy Core Zoom-in and Fast Swirl
       tl.fromTo(svgRef.current, 
-        { scale: 0.5, rotation: 0, opacity: 0 }, 
-        { scale: 3.5, rotation: 200, opacity: 1, duration: 0.5, ease: "power1.in" }, 
+        { scale: 0.5, rotation: 0, opacity: 0, transformOrigin: 'center center' }, 
+        { scale: 3.5, rotation: 200, opacity: 1, duration: 0.5, ease: "power1.in", transformOrigin: 'center center' }, 
         0
       );
       tl.to(svgRef.current, 
-        { scale: 7.5, rotation: 400, opacity: 0, duration: 0.5, ease: "power1.out" }, 
+        { scale: 7.5, rotation: 400, opacity: 0, duration: 0.5, ease: "power1.out", transformOrigin: 'center center' }, 
         0.5
       );
 

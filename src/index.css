@@ -351,3 +351,18 @@
 .animate-scanline {
   animation: scanline 6s linear infinite;
 }
+
+/* ─── Scroll Hint Chevron Animation ────────────────────────── */
+@keyframes hint-scroll-fade {
+  0%, 100% { opacity: 0.2; transform: translateX(-2px); }
+  50% { opacity: 1; transform: translateX(2px); }
+}
+
+/* ─── Hide scrollbar utility ─────────────────────────────── */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}

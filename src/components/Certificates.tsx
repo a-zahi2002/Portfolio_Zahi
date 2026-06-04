@@ -79,7 +79,21 @@ const Certificates: React.FC = () => {
     const container = scrollContainerRef.current;
     if (!container) return;
     container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
+
+    // Mouse-wheel → horizontal scroll (converts vertical delta to horizontal)
+    const handleWheel = (e: WheelEvent) => {
+      // Only intercept when cursor is over the scroll container
+      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+        e.preventDefault();
+        container.scrollLeft += e.deltaY;
+      }
+    };
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      container.removeEventListener('scroll', handleScroll);
+      container.removeEventListener('wheel', handleWheel);
+    };
   }, [certificates, isLoading]);
 
   return (
@@ -245,16 +259,31 @@ const Certificates: React.FC = () => {
               ))}
             </div>
 
-            {/* Drag scroll progress indicators */}
+            {/* Scroll hint + progress bar */}
             <div className="mt-8 flex flex-col items-center gap-3">
-              <span className="font-mono text-[8px] tracking-[0.25em] text-gray-400 dark:text-gray-500 uppercase select-none">
-                [ Drag to traverse • Scroll to explore ]
-              </span>
+              {/* Scroll progress bar */}
               <div className="w-48 h-[2px] bg-charcoal-100 dark:bg-white/5 rounded-full relative overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-[var(--universe-accent)] to-[var(--universe-accent-secondary)] rounded-full shadow-[0_0_6px_rgba(var(--universe-accent-rgb),0.5)] transition-all duration-75"
                   style={{ width: `${scrollProgress}%` }}
                 />
+              </div>
+
+              {/* Scroll direction hint — fades out once scrolled */}
+              <div 
+                className="flex items-center gap-2 transition-all duration-500"
+                style={{ opacity: scrollProgress < 5 ? 1 : 0, pointerEvents: 'none' }}
+              >
+                <span className="font-mono text-[8px] tracking-[0.25em] text-gray-400 dark:text-gray-500 uppercase select-none">[ Scroll or drag to explore ]</span>
+                <div className="flex gap-0.5">
+                  {[0, 1, 2].map(i => (
+                    <svg key={i} width="10" height="10" viewBox="0 0 10 10" fill="none"
+                      style={{ animation: `hint-scroll-fade 1.4s ease-in-out ${i * 0.18}s infinite` }}
+                    >
+                      <path d="M3 2L7 5L3 8" stroke="var(--universe-accent)" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ))}
+                </div>
               </div>
             </div>
 
