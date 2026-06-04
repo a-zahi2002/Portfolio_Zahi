@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Briefcase, GraduationCap, Calendar } from 'lucide-react';
 import { useExperiences } from '../hooks/cms/useExperiences';
 import { useEducation } from '../hooks/cms/useEducation';
@@ -59,23 +59,6 @@ const Journey: React.FC = () => {
   const educationList = education && education.length > 0 ? education : (education ? [] : fallbackEducation);
 
   const currentItems = activeTab === 'experience' ? experienceList : educationList;
-
-  useJourneyAnimation(sectionRef, isLoading, activeTab);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.15
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    show: { opacity: 1, y: 0, transition: { type: 'spring' as const, bounce: 0.25, duration: 0.6 } }
-  };
 
   return (
     <section id="journey" ref={sectionRef} className="relative py-32 overflow-hidden bg-transparent">
@@ -144,127 +127,139 @@ const Journey: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="relative max-w-3xl mx-auto journey-timeline-container">
-            {/* Constellation dust lane connector */}
-            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-[2px] -translate-x-1/2 pointer-events-none">
-              <svg className="w-[10px] h-full" preserveAspectRatio="none">
-                <line 
-                  x1="5" y1="0" 
-                  x2="5" y2="100%" 
-                  stroke="var(--universe-accent)" 
-                  strokeWidth="1.5" 
-                  strokeDasharray="4 6" 
-                  strokeOpacity="0.45" 
-                />
-              </svg>
-            </div>
-
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                variants={containerVariants}
-                initial="hidden"
-                animate="show"
-                exit={{ opacity: 0, transition: { duration: 0.2 } }}
-                className="space-y-12 w-full"
-              >
-                {currentItems.length === 0 ? (
-                  <motion.div variants={itemVariants} className="text-center py-12">
-                    <div className="w-16 h-16 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-white/10">
-                      {activeTab === 'experience' ? (
-                        <Briefcase className="w-6 h-6 text-gray-400" />
-                      ) : (
-                        <GraduationCap className="w-6 h-6 text-gray-400" />
-                      )}
-                    </div>
-                    <h3 className="text-xl font-display font-bold text-charcoal-900 dark:text-white mb-2">
-                      No {activeTab} added yet
-                    </h3>
-                    <p className="text-gray-500 max-w-sm mx-auto">
-                      Check back later for updates to this section.
-                    </p>
-                  </motion.div>
-                ) : (
-                  currentItems.map((item, idx) => {
-                    const isLeft = idx % 2 === 0;
-                    const itemTitle = 'role' in item ? item.role : item.degree;
-                    const itemSub = 'company' in item ? item.company : item.institution;
-                    const itemTech = 'technologies' in item ? item.technologies : null;
-
-                    return (
-                      <motion.div
-                        key={`${activeTab}-${item.id}`}
-                        variants={itemVariants}
-                        className={`relative flex flex-col md:flex-row items-start md:items-center journey-card-wrapper ${
-                          isLeft ? 'md:flex-row-reverse' : ''
-                        }`}
-                      >
-                        {/* Constellation Glowing Star Node */}
-                        <div className="absolute left-6 md:left-1/2 w-8 h-8 rounded-full blur-[8px] bg-[var(--universe-accent)]/30 -translate-x-1/2 z-10 pointer-events-none animate-pulse" />
-                        <div className="absolute left-6 md:left-1/2 w-10 h-10 rounded-full bg-white dark:bg-[#050505] border-2 border-[var(--universe-accent)] flex items-center justify-center -translate-x-1/2 z-20 shadow-[0_0_20px_rgba(var(--universe-accent-rgb),0.25)] group transition-all duration-300">
-                          {activeTab === 'experience' ? (
-                            <Briefcase className="w-4 h-4 text-[var(--universe-accent)]" />
-                          ) : (
-                            <GraduationCap className="w-4 h-4 text-[var(--universe-accent-secondary)]" />
-                          )}
-                        </div>
-
-                        {/* Content Card container */}
-                        <div className={`w-full md:w-1/2 pl-16 md:pl-0 ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}>
-                          <div className="bg-white/85 dark:bg-charcoal-900/30 backdrop-blur-xl p-6 md:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-xl hover:border-[var(--universe-accent)]/30 transition-all duration-300 hover:-translate-y-1 relative group parallax-card">
-                            
-                            {/* Constellation glowing edge accent */}
-                            <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-3xl bg-gradient-to-r from-[var(--universe-accent)] to-[var(--universe-accent-secondary)] opacity-20 group-hover:opacity-100 transition-opacity duration-500" />
-
-                            {/* Date badge */}
-                            <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[var(--universe-accent)] bg-[var(--universe-accent)]/10 border border-[var(--universe-accent)]/20 px-3 py-1.5 rounded-full mb-4 tracking-widest uppercase select-none">
-                              <Calendar className="w-3 h-3 text-[var(--universe-accent)]" />
-                              {item.start_date} - {item.end_date || 'Present'}
-                            </div>
-
-                            <h3 className="text-xl font-display font-bold text-charcoal-900 dark:text-white mb-1 group-hover:text-[var(--universe-accent)] transition-colors duration-300">
-                              {itemTitle}
-                            </h3>
-                            <h4 className="text-sm font-medium font-sans text-charcoal-600 dark:text-gray-400 mb-4">
-                              {itemSub}
-                            </h4>
-
-                            {/* Description */}
-                            <div
-                              className="text-charcoal-600 dark:text-gray-400 text-sm leading-relaxed mb-4
-                                prose prose-sm dark:prose-invert max-w-none
-                                prose-p:mb-2 font-sans
-                                prose-strong:text-[var(--universe-accent)] dark:prose-strong:text-[var(--universe-accent)] prose-strong:font-bold
-                                prose-ul:list-disc prose-ul:pl-4 prose-ul:mb-2
-                                prose-li:my-0.5"
-                              dangerouslySetInnerHTML={{ __html: parseMarkdown(item.description ?? '') }}
-                            />
-
-                            {/* Tech pills for Experience */}
-                            {itemTech && itemTech.length > 0 && (
-                              <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100 dark:border-white/5 mt-4">
-                                {itemTech.map(tech => (
-                                  <span
-                                    key={tech}
-                                    className="inline-flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase text-charcoal-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-2.5 py-1 rounded-full"
-                                  >
-                                    {tech}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </motion.div>
-                    );
-                  })
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+          <JourneyTimeline
+            key={activeTab}
+            activeTab={activeTab}
+            currentItems={currentItems}
+            isLoading={isLoading}
+          />
         )}
       </div>
     </section>
+  );
+};
+
+interface JourneyTimelineProps {
+  activeTab: 'experience' | 'education';
+  currentItems: any[];
+  isLoading: boolean;
+}
+
+const JourneyTimeline: React.FC<JourneyTimelineProps> = ({ activeTab, currentItems, isLoading }) => {
+  const containerRef = React.useRef<HTMLDivElement>(null);
+  
+  useJourneyAnimation(containerRef, isLoading, activeTab);
+
+  return (
+    <div ref={containerRef} className="relative max-w-3xl mx-auto journey-timeline-container">
+      {/* Constellation dust lane connector */}
+      <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-[2px] -translate-x-1/2 pointer-events-none">
+        <svg className="w-[10px] h-full" preserveAspectRatio="none">
+          <line 
+            x1="5" y1="0" 
+            x2="5" y2="100%" 
+            stroke="var(--universe-accent)" 
+            strokeWidth="1.5" 
+            strokeDasharray="4 6" 
+            strokeOpacity="0.45" 
+            className="timeline-svg-line"
+          />
+        </svg>
+      </div>
+
+      <div className="space-y-12 w-full">
+        {currentItems.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="w-16 h-16 rounded-full bg-gray-50 dark:bg-white/5 flex items-center justify-center mx-auto mb-4 border border-gray-100 dark:border-white/10">
+              {activeTab === 'experience' ? (
+                <Briefcase className="w-6 h-6 text-gray-400" />
+              ) : (
+                <GraduationCap className="w-6 h-6 text-gray-400" />
+              )}
+            </div>
+            <h3 className="text-xl font-display font-bold text-charcoal-900 dark:text-white mb-2">
+              No {activeTab} added yet
+            </h3>
+            <p className="text-gray-500 max-w-sm mx-auto">
+              Check back later for updates to this section.
+            </p>
+          </div>
+        ) : (
+          currentItems.map((item, idx) => {
+            const isLeft = idx % 2 === 0;
+            const itemTitle = 'role' in item ? item.role : item.degree;
+            const itemSub = 'company' in item ? item.company : item.institution;
+            const itemTech = 'technologies' in item ? item.technologies : null;
+
+            return (
+              <div
+                key={`${activeTab}-${item.id}`}
+                className={`relative flex flex-col md:flex-row items-start md:items-center journey-card-wrapper ${
+                  isLeft ? 'md:flex-row-reverse' : ''
+                }`}
+              >
+                {/* Constellation Glowing Star Node */}
+                <div className="absolute left-6 md:left-1/2 w-8 h-8 rounded-full blur-[8px] bg-[var(--universe-accent)]/30 -translate-x-1/2 z-10 pointer-events-none animate-pulse" />
+                <div className="absolute left-6 md:left-1/2 w-10 h-10 rounded-full bg-white dark:bg-[#050505] border-2 border-[var(--universe-accent)] flex items-center justify-center -translate-x-1/2 z-20 shadow-[0_0_20px_rgba(var(--universe-accent-rgb),0.25)] group transition-all duration-300">
+                  {activeTab === 'experience' ? (
+                    <Briefcase className="w-4 h-4 text-[var(--universe-accent)]" />
+                  ) : (
+                    <GraduationCap className="w-4 h-4 text-[var(--universe-accent-secondary)]" />
+                  )}
+                </div>
+
+                {/* Content Card container */}
+                <div className={`w-full md:w-1/2 pl-16 md:pl-0 ${isLeft ? 'md:pr-12' : 'md:pl-12'}`}>
+                  <div className="bg-white/85 dark:bg-charcoal-900/30 backdrop-blur-xl p-6 md:p-8 rounded-3xl border border-gray-200 dark:border-white/10 shadow-sm hover:shadow-xl hover:border-[var(--universe-accent)]/30 transition-all duration-300 hover:-translate-y-1 relative group parallax-card">
+                    
+                    {/* Constellation glowing edge accent */}
+                    <div className="absolute top-0 left-0 right-0 h-[2px] rounded-t-3xl bg-gradient-to-r from-[var(--universe-accent)] to-[var(--universe-accent-secondary)] opacity-20 group-hover:opacity-100 transition-opacity duration-500" />
+
+                    {/* Date badge */}
+                    <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[var(--universe-accent)] bg-[var(--universe-accent)]/10 border border-[var(--universe-accent)]/20 px-3 py-1.5 rounded-full mb-4 tracking-widest uppercase select-none">
+                      <Calendar className="w-3 h-3 text-[var(--universe-accent)]" />
+                      {item.start_date} - {item.end_date || 'Present'}
+                    </div>
+
+                    <h3 className="text-xl font-display font-bold text-charcoal-900 dark:text-white mb-1 group-hover:text-[var(--universe-accent)] transition-colors duration-300">
+                      {itemTitle}
+                    </h3>
+                    <h4 className="text-sm font-medium font-sans text-charcoal-600 dark:text-gray-400 mb-4">
+                      {itemSub}
+                    </h4>
+
+                    {/* Description */}
+                    <div
+                      className="text-charcoal-600 dark:text-gray-400 text-sm leading-relaxed mb-4
+                        prose prose-sm dark:prose-invert max-w-none
+                        prose-p:mb-2 font-sans
+                        prose-strong:text-[var(--universe-accent)] dark:prose-strong:text-[var(--universe-accent)] prose-strong:font-bold
+                        prose-ul:list-disc prose-ul:pl-4 prose-ul:mb-2
+                        prose-li:my-0.5"
+                      dangerouslySetInnerHTML={{ __html: parseMarkdown(item.description ?? '') }}
+                    />
+
+                    {/* Tech pills for Experience */}
+                    {itemTech && itemTech.length > 0 && (
+                      <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100 dark:border-white/5 mt-4">
+                        {itemTech.map((tech: string) => (
+                          <span
+                            key={tech}
+                            className="inline-flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase text-charcoal-600 dark:text-gray-300 bg-gray-50 dark:bg-white/5 border border-gray-200 dark:border-white/10 px-2.5 py-1 rounded-full"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+    </div>
   );
 };
 

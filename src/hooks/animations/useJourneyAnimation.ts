@@ -4,15 +4,17 @@ import { useLayoutEffect, RefObject } from 'react';
 import { gsap, ScrollTrigger } from '../../lib/gsap-init';
 
 export function useJourneyAnimation(
-  sectionRef: RefObject<HTMLElement>,
+  containerRef: RefObject<HTMLElement>,
   isLoading: boolean,
   activeTab: string
 ) {
   useLayoutEffect(() => {
     if (isLoading) return;
 
-    const section = sectionRef.current;
-    if (!section) return;
+    const container = containerRef.current;
+    if (!container) return;
+
+    const section = container.closest('section') || container;
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isMobile = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768;
@@ -35,11 +37,11 @@ export function useJourneyAnimation(
         onLeaveBack: () => gsap.to(chapterLabel, { opacity: 0, duration: 0.6 }),
       });
 
-      const cards = section.querySelectorAll('.journey-card-wrapper');
+      const cards = container.querySelectorAll('.journey-card-wrapper');
       
       if (prefersReduced) {
         gsap.set(cards, { opacity: 1, scale: 1, clipPath: 'none' });
-        const line = section.querySelector('.timeline-svg-line line');
+        const line = container.querySelector('.timeline-svg-line line');
         if (line) gsap.set(line, { drawSVG: '100%' });
         return;
       }
@@ -57,8 +59,8 @@ export function useJourneyAnimation(
         constellationSvg.setAttribute("viewBox", `0 0 ${width} ${height}`);
 
         const numDots = 14;
-        const dots = [];
-        const lines = [];
+        const dots: { el: SVGElement; x: number; y: number }[] = [];
+        const lines: SVGElement[] = [];
 
         // Generate dots
         for (let i = 0; i < numDots; i++) {
@@ -198,7 +200,7 @@ export function useJourneyAnimation(
       }
 
       // ── 3. TIMELINE CONNECTOR LINE ─────────────────────────────────────
-      const centerLine = section.querySelector('.timeline-svg-line line');
+      const centerLine = container.querySelector('.timeline-svg-line line');
       if (centerLine) {
         gsap.fromTo(centerLine, 
           { drawSVG: '0%' },

@@ -9,7 +9,11 @@ interface ProjectsAnimationRefs {
   marqueeRef: RefObject<HTMLElement>;
 }
 
-export function useProjectsAnimation(refs: ProjectsAnimationRefs, isLoading: boolean) {
+export function useProjectsAnimation(
+  refs: ProjectsAnimationRefs, 
+  isLoading: boolean, 
+  isDesktop: boolean
+) {
   useLayoutEffect(() => {
     if (isLoading) return;
 
@@ -39,22 +43,128 @@ export function useProjectsAnimation(refs: ProjectsAnimationRefs, isLoading: boo
       const cards = section.querySelectorAll<HTMLElement>('[data-project-card]');
 
       if (prefersReduced) {
-        cards.forEach((c) => gsap.set(c, { opacity: 1, y: 0, rotateX: 0, scale: 1, clearProps: 'all' }));
+        cards.forEach((c) => {
+          gsap.set(c, { opacity: 1, x: 0, y: 0, scale: 1, clearProps: 'all' });
+        });
         return;
       }
 
-      // ── 1. PROJECT CARD ENTRANCE — ORBITAL DROP ───────────────────────
-      if (cards.length > 0) {
+      if (isDesktop && cards.length > 0) {
+        // ─── DESKTOP SOLAR SYSTEM ANIMATION ────────────────────────────
+        const orbits = section.querySelectorAll('.stellar-orbits ellipse');
+        const sun = section.querySelector('.stellar-sun-core');
+
+        // Set initial positions
+        gsap.set(cards, { x: 0, y: 0, scale: 0, opacity: 0 });
+        if (orbits.length) gsap.set(orbits, { scale: 0, opacity: 0, transformOrigin: 'center center' });
+        if (sun) gsap.set(sun, { scale: 0, opacity: 0 });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: containerRef.current || section,
+            start: 'top 75%',
+          }
+        });
+
+        // Orbits and Sun expand
+        if (sun) {
+          tl.to(sun, {
+            scale: 1,
+            opacity: 1,
+            duration: 1.2,
+            ease: 'back.out(1.4)'
+          }, 0);
+        }
+
+        if (orbits.length) {
+          tl.to(orbits, {
+            scale: 1,
+            opacity: (i) => i === 0 ? 0.35 : (i === 1 ? 0.45 : 0.35),
+            duration: 1,
+            stagger: 0.15,
+            ease: 'power2.out'
+          }, 0.2);
+        }
+
+        // Explode cards outward (Big Bang)
+        tl.to(cards, {
+          x: (_, target) => parseFloat(target.getAttribute('data-x') || '0'),
+          y: (_, target) => parseFloat(target.getAttribute('data-y') || '0'),
+          scale: 1,
+          opacity: 1,
+          duration: 1.5,
+          stagger: 0.08,
+          ease: 'back.out(1.15)',
+          onComplete: () => {
+            // Setup card float / zero-g bobbing
+            cards.forEach((card, i) => {
+              const targetX = parseFloat(card.getAttribute('data-x') || '0');
+              const targetY = parseFloat(card.getAttribute('data-y') || '0');
+
+              const floatTween = gsap.fromTo(card,
+                { x: targetX, y: targetY },
+                {
+                  y: targetY + 8,
+                  x: targetX + (i % 2 === 0 ? 4 : -4),
+                  duration: 5 + i * 0.8,
+                  repeat: -1,
+                  yoyo: true,
+                  ease: 'sine.inOut',
+                  overwrite: 'auto'
+                }
+              );
+              (card as any)._floatTween = floatTween;
+            });
+          }
+        }, 0.3);
+
+        // Hover animations
+        cards.forEach((card) => {
+          card.addEventListener('mouseenter', () => {
+            // Pause float
+            if ((card as any)._floatTween) {
+              (card as any)._floatTween.pause();
+            }
+
+            // Animate scale
+            gsap.to(card, {
+              scale: 1.05,
+              zIndex: 50,
+              duration: 0.35,
+              ease: 'power2.out',
+              overwrite: 'auto'
+            });
+          });
+
+          card.addEventListener('mouseleave', () => {
+            // Animate scale back
+            gsap.to(card, {
+              scale: 1,
+              zIndex: 20,
+              duration: 0.35,
+              ease: 'power2.out',
+              overwrite: 'auto',
+              onComplete: () => {
+                // Resume float
+                if ((card as any)._floatTween) {
+                  (card as any)._floatTween.play();
+                }
+              }
+            });
+          });
+        });
+
+      } else if (cards.length > 0) {
+        // ─── MOBILE BENTO GRID ANIMATION (ORBITAL DROP) ────────────────
         const container = containerRef.current;
         if (container) {
           gsap.set(container, { perspective: 1200 });
         }
 
-        // Reset framer-motion defaults
         gsap.set(cards, { opacity: 0, y: -60, rotateX: -25, scale: 0.9, transformOrigin: 'top center' });
 
         ScrollTrigger.batch(cards, {
-          start: 'top 72%',
+          start: 'top 75%',
           onEnter: (elements) => {
             gsap.to(elements, {
               opacity: 1,
@@ -62,14 +172,9 @@ export function useProjectsAnimation(refs: ProjectsAnimationRefs, isLoading: boo
               rotateX: 0,
               scale: 1,
               ease: 'portal',
-              duration: 0.9,
-              stagger: 0.18,
-              overwrite: 'auto',
-              onComplete: () => {
-                elements.forEach((el) => {
-                  el.style.willChange = 'auto';
-                });
-              }
+              duration: 0.8,
+              stagger: 0.15,
+              overwrite: 'auto'
             });
           },
           onLeave: (elements) => {
@@ -88,8 +193,8 @@ export function useProjectsAnimation(refs: ProjectsAnimationRefs, isLoading: boo
               rotateX: 0,
               scale: 1,
               ease: 'portal',
-              duration: 0.9,
-              stagger: 0.18,
+              duration: 0.8,
+              stagger: 0.15,
               overwrite: 'auto'
             });
           },
@@ -103,62 +208,9 @@ export function useProjectsAnimation(refs: ProjectsAnimationRefs, isLoading: boo
             });
           }
         });
-
-        // ── 2. CARD HOVER — ARTIFACT EXAMINATION ─────────────────────────
-        cards.forEach((card) => {
-          card.style.willChange = 'transform, box-shadow';
-
-          // Create Grid Overlay
-          const gridOverlay = document.createElement('div');
-          gridOverlay.className = 'absolute inset-0 pointer-events-none z-10';
-          gridOverlay.style.background = 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,243,255,0.2) 1px, rgba(0,243,255,0.2) 2px)';
-          gridOverlay.style.backgroundSize = '100% 4px';
-          gridOverlay.style.opacity = '0';
-          card.appendChild(gridOverlay);
-
-          card.addEventListener('mouseenter', () => {
-            // Card Float
-            gsap.to(card, {
-              y: -10,
-              scale: 1.02,
-              boxShadow: '0 30px 60px rgba(0,0,0,0.5)',
-              duration: 0.3,
-              ease: 'power2.out',
-              overwrite: 'auto',
-            });
-            // Grid Overlay appear
-            gsap.to(gridOverlay, { opacity: 0.08, duration: 0.3 });
-
-            // Pause Scanning Beam
-            const beam = section.parentElement?.querySelector('.absolute.top-0.left-0.w-full.h-\\[2px\\]');
-            if (beam) {
-              const tweens = gsap.getTweensOf(beam);
-              tweens.forEach(t => t.pause());
-            }
-          });
-
-          card.addEventListener('mouseleave', () => {
-            gsap.to(card, {
-              y: 0,
-              scale: 1,
-              boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-              duration: 0.4,
-              ease: 'power2.out',
-              overwrite: 'auto',
-            });
-            gsap.to(gridOverlay, { opacity: 0, duration: 0.3 });
-
-            // Resume Scanning Beam
-            const beam = section.parentElement?.querySelector('.absolute.top-0.left-0.w-full.h-\\[2px\\]');
-            if (beam) {
-              const tweens = gsap.getTweensOf(beam);
-              tweens.forEach(t => t.resume());
-            }
-          });
-        });
       }
 
-      // ── 3. Tech Stack Marquee ─────────────────────────────────────────
+      // ── Tech Stack Marquee ─────────────────────────────────────────
       const marquee = marqueeRef.current;
       if (marquee) {
         const inner = marquee.querySelector<HTMLElement>('.marquee-inner');
@@ -166,7 +218,7 @@ export function useProjectsAnimation(refs: ProjectsAnimationRefs, isLoading: boo
           const totalWidth = inner.scrollWidth / 2;
           const marqueeTween = gsap.to(inner, {
             x: -totalWidth,
-            duration: 20,
+            duration: 25,
             ease: 'none',
             repeat: -1,
           });
@@ -179,13 +231,14 @@ export function useProjectsAnimation(refs: ProjectsAnimationRefs, isLoading: boo
 
       return () => {
         if (chapterLabel.parentNode) chapterLabel.parentNode.removeChild(chapterLabel);
-        cards.forEach(c => {
-          const grid = c.querySelector('div[style*="repeating-linear-gradient"]');
-          if (grid && grid.parentNode) grid.parentNode.removeChild(grid);
+        cards.forEach((card) => {
+          if ((card as any)._floatTween) {
+            (card as any)._floatTween.kill();
+          }
         });
       };
     }, section);
 
     return () => ctx.revert();
-  }, [isLoading]);
+  }, [isLoading, isDesktop]);
 }

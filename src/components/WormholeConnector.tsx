@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef, useState, useEffect } from 'react';
-import { gsap, ScrollTrigger } from '../lib/gsap-init';
+import { gsap } from '../lib/gsap-init';
 
 const WormholeConnector: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -66,7 +66,7 @@ const WormholeConnector: React.FC = () => {
   if (isMobile) return null;
 
   return (
-    <div ref={containerRef} className="relative w-full h-[100vh] flex items-center justify-center overflow-hidden bg-transparent">
+    <div ref={containerRef} className="relative w-full h-[100vh] flex items-center justify-center overflow-visible bg-transparent">
       {/* Subtle Dynamic Local Glows behind the shape */}
       <div 
         ref={topHalfRef}
@@ -86,7 +86,7 @@ const WormholeConnector: React.FC = () => {
           height="200" 
           viewBox="0 0 100 100" 
           className="opacity-0 pointer-events-none"
-          style={{ transform: 'scale(0.5)' }}
+          style={{ transform: 'scale(0.5)', overflow: 'visible' }}
         >
           <defs>
             {/* Core Glow Gradient */}

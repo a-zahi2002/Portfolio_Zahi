@@ -37,6 +37,8 @@ const About: React.FC = () => {
   const highlights = about?.highlights ?? [
     { icon: 'Code', title: 'Clean Code', subtitle: 'Scalable & Maintainable' },
     { icon: 'Zap', title: 'Performance', subtitle: 'Lightning Fast Loads' },
+    { icon: 'Layout', title: 'Modern UI/UX', subtitle: 'Pixel Perfect Design' },
+    { icon: 'Smartphone', title: 'Responsive', subtitle: 'Mobile & Tablet Ready' },
   ];
 
   return (
@@ -89,35 +91,52 @@ const About: React.FC = () => {
               </div>
             </div>
 
-            {/* Orbiting Satellite Highlight 1 (Desktop absolute, positioned on Orbit 1) */}
-            {!isLoading && highlights.length > 0 && (
-              <div 
-                className="absolute top-[10%] left-[2%] z-20 hidden lg:flex items-start gap-4 p-4 rounded-2xl backdrop-blur-md bg-white/80 dark:bg-charcoal-950/45 border border-gray-200/50 dark:border-[var(--universe-accent)]/15 shadow-[0_8px_32px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(var(--universe-accent-rgb),0.06)] hover:bg-gray-50 dark:hover:bg-charcoal-900/40 hover:border-[var(--universe-accent)]/30 transition-all duration-500 w-60 animate-cosmic-float pointer-events-auto"
-              >
-                <div className="p-2 rounded-lg bg-[var(--universe-accent)]/10 text-[var(--universe-accent)]">
-                  {ICON_MAP[highlights[0].icon] ?? <Code className="shrink-0 w-5 h-5" />}
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">{highlights[0].title}</h4>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{highlights[0].subtitle}</p>
-                </div>
-              </div>
-            )}
+            {/* Orbiting Satellite Highlights (Desktop absolute, positioned dynamically) */}
+            {!isLoading && highlights.slice(0, 4).map((highlight, index) => {
+              const positions = [
+                {
+                  // Highlight 1 (Orbit 1, Top-Left)
+                  className: "top-[6%] left-[-12%] animate-cosmic-float",
+                  borderClass: "dark:border-[var(--universe-accent)]/20",
+                  iconBg: "bg-[var(--universe-accent)]/10 text-[var(--universe-accent)]"
+                },
+                {
+                  // Highlight 2 (Orbit 1, Bottom-Right)
+                  className: "bottom-[8%] right-[-12%] animate-cosmic-float-delay",
+                  borderClass: "dark:border-[var(--universe-accent-secondary)]/20",
+                  iconBg: "bg-[var(--universe-accent-secondary)]/10 text-[var(--universe-accent-secondary)]"
+                },
+                {
+                  // Highlight 3 (Orbit 2, Bottom-Left)
+                  className: "top-[55%] left-[-18%] animate-cosmic-float-delay",
+                  borderClass: "dark:border-[var(--universe-accent)]/20",
+                  iconBg: "bg-[var(--universe-accent)]/10 text-[var(--universe-accent)]"
+                },
+                {
+                  // Highlight 4 (Orbit 2, Top-Right)
+                  className: "top-[12%] right-[-8%] animate-cosmic-float",
+                  borderClass: "dark:border-[var(--universe-accent-secondary)]/20",
+                  iconBg: "bg-[var(--universe-accent-secondary)]/10 text-[var(--universe-accent-secondary)]"
+                }
+              ];
 
-            {/* Orbiting Satellite Highlight 2 (Desktop absolute, positioned on Orbit 2) */}
-            {!isLoading && highlights.length > 1 && (
-              <div 
-                className="absolute bottom-[8%] right-[-4%] z-20 hidden lg:flex items-start gap-4 p-4 rounded-2xl backdrop-blur-md bg-white/80 dark:bg-charcoal-950/45 border border-gray-200/50 dark:border-[var(--universe-accent-secondary)]/15 shadow-[0_8px_32px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(var(--universe-accent-secondary-rgb),0.06)] hover:bg-gray-50 dark:hover:bg-charcoal-900/40 hover:border-[var(--universe-accent-secondary)]/30 transition-all duration-500 w-60 animate-cosmic-float-delay pointer-events-auto"
-              >
-                <div className="p-2 rounded-lg bg-[var(--universe-accent-secondary)]/10 text-[var(--universe-accent-secondary)]">
-                  {ICON_MAP[highlights[1].icon] ?? <Code className="shrink-0 w-5 h-5" />}
+              const pos = positions[index] || positions[0];
+
+              return (
+                <div 
+                  key={index}
+                  className={`absolute z-20 hidden lg:flex items-start gap-4 p-4 rounded-2xl backdrop-blur-md bg-white/80 dark:bg-charcoal-950/45 border border-gray-200/50 ${pos.borderClass} shadow-[0_8px_32px_rgba(0,0,0,0.04)] dark:shadow-[0_8px_32px_rgba(var(--universe-accent-rgb),0.06)] hover:bg-gray-50 dark:hover:bg-charcoal-900/40 hover:border-[var(--universe-accent)]/30 transition-all duration-500 w-60 ${pos.className} pointer-events-auto`}
+                >
+                  <div className={`p-2 rounded-lg ${pos.iconBg}`}>
+                    {ICON_MAP[highlight.icon] ?? <Code className="shrink-0 w-5 h-5" />}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">{highlight.title}</h4>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{highlight.subtitle}</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 dark:text-white text-sm mb-1">{highlights[1].title}</h4>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{highlights[1].subtitle}</p>
-                </div>
-              </div>
-            )}
+              );
+            })}
 
           </div>
 
