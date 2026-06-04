@@ -30,7 +30,6 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
   const wrapperRef = useRef<HTMLDivElement>(null);
   const borderTopRef = useRef<HTMLDivElement>(null);
   const targetLabelRef = useRef<HTMLDivElement>(null);
-  const [isHovered, setIsHovered] = useState(false);
 
   function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
     const { left, top } = currentTarget.getBoundingClientRect();
@@ -49,12 +48,12 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
     const ctx = gsap.context(() => {
       if (prefersReduced) {
         gsap.set(wrapper, { opacity: 1, y: 0, filter: 'blur(0px)' });
-        gsap.set(borderTop, { backgroundColor: 'var(--j-cyan)' });
+        gsap.set(borderTop, { opacity: 0.6, backgroundColor: 'var(--j-cyan)' });
         return;
       }
 
-      gsap.set(wrapper, { opacity: 0, y: 30, filter: 'blur(3px)' });
-      gsap.set(borderTop, { backgroundColor: 'var(--j-red)' });
+      gsap.set(wrapper, { opacity: 0, y: 20, filter: 'blur(0px)' });
+      gsap.set(borderTop, { opacity: 0.15, backgroundColor: 'var(--j-cyan)' });
 
       ScrollTrigger.create({
         trigger: wrapper,
@@ -62,12 +61,14 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
         once: true,
         onEnter: () => {
           gsap.to(wrapper, {
-            opacity: 1, y: 0, filter: 'blur(0px)',
-            duration: 0.5, delay: index * 0.1, ease: 'power3.out',
+            opacity: 1, y: 0,
+            duration: 0.8, delay: index * 0.15, ease: 'power3.out',
           });
-          // Border-top color flash: red → amber → cyan
-          gsap.to(borderTop, { backgroundColor: 'var(--j-amber)', duration: 0.2, delay: index * 0.1 + 0.1 });
-          gsap.to(borderTop, { backgroundColor: 'var(--j-cyan)', duration: 0.3, delay: index * 0.1 + 0.3 });
+          // Soft border-top opacity rise
+          gsap.to(borderTop, {
+            opacity: 0.6,
+            duration: 0.6, delay: index * 0.15 + 0.2,
+          });
         },
       });
     }, wrapper);
@@ -78,7 +79,6 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
 
   // ── Hover: TARGET ACQUIRED ─────────────────────────────────────────────────
   const handleMouseEnter = () => {
-    setIsHovered(true);
     if (borderTopRef.current) {
       gsap.to(borderTopRef.current, { backgroundColor: 'var(--j-amber)', duration: 0.2 });
     }
@@ -95,7 +95,6 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
   };
 
   const handleMouseLeave = () => {
-    setIsHovered(false);
     if (borderTopRef.current) {
       gsap.to(borderTopRef.current, { backgroundColor: 'var(--j-cyan)', duration: 0.3 });
     }
@@ -320,42 +319,25 @@ const Projects: React.FC = () => {
         start: 'top bottom',
         end: 'bottom top',
         onEnter: () => {
-          gsap.set(beam, { display: 'block', y: '0%', opacity: 0.5 });
+          gsap.set(beam, { display: 'block', y: '0%', opacity: 0.15 });
           beamAnim = gsap.to(beam, {
             y: '100%',
-            duration: 3,
+            duration: 6,
             ease: 'none',
             repeat: -1,
           });
-          // scanBeep loop
-          scanBeepIntervalRef.current = setInterval(() => {
-            JarvisAudio.scanBeep();
-          }, 2800);
         },
         onLeave: () => {
           beamAnim?.pause();
           gsap.set(beam, { display: 'none' });
-          if (scanBeepIntervalRef.current) {
-            clearInterval(scanBeepIntervalRef.current);
-            scanBeepIntervalRef.current = null;
-          }
         },
         onEnterBack: () => {
           gsap.set(beam, { display: 'block' });
           beamAnim?.resume();
-          if (!scanBeepIntervalRef.current) {
-            scanBeepIntervalRef.current = setInterval(() => {
-              JarvisAudio.scanBeep();
-            }, 2800);
-          }
         },
         onLeaveBack: () => {
           beamAnim?.pause();
           gsap.set(beam, { display: 'none' });
-          if (scanBeepIntervalRef.current) {
-            clearInterval(scanBeepIntervalRef.current);
-            scanBeepIntervalRef.current = null;
-          }
         },
       });
     }, section);

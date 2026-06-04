@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Github, Linkedin, Copy, Check, Mail } from 'lucide-react';
 import { useContactInfo } from '../hooks/cms/useContactInfo';
 import { useSocialLinks } from '../hooks/cms/useSocialLinks';
-import { gsap, ScrollTrigger, SplitText } from '../lib/gsap-config';
+import { gsap, ScrollTrigger } from '../lib/gsap-config';
 
 // Map icon name strings to Lucide components
 const ICON_MAP: Record<string, React.ReactNode> = {
@@ -46,40 +46,27 @@ const Contact: React.FC = () => {
         return;
       }
 
-      // ── Heading ScrambleText pre-pass then SplitText reveal ──────────
-      gsap.set(heading, { opacity: 0 });
+      // ── Heading character reveal ──────────
+      const chars = heading.querySelectorAll('.j-contact-char');
+      if (chars.length > 0) {
+        gsap.set(chars, { opacity: 0, y: 15, filter: 'blur(6px)' });
 
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top 70%',
-        once: true,
-        onEnter: () => {
-          gsap.to(heading, { opacity: 1, duration: 0.1 });
-
-          // ScrambleText pre-pass
-          gsap.to(heading, {
-            scrambleText: {
-              text: heading.textContent ?? '',
-              chars: 'upperCase!@#',
-              speed: 0.8,
-            },
-            duration: 0.3,
-            onComplete: () => {
-              // SplitText char-by-char reveal
-              const split = new SplitText(heading, { type: 'chars' });
-              gsap.fromTo(split.chars,
-                { opacity: 0, y: 20 },
-                {
-                  opacity: 1, y: 0,
-                  stagger: 0.06,
-                  duration: 0.5,
-                  ease: 'power3.out',
-                }
-              );
-            },
-          });
-        },
-      });
+        ScrollTrigger.create({
+          trigger: section,
+          start: 'top 75%',
+          once: true,
+          onEnter: () => {
+            gsap.to(chars, {
+              opacity: 1,
+              y: 0,
+              filter: 'blur(0px)',
+              duration: 1.0,
+              stagger: 0.03,
+              ease: 'power3.out',
+            });
+          },
+        });
+      }
     }, section);
 
     return () => ctx.revert();
@@ -120,9 +107,9 @@ const Contact: React.FC = () => {
           zIndex: 0,
         }}
       >
-        <div ref={ring1Ref} className="j-sonar-ring" style={{ animationDelay: '0s' }} />
-        <div ref={ring2Ref} className="j-sonar-ring" style={{ animationDelay: '0.8s' }} />
-        <div ref={ring3Ref} className="j-sonar-ring" style={{ animationDelay: '1.6s' }} />
+        <div ref={ring1Ref} className="j-sonar-ring" style={{ animationDuration: '4.8s', animationDelay: '0s' }} />
+        <div ref={ring2Ref} className="j-sonar-ring" style={{ animationDuration: '4.8s', animationDelay: '1.6s' }} />
+        <div ref={ring3Ref} className="j-sonar-ring" style={{ animationDuration: '4.8s', animationDelay: '3.2s' }} />
       </div>
 
       {/* Background glow */}
@@ -160,9 +147,28 @@ const Contact: React.FC = () => {
             <div className="h-16 bg-charcoal-900/5 dark:bg-white/5 animate-pulse rounded-2xl w-3/4 mx-auto" />
           ) : (
             <>
-              {heading} <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-400">
-                {headingHighlight}
+              <span className="inline-block">
+                {heading.split('').map((char, i) => (
+                  <span
+                    key={i}
+                    className="j-contact-char inline-block"
+                    style={{ display: 'inline-block', minWidth: char === ' ' ? '0.25em' : 'auto' }}
+                  >
+                    {char}
+                  </span>
+                ))}
+              </span>
+              <br />
+              <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-blue-400">
+                {headingHighlight.split('').map((char, i) => (
+                  <span
+                    key={i}
+                    className="j-contact-char inline-block"
+                    style={{ display: 'inline-block', minWidth: char === ' ' ? '0.25em' : 'auto' }}
+                  >
+                    {char}
+                  </span>
+                ))}
               </span>
             </>
           )}

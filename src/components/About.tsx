@@ -47,6 +47,9 @@ const About: React.FC = () => {
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+    let split1: SplitText | null = null;
+    let split2: SplitText | null = null;
+
     const ctx = gsap.context(() => {
       if (prefersReduced) {
         gsap.set([panel, statusLine], { opacity: 1, clipPath: 'inset(0% 0% 0% 0%)' });
@@ -61,18 +64,18 @@ const About: React.FC = () => {
           start: 'top 70%',
           once: true,
           onEnter: () => {
-            gsap.to(statusLine, { opacity: 1, duration: 0.2 });
+            gsap.to(statusLine, { opacity: 1, duration: 0.25 });
             gsap.to(statusLine, {
-              scrambleText: { text: '[ RUNNING BIO_ANALYSIS... ]', chars: 'upperCase', speed: 1 },
-              duration: 0.4,
+              scrambleText: { text: '[ RUNNING BIO_ANALYSIS... ]', chars: 'upperCase', speed: 0.8 },
+              duration: 0.6,
               onComplete: () => {
                 setTimeout(() => {
                   if (statusLine) {
                     gsap.to(statusLine, {
-                      scrambleText: { text: '[ ANALYSIS COMPLETE ]', chars: 'upperCase', speed: 2 },
-                      duration: 0.3,
+                      scrambleText: { text: '[ ANALYSIS COMPLETE ]', chars: 'upperCase', speed: 1.5 },
+                      duration: 0.4,
                     });
-                    gsap.to(statusLine, { color: 'var(--j-green)', duration: 0.3 });
+                    gsap.to(statusLine, { color: 'var(--j-green)', duration: 0.4 });
                   }
                 }, 500);
               },
@@ -82,7 +85,7 @@ const About: React.FC = () => {
       }
 
       // ── Data panel clip-path reveal ───────────────────────────────────
-      gsap.set(panel, { clipPath: 'inset(50% 50% 50% 50%)', opacity: 0 });
+      gsap.set(panel, { clipPath: 'inset(30% 0% 0% 0%)', opacity: 0 });
 
       ScrollTrigger.create({
         trigger: panel,
@@ -92,30 +95,34 @@ const About: React.FC = () => {
           gsap.to(panel, {
             clipPath: 'inset(0% 0% 0% 0%)',
             opacity: 1,
-            duration: 0.6,
+            duration: 0.8,
             ease: 'power3.out',
           });
 
           // Bio text word-by-word data readout
           if (bioEl) {
-            const split = new SplitText(bioEl, { type: 'words' });
-            gsap.fromTo(split.words,
+            split1 = new SplitText(bioEl, { type: 'words' });
+            gsap.fromTo(split1.words,
               { opacity: 0, x: -6 },
-              { opacity: 1, x: 0, stagger: 0.025, duration: 0.4, delay: 0.3, ease: 'power2.out' }
+              { opacity: 1, x: 0, stagger: 0.04, duration: 0.5, delay: 0.3, ease: 'power2.out' }
             );
           }
           if (bioSecEl) {
-            const splitSec = new SplitText(bioSecEl, { type: 'words' });
-            gsap.fromTo(splitSec.words,
+            split2 = new SplitText(bioSecEl, { type: 'words' });
+            gsap.fromTo(split2.words,
               { opacity: 0, x: -6 },
-              { opacity: 1, x: 0, stagger: 0.02, duration: 0.4, delay: 0.6, ease: 'power2.out' }
+              { opacity: 1, x: 0, stagger: 0.03, duration: 0.5, delay: 0.7, ease: 'power2.out' }
             );
           }
         },
       });
     }, section);
 
-    return () => ctx.revert();
+    return () => {
+      ctx.revert();
+      if (split1) (split1 as SplitText).revert();
+      if (split2) (split2 as SplitText).revert();
+    };
   }, [isLoading]);
 
   // Fallback values

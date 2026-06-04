@@ -6,7 +6,7 @@
 //   - "CAPABILITY_INDEX COMPILED" status line after all skills revealed
 // CMS hooks, data, 3D tilt, spotlight: UNTOUCHED.
 
-import React, { useLayoutEffect, useRef } from 'react';
+import React, { useLayoutEffect } from 'react';
 import { motion, useMotionValue, useMotionTemplate } from 'framer-motion';
 import { Code2, Database, Layout, Wrench, Cpu, Layers, Globe, Palette, Terminal, Settings } from 'lucide-react';
 import { useSkills } from '../hooks/cms/useSkills';
@@ -64,7 +64,7 @@ const SkillsCard: React.FC<{
         return;
       }
 
-      gsap.set(header, { clipPath: 'inset(0 100% 0 0)', opacity: 0 });
+      gsap.set(header, { clipPath: 'inset(0 0 100% 0)', opacity: 0 });
       const skillItems = items.querySelectorAll('.skill-item-row');
       gsap.set(skillItems, { opacity: 0, x: -10 });
 
@@ -73,21 +73,21 @@ const SkillsCard: React.FC<{
         start: 'top 80%',
         once: true,
         onEnter: () => {
-          // Category header wipe
+          // Category header wipe (top-to-bottom)
           gsap.to(header, {
-            clipPath: 'inset(0 0% 0 0)',
+            clipPath: 'inset(0 0 0% 0)',
             opacity: 1,
-            duration: 0.4,
-            delay: index * 0.1,
+            duration: 0.6,
+            delay: index * 0.15,
             ease: 'power3.out',
           });
           // Items stagger
           gsap.to(skillItems, {
             opacity: 1,
             x: 0,
-            stagger: 0.04,
-            duration: 0.3,
-            delay: index * 0.1 + 0.2,
+            stagger: 0.06,
+            duration: 0.4,
+            delay: index * 0.15 + 0.3,
             ease: 'power2.out',
           });
         },
@@ -273,14 +273,14 @@ const Skills: React.FC = () => {
           start: 'top 70%',
           once: true,
           onEnter: () => {
-            gsap.to(headerStatus, { opacity: 1, duration: 0.1 });
+            gsap.to(headerStatus, { opacity: 1, duration: 0.25 });
             gsap.to(headerStatus, {
               scrambleText: {
                 text: '[ RUNNING CAPABILITY_INDEX... ]',
                 chars: 'upperCase',
-                speed: 1,
+                speed: 0.8,
               },
-              duration: 0.5,
+              duration: 0.8,
             });
           },
         });
@@ -293,14 +293,14 @@ const Skills: React.FC = () => {
           start: 'top 90%',
           once: true,
           onEnter: () => {
-            gsap.to(compiled, { opacity: 1, duration: 0.1 });
+            gsap.to(compiled, { opacity: 1, duration: 0.25 });
             gsap.to(compiled, {
               scrambleText: {
                 text: '[ CAPABILITY_INDEX COMPILED — ALL SYSTEMS INDEXED ]',
                 chars: 'upperCase',
-                speed: 1,
+                speed: 0.8,
               },
-              duration: 0.6,
+              duration: 0.8,
             });
           },
         });

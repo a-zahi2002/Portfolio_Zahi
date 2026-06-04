@@ -54,7 +54,7 @@ const OsModule: React.FC<OsModuleProps> = ({
             trigger: wrapper,
             start: 'top 90%',
             end: 'top 50%',
-            scrub: 0.5,
+            scrub: 1.2,
           },
         }
       );
@@ -85,15 +85,17 @@ const OsModule: React.FC<OsModuleProps> = ({
           JarvisAudio.moduleInitialize();
 
           // Header fade in + ScrambleText
-          gsap.to(header, { opacity: 1, duration: 0.1 });
-          gsap.to(header, {
-            scrambleText: {
-              text: headerText,
-              chars: 'upperCase-_.',
-              speed: 0.8,
-            },
-            duration: 0.4,
-          });
+          gsap.to(header, { opacity: 1, duration: 0.15 });
+          if (statusEl) {
+            gsap.to(statusEl, {
+              scrambleText: {
+                text: headerText,
+                chars: 'upperCase-_.',
+                speed: 0.8,
+              },
+              duration: 0.7,
+            });
+          }
         },
       });
 
@@ -106,7 +108,7 @@ const OsModule: React.FC<OsModuleProps> = ({
           gsap.to(header, { opacity: 0.4, duration: 0.4 });
           // Update text to show LOGGED
           const loggedText = `[ ${moduleId} ] ─── [ ${protocolName} ] ─── [ STATUS: LOGGED ]`;
-          gsap.to(header, {
+          gsap.to(statusEl, {
             scrambleText: {
               text: loggedText,
               chars: 'upperCase',
@@ -119,14 +121,16 @@ const OsModule: React.FC<OsModuleProps> = ({
           // Re-enter from scrolling back up — restore ACTIVE
           gsap.to(header, { opacity: 1, duration: 0.3 });
           const activeText = `[ ${moduleId} ] ─── [ ${protocolName} ] ─── [ STATUS: ACTIVE ]`;
-          gsap.to(header, {
-            scrambleText: {
-              text: activeText,
-              chars: 'upperCase',
-              speed: 2,
-            },
-            duration: 0.3,
-          });
+          if (statusEl) {
+            gsap.to(statusEl, {
+              scrambleText: {
+                text: activeText,
+                chars: 'upperCase',
+                speed: 2,
+              },
+              duration: 0.3,
+            });
+          }
 
           // Re-dispatch module:active when scrolling back up into section
           document.dispatchEvent(

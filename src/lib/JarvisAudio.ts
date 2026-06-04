@@ -65,35 +65,35 @@ class JarvisAudioEngine {
     const ctx = this.getCtx();
     const now = ctx.currentTime;
 
-    // Layer 1: sawtooth sweep 40→120 Hz
-    const { osc: osc1, gain: g1 } = this.makeOsc('sawtooth', 40, 0, now, now + 2.5, ctx);
-    osc1.frequency.exponentialRampToValueAtTime(120, now + 0.8);
+    // Layer 1: sine sweep 40→100 Hz (warm low-end rumble)
+    const { osc: osc1, gain: g1 } = this.makeOsc('sine', 40, 0, now, now + 2.5, ctx);
+    osc1.frequency.exponentialRampToValueAtTime(100, now + 1.0);
     g1.gain.setValueAtTime(0, now);
-    g1.gain.linearRampToValueAtTime(0.18, now + 0.01);
-    g1.gain.setValueAtTime(0.18, now + 2.0);
+    g1.gain.linearRampToValueAtTime(0.06, now + 0.05);
+    g1.gain.setValueAtTime(0.06, now + 2.0);
     g1.gain.linearRampToValueAtTime(0, now + 2.5);
 
-    // Lowpass filter on layer 1
+    // Lowpass filter on layer 1 (muffle any harmonics)
     const filter1 = ctx.createBiquadFilter();
     filter1.type = 'lowpass';
-    filter1.frequency.value = 800;
+    filter1.frequency.value = 300;
     osc1.disconnect();
     osc1.connect(filter1);
     filter1.connect(this.masterGain!);
 
-    // Layer 2: sine sweep 80→200 Hz
-    const { osc: osc2, gain: g2 } = this.makeOsc('sine', 80, 0, now, now + 2.5, ctx);
-    osc2.frequency.exponentialRampToValueAtTime(200, now + 0.8);
+    // Layer 2: sine sweep 60→160 Hz (smooth mid-low sweep)
+    const { osc: osc2, gain: g2 } = this.makeOsc('sine', 60, 0, now, now + 2.5, ctx);
+    osc2.frequency.exponentialRampToValueAtTime(160, now + 1.0);
     g2.gain.setValueAtTime(0, now);
-    g2.gain.linearRampToValueAtTime(0.12, now + 0.01);
-    g2.gain.setValueAtTime(0.12, now + 2.0);
+    g2.gain.linearRampToValueAtTime(0.04, now + 0.05);
+    g2.gain.setValueAtTime(0.04, now + 2.0);
     g2.gain.linearRampToValueAtTime(0, now + 2.5);
 
-    // Completion ping at t=2.0s — sine 2000 Hz, very short
-    const { gain: pingGain } = this.makeOsc('sine', 2000, 0, now + 2.0, now + 2.08, ctx);
+    // Soft warm completion chime at t=2.0s — sine 600 Hz, short
+    const { gain: pingGain } = this.makeOsc('sine', 600, 0, now + 2.0, now + 2.12, ctx);
     pingGain.gain.setValueAtTime(0, now + 2.0);
-    pingGain.gain.linearRampToValueAtTime(0.3, now + 2.01);
-    pingGain.gain.linearRampToValueAtTime(0, now + 2.08);
+    pingGain.gain.linearRampToValueAtTime(0.02, now + 2.02);
+    pingGain.gain.linearRampToValueAtTime(0, now + 2.12);
   }
 
   /** Quick system chirp. ~0.15s */
@@ -102,10 +102,11 @@ class JarvisAudioEngine {
     const ctx = this.getCtx();
     const now = ctx.currentTime;
 
-    const { osc, gain } = this.makeOsc('square', 440, 0, now, now + 0.15, ctx);
-    osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+    // Soft triangle sweep 320→640Hz (lower pitch, gentler than square)
+    const { osc, gain } = this.makeOsc('triangle', 320, 0, now, now + 0.15, ctx);
+    osc.frequency.exponentialRampToValueAtTime(640, now + 0.1);
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.12, now + 0.005);
+    gain.gain.linearRampToValueAtTime(0.03, now + 0.01);
     gain.gain.linearRampToValueAtTime(0, now + 0.15);
   }
 
@@ -114,14 +115,15 @@ class JarvisAudioEngine {
     if (this._isMuted) return;
     const ctx = this.getCtx();
     const now = ctx.currentTime;
-    const freqs = [600, 900, 1100, 750, 1400, 800];
+    // Lower pitched, fewer tones (3 instead of 6), slower spread
+    const freqs = [500, 700, 600];
 
     freqs.forEach((freq, i) => {
-      const t = now + i * 0.06;
-      const { gain } = this.makeOsc('sine', freq + Math.random() * 200, 0, t, t + 0.05, ctx);
+      const t = now + i * 0.1;
+      const { gain } = this.makeOsc('sine', freq + Math.random() * 50, 0, t, t + 0.08, ctx);
       gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.15, t + 0.005);
-      gain.gain.linearRampToValueAtTime(0, t + 0.05);
+      gain.gain.linearRampToValueAtTime(0.02, t + 0.01);
+      gain.gain.linearRampToValueAtTime(0, t + 0.08);
     });
   }
 
@@ -131,9 +133,10 @@ class JarvisAudioEngine {
     const ctx = this.getCtx();
     const now = ctx.currentTime;
 
-    const { gain } = this.makeOsc('triangle', 1200, 0, now, now + 0.06, ctx);
-    gain.gain.setValueAtTime(0.2, now);
-    gain.gain.linearRampToValueAtTime(0, now + 0.06);
+    // Sine wave 600Hz (much softer than triangle 1200Hz)
+    const { gain } = this.makeOsc('sine', 600, 0, now, now + 0.04, ctx);
+    gain.gain.setValueAtTime(0.04, now);
+    gain.gain.linearRampToValueAtTime(0, now + 0.04);
   }
 
   /** Soft hover tick. ~0.04s */
@@ -142,9 +145,10 @@ class JarvisAudioEngine {
     const ctx = this.getCtx();
     const now = ctx.currentTime;
 
-    const { gain } = this.makeOsc('sine', 800, 0, now, now + 0.04, ctx);
-    gain.gain.setValueAtTime(0.08, now);
-    gain.gain.linearRampToValueAtTime(0, now + 0.04);
+    // Barely audible 300Hz sine wave pulse
+    const { gain } = this.makeOsc('sine', 300, 0, now, now + 0.03, ctx);
+    gain.gain.setValueAtTime(0.02, now);
+    gain.gain.linearRampToValueAtTime(0, now + 0.03);
   }
 
   /** Radar-like scan beep. ~0.3s */
@@ -153,10 +157,11 @@ class JarvisAudioEngine {
     const ctx = this.getCtx();
     const now = ctx.currentTime;
 
-    const { gain } = this.makeOsc('sine', 1000, 0, now, now + 0.3, ctx);
+    // Softer 500Hz sine beep
+    const { gain } = this.makeOsc('sine', 500, 0, now, now + 0.25, ctx);
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.3, now + 0.15);
-    gain.gain.linearRampToValueAtTime(0, now + 0.3);
+    gain.gain.linearRampToValueAtTime(0.04, now + 0.1);
+    gain.gain.linearRampToValueAtTime(0, now + 0.25);
   }
 
   /** Descending standby hum. ~1.2s */
@@ -165,18 +170,19 @@ class JarvisAudioEngine {
     const ctx = this.getCtx();
     const now = ctx.currentTime;
 
-    const { osc, gain } = this.makeOsc('sawtooth', 200, 0, now, now + 1.2, ctx);
+    // Sine sweep (softer than sawtooth)
+    const { osc, gain } = this.makeOsc('sine', 150, 0, now, now + 1.2, ctx);
     osc.frequency.exponentialRampToValueAtTime(60, now + 1.0);
 
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    filter.frequency.value = 400;
+    filter.frequency.value = 200;
     osc.disconnect();
     osc.connect(filter);
     filter.connect(this.masterGain!);
 
     gain.gain.setValueAtTime(0, now);
-    gain.gain.linearRampToValueAtTime(0.2, now + 0.05);
+    gain.gain.linearRampToValueAtTime(0.03, now + 0.05);
     gain.gain.linearRampToValueAtTime(0, now + 1.2);
   }
 

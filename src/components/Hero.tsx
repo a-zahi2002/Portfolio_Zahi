@@ -3,12 +3,12 @@
 // typing cursor on role, identity scan sweep line, and hero pin.
 // CMS hooks, data, props, handlers: UNTOUCHED.
 
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowDown, FileText } from 'lucide-react';
 import { useHeroSection } from '../hooks/cms/useHeroSection';
 import { useSiteSettings } from '../hooks/cms/useSiteSettings';
-import { gsap, ScrollTrigger, SplitText, ScrambleTextPlugin } from '../lib/gsap-config';
+import { gsap, ScrollTrigger } from '../lib/gsap-config';
 
 const MagneticButton = ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => {
   const ref = useRef<HTMLButtonElement>(null);
@@ -103,11 +103,11 @@ const Hero: React.FC = () => {
           gsap.set([outerCircle, innerCircle], { drawSVG: '0%', opacity: 1 });
           gsap.set(ticks, { scale: 0, opacity: 0, transformOrigin: 'center center' });
 
-          gsap.to(outerCircle, { drawSVG: '100%', duration: 0.8, ease: 'power2.out' });
-          gsap.to(innerCircle, { drawSVG: '100%', duration: 0.6, ease: 'power2.out', delay: 0.2 });
+          gsap.to(outerCircle, { drawSVG: '100%', duration: 1.2, ease: 'power2.out' });
+          gsap.to(innerCircle, { drawSVG: '100%', duration: 0.9, ease: 'power2.out', delay: 0.3 });
           gsap.to(ticks, {
-            scale: 1, opacity: 1, duration: 0.3, stagger: 0.05,
-            ease: 'back.out(2)', delay: 0.4,
+            scale: 1, opacity: 1, duration: 0.4, stagger: 0.05,
+            ease: 'back.out(1.5)', delay: 0.6,
           });
 
           // Slow rotation — infinite
@@ -122,20 +122,19 @@ const Hero: React.FC = () => {
         }
       }
 
-      // ── 2. Name reveal — ScrambleText pass then SplitText chars ───────
-      if (heading) {
-        const split = new SplitText(heading, { type: 'chars' });
-        gsap.set(split.chars, { opacity: 0, y: 20, filter: 'blur(4px)' });
+      // ── 2. Name reveal — direct chars fade-in ───────
+      const nameChars = heading.querySelectorAll('.j-name-char');
+      if (nameChars.length > 0) {
+        gsap.set(nameChars, { opacity: 0, y: 15, filter: 'blur(8px)' });
 
-        gsap.to(heading, {
-          scrambleText: { text: heading.textContent ?? '', chars: 'upperCase', speed: 0.8 },
-          duration: 0.2,
-          onComplete: () => {
-            gsap.to(split.chars, {
-              opacity: 1, y: 0, filter: 'blur(0px)',
-              duration: 0.6, stagger: 0.04, ease: 'power3.out',
-            });
-          },
+        gsap.to(nameChars, {
+          opacity: 1,
+          y: 0,
+          filter: 'blur(0px)',
+          duration: 1.0,
+          stagger: 0.03,
+          ease: 'power3.out',
+          delay: 0.1,
         });
       }
 
@@ -143,9 +142,9 @@ const Hero: React.FC = () => {
       if (subheading) {
         subheading.classList.add('j-typing-cursor');
         gsap.fromTo(subheading,
-          { opacity: 0, y: 20 },
+          { opacity: 0, y: 15 },
           {
-            opacity: 1, y: 0, duration: 0.8, delay: 0.6, ease: 'power3.out',
+            opacity: 1, y: 0, duration: 1.2, delay: 0.8, ease: 'power3.out',
             onComplete: () => {
               // Blink cursor 3 times then remove
               setTimeout(() => {
@@ -161,15 +160,15 @@ const Hero: React.FC = () => {
       if (content) {
         const buttons = content.querySelectorAll('.flex.flex-col, .flex.flex-col.sm\\:flex-row');
         gsap.fromTo(buttons,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.8, delay: 0.8, ease: 'power3.out' }
+          { opacity: 0, y: 15 },
+          { opacity: 1, y: 0, duration: 1.0, delay: 1.1, ease: 'power3.out' }
         );
       }
 
       if (indicator) {
         gsap.fromTo(indicator,
           { opacity: 0 },
-          { opacity: 1, duration: 0.6, delay: 1.2 }
+          { opacity: 1, duration: 0.8, delay: 1.5 }
         );
       }
 
@@ -177,12 +176,12 @@ const Hero: React.FC = () => {
       if (scanLine) {
         gsap.set(scanLine, { opacity: 0 });
         gsap.to(scanLine, {
-          opacity: 1, duration: 0.1, delay: 1.0,
+          opacity: 0.25, duration: 0.15, delay: 1.2,
           onComplete: () => {
             gsap.to(scanLine, {
-              y: '100vh', duration: 0.8, ease: 'none', delay: 0,
+              y: '100vh', duration: 1.2, ease: 'power2.out', delay: 0,
               onComplete: () => {
-                gsap.to(scanLine, { opacity: 0, duration: 0.1 });
+                gsap.to(scanLine, { opacity: 0, duration: 0.15 });
               },
             });
           },
@@ -333,16 +332,35 @@ const Hero: React.FC = () => {
           </motion.div>
         )}
 
-        {/* Heading — data-hero-heading for GSAP ScrambleText */}
+        {/* Heading — split into chars natively */}
         <div className="mb-6 overflow-hidden py-2">
           <h1
             ref={headingRef}
             data-hero-heading
             className="text-6xl md:text-8xl lg:text-[7rem] font-display font-bold tracking-tighter text-charcoal-900 dark:text-white leading-[1.1]"
           >
-            {heading}{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple drop-shadow-sm">
-              {headingHighlight}
+            <span className="inline-block">
+              {heading.split('').map((char, i) => (
+                <span
+                  key={i}
+                  className="j-name-char inline-block"
+                  style={{ display: 'inline-block', minWidth: char === ' ' ? '0.25em' : 'auto' }}
+                >
+                  {char}
+                </span>
+              ))}
+            </span>
+            {' '}
+            <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple drop-shadow-sm">
+              {headingHighlight.split('').map((char, i) => (
+                <span
+                  key={i}
+                  className="j-name-char inline-block"
+                  style={{ display: 'inline-block', minWidth: char === ' ' ? '0.25em' : 'auto' }}
+                >
+                  {char}
+                </span>
+              ))}
             </span>
           </h1>
         </div>

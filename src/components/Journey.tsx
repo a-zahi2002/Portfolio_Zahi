@@ -72,44 +72,31 @@ const RecordCard: React.FC<RecordCardProps> = ({ recId, timestamp, title, childr
 
   useLayoutEffect(() => {
     const card = cardRef.current;
-    const titleEl = titleRef.current;
     if (!card) return;
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     const ctx = gsap.context(() => {
       if (prefersReduced) {
-        gsap.set(card, { opacity: 1, filter: 'blur(0px)', clipPath: 'inset(0 0% 0 0)' });
+        gsap.set(card, { opacity: 1, filter: 'blur(0px)', clipPath: 'inset(0 0 0% 0)' });
         return;
       }
 
-      gsap.set(card, { opacity: 0, filter: 'blur(8px)', clipPath: 'inset(0 100% 0 0)' });
+      gsap.set(card, { opacity: 0, filter: 'blur(4px)', clipPath: 'inset(0 0 100% 0)' });
 
       ScrollTrigger.create({
         trigger: card,
-        start: 'top 80%',
+        start: 'top 85%',
         once: true,
         onEnter: () => {
-          // ScrambleText on title
-          if (titleEl) {
-            gsap.to(titleEl, {
-              scrambleText: {
-                text: titleEl.textContent ?? '',
-                chars: 'upperCase!@#',
-                speed: 1,
-              },
-              duration: 0.3,
-            });
-          }
-
-          // Clip-path wipe + blur clear
+          // Vertical clip-path wipe + blur clear
           gsap.to(card, {
-            clipPath: 'inset(0 0% 0 0)',
+            clipPath: 'inset(0 0 0% 0)',
             filter: 'blur(0px)',
             opacity: 1,
-            duration: 0.5,
+            duration: 0.8,
             ease: 'power3.out',
-            delay: index * 0.05,
+            delay: index * 0.15,
             onStart: () => JarvisAudio.dataStream(),
           });
         },
