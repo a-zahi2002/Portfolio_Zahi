@@ -32,4 +32,7 @@ export function initGSAP(): void {
   gsap.defaults({ duration: 0.9, ease: 'power3.out' });
 }
 
+// Initialize GSAP immediately on module import to ensure all plugins and custom eases are registered
+initGSAP();
+
 export { gsap, ScrollTrigger, ScrollToPlugin, SplitText, ScrambleTextPlugin, DrawSVGPlugin, MorphSVGPlugin, CustomEase };

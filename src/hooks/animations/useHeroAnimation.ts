@@ -157,26 +157,38 @@ export function useHeroAnimation(
           },
         });
 
-        pinTl.to(heading, {
-          y: -80,
-          opacity: 0,
-          ease: 'none',
-        }, 0);
+        pinTl.fromTo(heading,
+          { opacity: 1, y: 0 },
+          {
+            y: -80,
+            opacity: 0,
+            ease: 'none',
+          },
+          0
+        );
 
         if (backgroundGrid) {
-          pinTl.to(backgroundGrid, {
-            scale: 1.08,
-            ease: 'none',
-            transformOrigin: 'center center'
-          }, 0);
+          pinTl.fromTo(backgroundGrid,
+            { scale: 1 },
+            {
+              scale: 1.08,
+              ease: 'none',
+              transformOrigin: 'center center'
+            },
+            0
+          );
         }
 
         // Subtitle and buttons fade out too
-        pinTl.to([subheading, buttonsContainer, chapterLabel], {
-          opacity: 0,
-          y: -40,
-          ease: 'none'
-        }, 0.2);
+        pinTl.fromTo([subheading, buttonsContainer, chapterLabel],
+          { opacity: 1, y: 0 },
+          {
+            opacity: 0,
+            y: -40,
+            ease: 'none'
+          },
+          0.2
+        );
       }
 
       // Scroll Indicator 
