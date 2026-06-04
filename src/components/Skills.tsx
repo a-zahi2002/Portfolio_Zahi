@@ -155,7 +155,7 @@ const SkillsCard: React.FC<{
           {skillGroup.items.map((skill, index) => {
             const skillColor = skill.color || '#00f3ff';
             return (
-              <div key={skill.id} className="space-y-2 group/item">
+              <div key={skill.id} className="space-y-2 group/item" data-skill-item-inner>
                 <div className="flex justify-between items-center text-sm">
                   <span className="font-medium text-gray-800 dark:text-gray-200 group-hover/item:text-blue-600 dark:group-hover/item:text-accent-cyan transition-colors">
                     {skill.name}
@@ -172,10 +172,11 @@ const SkillsCard: React.FC<{
                     whileInView={{ width: `${skill.proficiency}%` }}
                     viewport={{ once: true }}
                     transition={{ duration: 1.2, ease: "easeOut", delay: index * 0.08 }}
-                    className="h-full rounded-full absolute left-0 top-0"
+                    className="h-full rounded-full absolute left-0 top-0 progress-bar-inner"
+                    data-proficiency={skill.proficiency}
                     style={{ 
                       backgroundColor: skillColor,
-                      boxShadow: `0 0 6px ${skillColor}60` 
+                      boxShadow: `0 0 6px ${skillColor}60`,
                     }}
                   />
                 </div>

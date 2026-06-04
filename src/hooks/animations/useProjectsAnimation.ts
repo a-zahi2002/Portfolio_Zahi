@@ -1,7 +1,7 @@
-// ANIMATION ONLY — does not modify data, props, or CMS logic
+// ANIMATION LAYER ONLY — CMS/data/props untouched
 
 import { useLayoutEffect, RefObject } from 'react';
-import { gsap } from '../../lib/gsap-config';
+import { gsap, ScrollTrigger } from '../../lib/gsap-init';
 
 interface ProjectsAnimationRefs {
   sectionRef: RefObject<HTMLElement>;
@@ -19,66 +19,141 @@ export function useProjectsAnimation(refs: ProjectsAnimationRefs, isLoading: boo
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    if (prefersReduced) {
-      const cards = section.querySelectorAll<HTMLElement>('[data-project-card]');
-      cards.forEach((c) => gsap.set(c, { opacity: 1, y: 0, rotateX: 0, clearProps: 'all' }));
-      return;
-    }
-
     const ctx = gsap.context(() => {
-      // ── 1. Staggered Card Entrance with rotateX ───────────────────────
+      // Create Chapter Label
+      const chapterLabel = document.createElement('div');
+      chapterLabel.textContent = '[ CHAPTER 04 — THE ARTIFACTS ]';
+      chapterLabel.className = 'absolute top-24 md:top-28 left-6 md:left-12 font-mono text-xs font-bold tracking-widest text-charcoal-500 dark:text-gray-400 opacity-0 z-50';
+      section.appendChild(chapterLabel);
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: 'top 60%',
+        end: 'bottom 40%',
+        onEnter: () => gsap.to(chapterLabel, { opacity: 1, duration: 0.6 }),
+        onLeave: () => gsap.to(chapterLabel, { opacity: 0, duration: 0.6 }),
+        onEnterBack: () => gsap.to(chapterLabel, { opacity: 1, duration: 0.6 }),
+        onLeaveBack: () => gsap.to(chapterLabel, { opacity: 0, duration: 0.6 }),
+      });
+
       const cards = section.querySelectorAll<HTMLElement>('[data-project-card]');
+
+      if (prefersReduced) {
+        cards.forEach((c) => gsap.set(c, { opacity: 1, y: 0, rotateX: 0, scale: 1, clearProps: 'all' }));
+        return;
+      }
+
+      // ── 1. PROJECT CARD ENTRANCE — ORBITAL DROP ───────────────────────
       if (cards.length > 0) {
         const container = containerRef.current;
         if (container) {
-          gsap.set(container, { perspective: 1000 });
+          gsap.set(container, { perspective: 1200 });
         }
 
-        gsap.fromTo(
-          cards,
-          { opacity: 0, y: 60, rotateX: 8 },
-          {
-            opacity: 1,
-            y: 0,
-            rotateX: 0,
-            ease: 'power3.out',
-            duration: 0.9,
-            stagger: 0.15,
-            onComplete: () => {
-              cards.forEach((c) => gsap.set(c, { willChange: 'auto' }));
-            },
-            scrollTrigger: {
-              trigger: container || section,
-              start: 'top 75%',
-              toggleActions: 'play none none none',
-            },
-          }
-        );
+        // Reset framer-motion defaults
+        gsap.set(cards, { opacity: 0, y: -60, rotateX: -25, scale: 0.9, transformOrigin: 'top center' });
 
-        // ── 2. Card Hover State via GSAP ─────────────────────────────────
+        ScrollTrigger.batch(cards, {
+          start: 'top 72%',
+          onEnter: (elements) => {
+            gsap.to(elements, {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              scale: 1,
+              ease: 'portal',
+              duration: 0.9,
+              stagger: 0.18,
+              overwrite: 'auto',
+              onComplete: () => {
+                elements.forEach((el) => {
+                  el.style.willChange = 'auto';
+                });
+              }
+            });
+          },
+          onLeave: (elements) => {
+            gsap.to(elements, {
+              opacity: 0,
+              y: -60,
+              rotateX: -25,
+              scale: 0.9,
+              overwrite: 'auto'
+            });
+          },
+          onEnterBack: (elements) => {
+            gsap.to(elements, {
+              opacity: 1,
+              y: 0,
+              rotateX: 0,
+              scale: 1,
+              ease: 'portal',
+              duration: 0.9,
+              stagger: 0.18,
+              overwrite: 'auto'
+            });
+          },
+          onLeaveBack: (elements) => {
+            gsap.to(elements, {
+              opacity: 0,
+              y: -60,
+              rotateX: -25,
+              scale: 0.9,
+              overwrite: 'auto'
+            });
+          }
+        });
+
+        // ── 2. CARD HOVER — ARTIFACT EXAMINATION ─────────────────────────
         cards.forEach((card) => {
-          const accent = card.querySelector<HTMLElement>('.card-accent-border');
+          card.style.willChange = 'transform, box-shadow';
+
+          // Create Grid Overlay
+          const gridOverlay = document.createElement('div');
+          gridOverlay.className = 'absolute inset-0 pointer-events-none z-10';
+          gridOverlay.style.background = 'repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,243,255,0.2) 1px, rgba(0,243,255,0.2) 2px)';
+          gridOverlay.style.backgroundSize = '100% 4px';
+          gridOverlay.style.opacity = '0';
+          card.appendChild(gridOverlay);
 
           card.addEventListener('mouseenter', () => {
+            // Card Float
             gsap.to(card, {
-              y: -8,
-              boxShadow: '0 24px 48px rgba(0,0,0,0.3)',
+              y: -10,
+              scale: 1.02,
+              boxShadow: '0 30px 60px rgba(0,0,0,0.5)',
               duration: 0.3,
               ease: 'power2.out',
               overwrite: 'auto',
             });
-            if (accent) gsap.to(accent, { opacity: 1, duration: 0.3 });
+            // Grid Overlay appear
+            gsap.to(gridOverlay, { opacity: 0.08, duration: 0.3 });
+
+            // Pause Scanning Beam
+            const beam = section.parentElement?.querySelector('.absolute.top-0.left-0.w-full.h-\\[2px\\]');
+            if (beam) {
+              const tweens = gsap.getTweensOf(beam);
+              tweens.forEach(t => t.pause());
+            }
           });
 
           card.addEventListener('mouseleave', () => {
             gsap.to(card, {
               y: 0,
+              scale: 1,
               boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
               duration: 0.4,
               ease: 'power2.out',
               overwrite: 'auto',
             });
-            if (accent) gsap.to(accent, { opacity: 0, duration: 0.3 });
+            gsap.to(gridOverlay, { opacity: 0, duration: 0.3 });
+
+            // Resume Scanning Beam
+            const beam = section.parentElement?.querySelector('.absolute.top-0.left-0.w-full.h-\\[2px\\]');
+            if (beam) {
+              const tweens = gsap.getTweensOf(beam);
+              tweens.forEach(t => t.resume());
+            }
           });
         });
       }
@@ -89,7 +164,7 @@ export function useProjectsAnimation(refs: ProjectsAnimationRefs, isLoading: boo
         const inner = marquee.querySelector<HTMLElement>('.marquee-inner');
         if (inner) {
           const totalWidth = inner.scrollWidth / 2;
-          gsap.to(inner, {
+          const marqueeTween = gsap.to(inner, {
             x: -totalWidth,
             duration: 20,
             ease: 'none',
@@ -97,12 +172,20 @@ export function useProjectsAnimation(refs: ProjectsAnimationRefs, isLoading: boo
           });
 
           // Pause on hover
-          marquee.addEventListener('mouseenter', () => gsap.globalTimeline.pause());
-          marquee.addEventListener('mouseleave', () => gsap.globalTimeline.resume());
+          marquee.addEventListener('mouseenter', () => marqueeTween.pause());
+          marquee.addEventListener('mouseleave', () => marqueeTween.resume());
         }
       }
+
+      return () => {
+        if (chapterLabel.parentNode) chapterLabel.parentNode.removeChild(chapterLabel);
+        cards.forEach(c => {
+          const grid = c.querySelector('div[style*="repeating-linear-gradient"]');
+          if (grid && grid.parentNode) grid.parentNode.removeChild(grid);
+        });
+      };
     }, section);
 
     return () => ctx.revert();
-  }, [isLoading, refs]);
+  }, [isLoading]);
 }

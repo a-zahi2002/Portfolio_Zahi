@@ -157,38 +157,33 @@ const Hero: React.FC = () => {
 
         {/* Heading with Mask Reveal — data-hero-heading for GSAP ScrambleText */}
         <div className="mb-6 overflow-hidden py-2">
-          <motion.h1
+          <h1
             ref={headingRef}
             data-hero-heading
-            initial={{ y: "100%", opacity: 0, rotateZ: 5 }}
-            animate={{ y: 0, opacity: 1, rotateZ: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+            style={{ opacity: 0 }}
             className="text-6xl md:text-8xl lg:text-[7rem] font-display font-bold tracking-tighter text-charcoal-900 dark:text-white leading-[1.1]"
           >
-            {heading}{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple drop-shadow-sm">
+            <span className="hero-name-base">{heading}</span>{' '}
+            <span className="hero-name-highlight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-accent-cyan dark:to-accent-purple drop-shadow-sm">
               {headingHighlight}
             </span>
-          </motion.h1>
+          </h1>
         </div>
 
         {/* Subheading — data-hero-subheading for ScrambleText */}
-        <motion.p
+        <p
           ref={subheadingRef}
           data-hero-subheading
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          style={{ opacity: 0 }}
           className="text-lg md:text-2xl text-charcoal-600 dark:text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed font-sans whitespace-pre-line"
         >
           {subheading}
-        </motion.p>
+        </p>
 
         {/* Buttons */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
+        <div
+          data-hero-buttons
+          style={{ opacity: 0 }}
           className="flex flex-col sm:flex-row items-center gap-6"
         >
           <MagneticButton onClick={() => document.getElementById(ctaTarget)?.scrollIntoView({ behavior: 'smooth' })}>
@@ -206,7 +201,7 @@ const Hero: React.FC = () => {
               <FileText className="w-4 h-4" />
             </a>
           )}
-        </motion.div>
+        </div>
       </div>
 
       {/* ── Scroll Indicator (animated via useHeroAnimation) ── */}

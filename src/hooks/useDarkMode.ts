@@ -13,6 +13,8 @@ export const useDarkMode = () => {
     } else {
       document.documentElement.classList.remove('dark');
     }
+    // Dispatch custom event for theme synchronization across canvas and animations
+    window.dispatchEvent(new CustomEvent('themechanged', { detail: { isDark } }));
   }, [isDark]);
 
   const toggleDarkMode = () => setIsDark(!isDark);

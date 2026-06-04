@@ -1,7 +1,7 @@
-// ANIMATION ONLY — does not modify data, props, or CMS logic
+// ANIMATION LAYER ONLY — CMS/data/props untouched
 
 import React, { useLayoutEffect, useRef } from 'react';
-import { gsap } from '../lib/gsap-config';
+import { gsap, ScrollTrigger } from '../lib/gsap-init';
 
 const ScrollProgressBar: React.FC = () => {
   const barRef = useRef<HTMLDivElement>(null);
@@ -12,41 +12,43 @@ const ScrollProgressBar: React.FC = () => {
 
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) {
-      // Skip to final state immediately
       gsap.set(bar, { scaleX: 1, transformOrigin: 'left center' });
       return;
     }
 
     const ctx = gsap.context(() => {
-      // Drive bar width from 0 → 1 (scaleX) based on page scroll progress
       gsap.fromTo(
         bar,
-        { scaleX: 0 },
+        { scaleX: 0, opacity: 1, boxShadow: 'none' },
         {
           scaleX: 1,
           ease: 'none',
           transformOrigin: 'left center',
           scrollTrigger: {
-            trigger: document.documentElement,
+            trigger: document.body,
             start: 'top top',
             end: 'bottom bottom',
-            scrub: 0.3,
+            scrub: true,
             onUpdate: (self) => {
-              // Glow pulse when near 100%
-              if (self.progress > 0.98) {
+              if (self.progress === 1) {
+                // Glow pulse at bottom
                 gsap.to(bar, {
-                  boxShadow: '0 0 12px 3px #00f3ff, 0 0 24px 6px rgba(0,243,255,0.4)',
+                  boxShadow: '0 0 15px 2px var(--universe-accent, #00f3ff)',
+                  opacity: 0.5,
                   duration: 0.4,
-                  overwrite: 'auto',
+                  ease: 'power2.out',
+                  overwrite: 'auto'
                 });
-              } else {
+              } else if (self.direction === -1 && self.progress > 0.95) {
+                // Reset when scrolling up from bottom
                 gsap.to(bar, {
-                  boxShadow: '0 0 6px 1px rgba(0,243,255,0.5)',
-                  duration: 0.4,
-                  overwrite: 'auto',
+                  boxShadow: 'none',
+                  opacity: 1,
+                  duration: 0.2,
+                  overwrite: 'auto'
                 });
               }
-            },
+            }
           },
         }
       );
@@ -57,28 +59,19 @@ const ScrollProgressBar: React.FC = () => {
 
   return (
     <div
+      ref={barRef}
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100%',
-        height: '3px',
+        height: '2px',
+        background: 'linear-gradient(to right, var(--universe-accent, #00f3ff), var(--universe-accent-secondary, #3b82f6))',
         zIndex: 9999,
         pointerEvents: 'none',
+        willChange: 'transform'
       }}
-    >
-      <div
-        ref={barRef}
-        style={{
-          width: '100%',
-          height: '100%',
-          background: 'linear-gradient(90deg, #3b82f6, #00f3ff, #9d00ff)',
-          transformOrigin: 'left center',
-          transform: 'scaleX(0)',
-          boxShadow: '0 0 6px 1px rgba(0,243,255,0.5)',
-        }}
-      />
-    </div>
+    />
   );
 };
 

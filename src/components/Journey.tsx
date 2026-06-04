@@ -4,11 +4,13 @@ import { Briefcase, GraduationCap, Calendar } from 'lucide-react';
 import { useExperiences } from '../hooks/cms/useExperiences';
 import { useEducation } from '../hooks/cms/useEducation';
 import { parseMarkdown } from '../utils/markdown';
+import { useJourneyAnimation } from '../hooks/animations/useJourneyAnimation';
 
 const Journey: React.FC = () => {
   const { data: experiences, isLoading: expLoading } = useExperiences();
   const { data: education, isLoading: eduLoading } = useEducation();
   const [activeTab, setActiveTab] = useState<'experience' | 'education'>('experience');
+  const sectionRef = React.useRef<HTMLElement>(null);
 
   const isLoading = activeTab === 'experience' ? expLoading : eduLoading;
 
@@ -62,6 +64,8 @@ const Journey: React.FC = () => {
 
   const currentItems = activeTab === 'experience' ? experienceList : educationList;
 
+  useJourneyAnimation(sectionRef, isLoading, activeTab);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -78,7 +82,7 @@ const Journey: React.FC = () => {
   };
 
   return (
-    <section id="journey" className="relative py-32 overflow-hidden">
+    <section id="journey" ref={sectionRef} className="relative py-32 overflow-hidden">
       
       {/* Background Glow */}
       <div className="absolute top-1/3 right-1/4 w-[40vw] h-[40vw] max-w-[400px] max-h-[400px] bg-purple-500/5 dark:bg-accent-purple/5 rounded-full blur-[100px] pointer-events-none parallax-glow" />
@@ -144,9 +148,13 @@ const Journey: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="relative max-w-3xl mx-auto">
+          <div className="relative max-w-3xl mx-auto journey-timeline-container">
             {/* Center line for desktop, left line for mobile */}
-            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-[2px] bg-gradient-to-b from-blue-600/30 via-purple-600/30 to-transparent dark:from-accent-cyan/20 dark:via-accent-purple/20 dark:to-transparent -translate-x-1/2" />
+            <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-[2px] -translate-x-1/2">
+              <svg className="w-full h-full timeline-svg-line" preserveAspectRatio="none">
+                <line x1="1" y1="0" x2="1" y2="100%" stroke="var(--universe-accent-secondary, #3b82f6)" strokeWidth="2" strokeOpacity="0.4" />
+              </svg>
+            </div>
 
             <AnimatePresence mode="wait">
               <motion.div
@@ -184,7 +192,7 @@ const Journey: React.FC = () => {
                       <motion.div
                         key={`${activeTab}-${item.id}`}
                         variants={itemVariants}
-                        className={`relative flex flex-col md:flex-row items-start md:items-center ${
+                        className={`relative flex flex-col md:flex-row items-start md:items-center journey-card-wrapper ${
                           isLeft ? 'md:flex-row-reverse' : ''
                         }`}
                       >

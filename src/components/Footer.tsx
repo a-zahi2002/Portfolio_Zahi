@@ -4,8 +4,8 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
 import { useSiteSettings } from '../hooks/cms/useSiteSettings';
-import SectionReveal from './SectionReveal';
 import { useSmoothScroll } from './SmoothScrollProvider';
+import { useFooterAnimation } from '../hooks/animations/useFooterAnimation';
 
 const BackToTopButton: React.FC = () => {
   const { lenis } = useSmoothScroll();
@@ -41,10 +41,11 @@ const BackToTopButton: React.FC = () => {
 const Footer: React.FC = () => {
   const { data: settings } = useSiteSettings();
   const copyrightText = settings?.copyright_text ?? '© 2025 A. Zahi Faleel. All rights reserved.';
+  const sectionRef = React.useRef<HTMLElement>(null);
+  useFooterAnimation(sectionRef);
 
   return (
-    <footer className="bg-charcoal-950 text-white py-12 border-t border-white/5">
-      <SectionReveal>
+    <footer ref={sectionRef} className="bg-charcoal-950 text-white py-12 border-t border-white/5 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center mb-4">
@@ -67,7 +68,6 @@ const Footer: React.FC = () => {
             </div>
           </div>
         </div>
-      </SectionReveal>
     </footer>
   );
 };

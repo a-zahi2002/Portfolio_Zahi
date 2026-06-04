@@ -20,11 +20,13 @@ const AdminLayout = lazy(() => import('./components/admin/layout/AdminLayout.tsx
 import AuroraBackground from './components/ui/AuroraBackground';
 
 // ── Animation Layer — additive, no CMS/data changes ──────────────────────────
-import SmoothScrollProvider from './components/SmoothScrollProvider';
+import SmoothScrollProvider from './providers/SmoothScrollProvider';
 import ScrollProgressBar from './components/ScrollProgressBar';
 import CustomCursor from './components/CustomCursor';
-import SectionReveal from './components/SectionReveal';
-import SectionConnector from './components/SectionConnector';
+import UniverseSection from './components/UniverseSection';
+import WormholeConnector from './components/WormholeConnector';
+import Preloader from './components/Preloader';
+import AmbientCanvas from './components/AmbientCanvas';
 
 /** Portfolio single-page layout (unchanged) */
 const Portfolio: React.FC = () => {
@@ -61,50 +63,54 @@ const Portfolio: React.FC = () => {
   return (
     <div className="min-h-screen text-charcoal-900 dark:text-white selection:bg-accent-cyan selection:text-charcoal-950">
       <AuroraBackground />
+      <AmbientCanvas />
+      <Preloader onComplete={() => {}} />
       <SEOHead route="/" />
       <Navbar />
-      <main className="relative z-10">
-        {/* Hero — has its own internal animation hook, no SectionReveal wrapper needed */}
-        <Hero />
+      <main className="relative z-10" style={{ visibility: 'hidden' }}>
+        <UniverseSection theme="void">
+          <Hero />
+        </UniverseSection>
 
-        <SectionConnector />
+        <WormholeConnector />
 
-        <SectionReveal>
+        <UniverseSection theme="nebula">
           <About />
-        </SectionReveal>
+        </UniverseSection>
 
-        <SectionConnector />
+        <WormholeConnector />
 
-        <SectionReveal>
+        <UniverseSection theme="constellation">
           <Journey />
-        </SectionReveal>
+        </UniverseSection>
 
-        <SectionConnector />
+        <WormholeConnector />
 
-        {/* Projects has its own internal animation hook */}
-        <SectionReveal>
+        <UniverseSection theme="artifact">
           <Projects />
-        </SectionReveal>
+        </UniverseSection>
 
-        <SectionConnector />
+        <WormholeConnector />
 
-        <SectionReveal>
+        <UniverseSection theme="frequency">
           <Certificates />
-        </SectionReveal>
+        </UniverseSection>
 
-        <SectionConnector />
+        <WormholeConnector />
 
-        {/* Skills has its own internal animation hook */}
-        <SectionReveal>
+        <UniverseSection theme="frequency">
           <Skills />
-        </SectionReveal>
+        </UniverseSection>
 
-        <SectionConnector />
+        <WormholeConnector />
 
-        {/* Contact has its own 1.4s slow fade internally — no additional SectionReveal */}
-        <Contact />
+        <UniverseSection theme="signal">
+          <Contact />
+        </UniverseSection>
       </main>
-      <Footer />
+      <UniverseSection theme="abyss">
+        <Footer />
+      </UniverseSection>
     </div>
   );
 };
