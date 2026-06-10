@@ -181,7 +181,6 @@ const ProjectsList: React.FC = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-0.5">
                           <p className="text-sm font-medium text-charcoal-900 dark:text-white truncate">{project.title}</p>
-                          {project.featured && <Badge variant="info">Featured</Badge>}
                         </div>
                         <p className="text-xs text-gray-500 truncate">{project.category} · {project.technologies.slice(0, 3).join(', ')}</p>
                       </div>

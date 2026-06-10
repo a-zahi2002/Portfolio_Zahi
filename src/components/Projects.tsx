@@ -9,15 +9,120 @@ import { useProjects } from '../hooks/cms/useProjects';
 import type { CMSProject } from '../types/cms';
 import { useAudio } from './audio/AudioProvider';
 
+// Helper to get dynamic responsive span classes for a project card to perfectly fill a bento grid with zero gaps.
+const getCardSpanClasses = (index: number, total: number): string => {
+  if (total === 0) return '';
+  
+  // 1. Mobile layout: grid-cols-1, so all cards span 1 (default width)
+  
+  // 2. Medium layout (Tablet): md:grid-cols-2
+  // If total is even, we can lay out all cards as span 1 (equal halves).
+  // If total is odd, we want one card to be full width (span 2) to avoid any trailing gap.
+  // We make the first card full width (col-span-2) if total is odd.
+  let mdSpan = 'md:col-span-1';
+  if (total === 1) {
+    mdSpan = 'md:col-span-2';
+  } else if (total % 2 !== 0) {
+    if (index === 0) {
+      mdSpan = 'md:col-span-2';
+    }
+  } else {
+    // If total is even and > 2, we can alternate full-width cards at the beginning and end
+    // for a more dynamic feel (e.g., total = 4: first and last are span 2, middle are span 1).
+    if (total > 2) {
+      if (index === 0 || index === total - 1) {
+        mdSpan = 'md:col-span-2';
+      }
+    }
+  }
+
+  // 3. Large layout (Desktop): lg:grid-cols-6 (we use 6 cols for max flexibility)
+  // We want to group items into rows where the sum of spans is exactly 6.
+  // We partition the total items into rows of size 3 (spans [2, 2, 2]) and size 2 (spans [4, 2] or [2, 4]).
+  let lgSpan = 'lg:col-span-2'; // Default to 1/3 width
+
+  if (total === 1) {
+    lgSpan = 'lg:col-span-6';
+  } else {
+    // Decompose total into row sizes of 3 and 2
+    let numThrees = 0;
+    let numTwos = 0;
+    if (total % 3 === 0) {
+      numThrees = total / 3;
+    } else if (total % 3 === 1) {
+      numThrees = (total - 4) / 3;
+      numTwos = 2;
+    } else { // total % 3 === 2
+      numThrees = (total - 2) / 3;
+      numTwos = 1;
+    }
+
+    // Interleave rows of size 2 and size 3 to create a dynamic bento mix
+    const rowSizes: number[] = [];
+    const totalRows = numThrees + numTwos;
+    let tempThrees = numThrees;
+    let tempTwos = numTwos;
+
+    for (let i = 0; i < totalRows; i++) {
+      if (tempTwos > 0 && (i % 2 === 0 || tempThrees === 0)) {
+        rowSizes.push(2);
+        tempTwos--;
+      } else {
+        rowSizes.push(3);
+        tempThrees--;
+      }
+    }
+
+    // Find which row and position the current index falls into
+    let currentIndex = 0;
+    let targetRowIndex = -1;
+    let targetRowSize = 0;
+    let positionInRow = 0;
+    let twoRowCounter = 0;
+
+    for (let r = 0; r < rowSizes.length; r++) {
+      const size = rowSizes[r];
+      if (index >= currentIndex && index < currentIndex + size) {
+        targetRowIndex = r;
+        targetRowSize = size;
+        positionInRow = index - currentIndex;
+        
+        // Count how many size-2 rows are BEFORE this row
+        // to alternate spans [4, 2] vs [2, 4]
+        let tempTwoCounter = 0;
+        for (let j = 0; j < r; j++) {
+          if (rowSizes[j] === 2) tempTwoCounter++;
+        }
+        twoRowCounter = tempTwoCounter;
+        break;
+      }
+      currentIndex += size;
+    }
+
+    if (targetRowSize === 3) {
+      lgSpan = 'lg:col-span-2'; // Three items in row: each spans 2/6 (33.3%)
+    } else if (targetRowSize === 2) {
+      // Alternate span order between rows of size 2
+      if (twoRowCounter % 2 === 0) {
+        lgSpan = positionInRow === 0 ? 'lg:col-span-4' : 'lg:col-span-2';
+      } else {
+        lgSpan = positionInRow === 0 ? 'lg:col-span-2' : 'lg:col-span-4';
+      }
+    }
+  }
+
+  return `${mdSpan} ${lgSpan}`;
+};
+
 // ── Skeleton card ─────────────────────────────────────────────────────────────
-const ProjectCardSkeleton: React.FC<{ wide?: boolean }> = ({ wide }) => (
-  <div className={`rounded-2xl bg-white/5 border border-white/5 overflow-hidden animate-pulse ${wide ? 'md:col-span-2' : ''}`}>
+const ProjectCardSkeleton: React.FC<{ spanClasses: string }> = ({ spanClasses }) => (
+  <div className={`rounded-2xl bg-white/5 border border-white/5 overflow-hidden animate-pulse ${spanClasses}`}>
     <div className="w-full h-full bg-white/5 min-h-[400px]" />
   </div>
 );
 
 // ── Spotlight Card ──────────────────────────────────────────────────────────
-const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: number }> = ({ project, wide, index }) => {
+const SpotlightCard: React.FC<{ project: CMSProject; spanClasses: string; index: number }> = ({ project, spanClasses, index }) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -35,7 +140,7 @@ const SpotlightCard: React.FC<{ project: CMSProject; wide: boolean; index: numbe
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className={`relative glass-cyber rounded-2xl overflow-hidden ${wide ? 'md:col-span-2' : ''}`}
+      className={`relative glass-cyber rounded-2xl overflow-hidden ${spanClasses}`}
       onMouseEnter={playHover}
     >
       {/* HUD corners */}
@@ -143,15 +248,17 @@ const Projects: React.FC = () => {
         </motion.div>
 
         {/* Bento Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[400px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6 auto-rows-[400px]">
           {isLoading
-            ? [true, false, false, true, false, false].map((wide, i) => <ProjectCardSkeleton key={i} wide={wide} />)
+            ? Array.from({ length: 6 }).map((_, i) => (
+                <ProjectCardSkeleton key={i} spanClasses={getCardSpanClasses(i, 6)} />
+              ))
             : (projects ?? []).map((project, index) => (
                 <SpotlightCard
                   key={project.id}
                   project={project}
                   index={index}
-                  wide={project.featured || index === 0 || index === 3}
+                  spanClasses={getCardSpanClasses(index, (projects ?? []).length)}
                 />
               ))
           }
