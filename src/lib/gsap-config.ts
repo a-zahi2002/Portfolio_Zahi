@@ -1,27 +1,20 @@
-// ANIMATION ONLY — does not modify data, props, or CMS logic
+// Cyber Terminal — GSAP Configuration
+// Lean setup: only ScrollTrigger + ScrollToPlugin (no premium plugins)
 
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
-import { SplitText } from 'gsap/SplitText';
-import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
-import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
+
+// Register plugins eagerly at module level
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+gsap.defaults({ duration: 0.8, ease: 'power3.out' });
 
 let initialized = false;
 
 export function initGSAP(): void {
   if (initialized) return;
   initialized = true;
-
-  gsap.registerPlugin(
-    ScrollTrigger,
-    ScrollToPlugin,
-    SplitText,
-    ScrambleTextPlugin,
-    DrawSVGPlugin,
-  );
-
-  gsap.defaults({ duration: 0.9, ease: 'power3.out' });
 }
 
-export { gsap, ScrollTrigger, ScrollToPlugin, SplitText, ScrambleTextPlugin, DrawSVGPlugin };
+export { gsap, ScrollTrigger, ScrollToPlugin };

@@ -1,85 +1,67 @@
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+// Cyber Terminal — Scroll Animation Utilities
+import { gsap, ScrollTrigger } from '../lib/gsap-config';
 
-gsap.registerPlugin(ScrollTrigger);
+/**
+ * Initialize global scroll-triggered animations.
+ * Called once from Portfolio component after mount.
+ */
+export function initScrollAnimations(): void {
+  // Batch animate all elements with data-animate attribute
+  const animateEls = document.querySelectorAll('[data-animate]');
 
-export const initScrollAnimations = () => {
-  // Fade in animation for sections
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  gsap.utils.toArray('.fade-in').forEach((element: any) => {
-    gsap.fromTo(element, 
-      { opacity: 0, y: 50 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: element,
-          start: "top 85%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
+  animateEls.forEach((el) => {
+    const direction = el.getAttribute('data-animate') || 'up';
+    const delay = parseFloat(el.getAttribute('data-animate-delay') || '0');
+
+    const from: gsap.TweenVars = { opacity: 0 };
+    if (direction === 'up') from.y = 40;
+    else if (direction === 'down') from.y = -40;
+    else if (direction === 'left') from.x = 40;
+    else if (direction === 'right') from.x = -40;
+    else if (direction === 'scale') { from.scale = 0.95; from.y = 20; }
+
+    gsap.fromTo(el, from, {
+      opacity: 1,
+      y: 0,
+      x: 0,
+      scale: 1,
+      duration: 0.8,
+      delay,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: el,
+        start: 'top 85%',
+        once: true,
+      },
+    });
   });
+}
 
-  // Stagger animation for project cards
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  gsap.utils.toArray('.project-card').forEach((element: any, index) => {
-    gsap.fromTo(element,
-      { opacity: 0, y: 30, scale: 0.95 },
-      {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        duration: 0.6,
-        delay: index * 0.1,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: element,
-          start: "top 90%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
-  });
+/**
+ * Create a stagger-in animation for a group of children.
+ */
+export function staggerIn(
+  container: Element,
+  childSelector: string,
+  options?: { stagger?: number; delay?: number }
+): void {
+  const children = container.querySelectorAll(childSelector);
+  if (!children.length) return;
 
-  // Skills animation
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  gsap.utils.toArray('.skill-item').forEach((element: any, index) => {
-    gsap.fromTo(element,
-      { opacity: 0, scale: 0.8 },
-      {
-        opacity: 1,
-        scale: 1,
-        duration: 0.4,
-        delay: index * 0.05,
-        ease: "back.out(1.7)",
-        scrollTrigger: {
-          trigger: element,
-          start: "top 90%",
-          toggleActions: "play none none reverse"
-        }
-      }
-    );
-  });
-};
-
-export const heroAnimation = () => {
-  const tl = gsap.timeline();
-  
-  tl.fromTo('.hero-title', 
-    { opacity: 0, y: 50 },
-    { opacity: 1, y: 0, duration: 1, ease: "power2.out" }
-  )
-  .fromTo('.hero-subtitle', 
+  gsap.fromTo(children,
     { opacity: 0, y: 30 },
-    { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 
-    "-=0.5"
-  )
-  .fromTo('.hero-cta', 
-    { opacity: 0, scale: 0.8 },
-    { opacity: 1, scale: 1, duration: 0.6, ease: "back.out(1.7)" }, 
-    "-=0.3"
+    {
+      opacity: 1,
+      y: 0,
+      duration: 0.6,
+      stagger: options?.stagger ?? 0.1,
+      delay: options?.delay ?? 0,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: container,
+        start: 'top 80%',
+        once: true,
+      },
+    }
   );
-};
+}

@@ -5,20 +5,25 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Space Grotesk', 'Inter', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Fira Code', 'Courier New', 'monospace'],
       },
       colors: {
-        // Deep dark charcoal/black palette
+        // Deep space dark palette
         charcoal: {
-          950: '#050505',
-          900: '#0a0a0a',
-          800: '#121212',
-          700: '#1a1a1a',
+          950: '#06080f',
+          900: '#0a0e18',
+          800: '#0c1019',
+          700: '#131827',
+          600: '#1c2333',
         },
-        // Neon/Electric accents
+        // Neon accents
         accent: {
-          cyan: '#00f3ff', // Electric Blue / Cyan
-          purple: '#9d00ff', // Deep Electric Purple
+          cyan: '#00f3ff',
+          purple: '#9d5fff',
+          gold: '#f0c27a',
+          rose: '#e88da3',
         },
       },
       animation: {
@@ -26,12 +31,24 @@ export default {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'spin-slow': 'spin 12s linear infinite',
         'gradient': 'gradient 8s linear infinite',
+        'float': 'float-bob 6s ease-in-out infinite',
+        'glow': 'glow-breathe 3s ease-in-out infinite',
+        'grid-pulse': 'grid-pulse 4s ease-in-out infinite',
+        'border-trace': 'border-trace 3s ease-out forwards',
       },
       keyframes: {
         gradient: {
           '0%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
           '100%': { backgroundPosition: '0% 50%' },
+        },
+        'float-bob': {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'glow-breathe': {
+          '0%, 100%': { opacity: '0.4' },
+          '50%': { opacity: '1' },
         },
       },
       spacing: {
@@ -42,6 +59,7 @@ export default {
       },
       backgroundImage: {
         'glass-gradient': 'linear-gradient(rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02))',
+        'cyber-gradient': 'linear-gradient(135deg, #00f3ff 0%, #9d5fff 50%, #e88da3 100%)',
       },
     },
   },

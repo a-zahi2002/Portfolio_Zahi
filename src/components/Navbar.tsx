@@ -1,13 +1,21 @@
+// CYBER TERMINAL THEME
+// Navbar.tsx — Floating glass-cyber navbar with mute toggle.
+// CMS hooks, data: UNTOUCHED.
+
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Download } from 'lucide-react';
 import DarkModeToggle from './DarkModeToggle';
+import MuteToggle from './audio/MuteToggle';
 import { useSiteSettings } from '../hooks/cms/useSiteSettings';
+import { useAudio } from './audio/AudioProvider';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState('hero');
   const { data: settings } = useSiteSettings();
+  const { playClick } = useAudio();
 
   const brandName = settings?.brand_name ?? 'A.ZAHI';
 
@@ -38,55 +46,95 @@ const Navbar: React.FC = () => {
   ];
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 dark:bg-charcoal-950/80 backdrop-blur-md border-b border-gray-200 dark:border-white/5 py-4' : 'bg-transparent py-6'}`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav
+      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-500 ${
+        scrolled
+          ? 'w-[95%] max-w-5xl'
+          : 'w-[95%] max-w-6xl'
+      }`}
+    >
+      <div
+        className={`glass-cyber rounded-2xl px-6 py-3 transition-all duration-500 ${
+          scrolled
+            ? 'shadow-lg shadow-black/20 dark:shadow-accent-cyan/5'
+            : 'border-transparent bg-transparent dark:bg-transparent backdrop-blur-none'
+        }`}
+        style={!scrolled ? { border: '1px solid transparent', background: 'transparent', backdropFilter: 'none' } : undefined}
+      >
         <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <a href="#" className="group relative">
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white font-['Space_Grotesk'] tracking-widest">
-                {brandName.replace('.', '')}<span className="text-blue-500 dark:text-accent-cyan">.</span>
-              </h1>
-              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-500 dark:bg-accent-cyan transition-all duration-300 group-hover:w-full" />
-            </a>
-          </div>
+          {/* Brand */}
+          <a href="#" className="group relative" onClick={() => playClick()}>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white font-display tracking-widest">
+              {brandName.replace('.', '')}
+              <span className="text-accent-cyan">.</span>
+            </h1>
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-accent-cyan transition-all duration-300 group-hover:w-full" />
+          </a>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map(link => (
-              <a
-                key={link.name}
-                href={link.href}
-                className={`text-sm uppercase tracking-wider font-medium transition-all duration-300 hover:text-blue-600 dark:hover:text-accent-cyan relative group ${activeSection === link.href.substring(1) ? 'text-blue-600 dark:text-accent-cyan' : 'text-gray-600 dark:text-gray-400'}`}
-              >
-                {link.name}
-                <span className={`absolute -bottom-1 left-0 h-0.5 bg-blue-600 dark:bg-accent-cyan transition-all duration-300 ${activeSection === link.href.substring(1) ? 'w-full' : 'w-0 group-hover:w-full'}`} />
-              </a>
-            ))}
-            <div className="flex items-center space-x-4 pl-8 border-l border-gray-300 dark:border-white/10">
+          <div className="hidden md:flex items-center gap-1">
+            {navLinks.map(link => {
+              const isActive = activeSection === link.href.substring(1);
+              return (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => playClick()}
+                  className="relative px-4 py-2 text-sm font-medium transition-colors duration-300"
+                >
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-active"
+                      className="absolute inset-0 rounded-lg"
+                      style={{
+                        background: 'var(--ct-cyan-dim)',
+                        border: '1px solid var(--ct-border-hover)',
+                      }}
+                      transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+                    />
+                  )}
+                  <span className={`relative z-10 ${isActive ? 'text-accent-cyan' : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'}`}>
+                    {link.name}
+                  </span>
+                </a>
+              );
+            })}
+
+            <div className="flex items-center gap-2 pl-4 ml-4 border-l border-gray-200 dark:border-white/10">
+              <MuteToggle />
               <DarkModeToggle />
               {settings?.resume_url && (
                 <a
                   href={settings.resume_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-4 py-2 border border-gray-300 dark:border-white/10 hover:border-blue-500 dark:hover:border-accent-cyan/50 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-accent-cyan text-sm font-bold rounded-full transition-colors"
+                  onClick={() => playClick()}
+                  className="cyber-button !py-2 !px-4 !text-xs"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>Resume</span>
+                  Resume
                 </a>
               )}
-              <a href="#contact" className="px-5 py-2 bg-gray-900 dark:bg-white text-white dark:text-charcoal-950 text-sm font-bold rounded-full hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors">
+              <a
+                href="#contact"
+                onClick={() => playClick()}
+                className="cyber-button-filled !py-2 !px-5 !text-xs !rounded-full"
+              >
                 Let's Talk
               </a>
             </div>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center gap-4">
+          <div className="md:hidden flex items-center gap-3">
+            <MuteToggle />
             <DarkModeToggle />
             <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-accent-cyan transition-colors"
+              onClick={() => {
+                setIsOpen(!isOpen);
+                playClick();
+              }}
+              className="text-gray-900 dark:text-white hover:text-accent-cyan transition-colors p-2"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -94,40 +142,58 @@ const Navbar: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
-      <div className={`md:hidden absolute top-full left-0 w-full bg-white dark:bg-charcoal-950 border-b border-gray-200 dark:border-white/5 shadow-xl transition-all duration-300 ease-in-out ${isOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-        <div className="px-4 py-6 space-y-4">
-          {navLinks.map(link => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="block text-lg font-medium text-gray-800 dark:text-gray-300 hover:text-blue-600 dark:hover:text-accent-cyan hover:pl-2 transition-all duration-200"
-              onClick={() => setIsOpen(false)}
-            >
-              {link.name}
-            </a>
-          ))}
-          {settings?.resume_url && (
-            <a
-              href={settings.resume_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-lg font-medium text-gray-800 dark:text-gray-300 hover:text-blue-600 dark:hover:text-accent-cyan hover:pl-2 transition-all duration-200"
-              onClick={() => setIsOpen(false)}
-            >
-              <Download className="w-4 h-4" />
-              Download Resume
-            </a>
-          )}
-          <a
-            href="#contact"
-            className="block text-lg font-bold text-blue-600 dark:text-accent-cyan hover:pl-2 transition-all duration-200"
-            onClick={() => setIsOpen(false)}
+      {/* Mobile Menu — Full Screen Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="mt-2 glass-cyber rounded-2xl overflow-hidden"
           >
-            Contact Me
-          </a>
-        </div>
-      </div>
+            <div className="px-6 py-6 space-y-1">
+              {navLinks.map((link, i) => (
+                <motion.a
+                  key={link.name}
+                  href={link.href}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  className="block py-3 text-lg font-medium text-gray-300 hover:text-accent-cyan transition-colors"
+                  onClick={() => {
+                    setIsOpen(false);
+                    playClick();
+                  }}
+                >
+                  {link.name}
+                </motion.a>
+              ))}
+              <div className="pt-4 border-t border-white/10 space-y-3">
+                {settings?.resume_url && (
+                  <a
+                    href={settings.resume_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-gray-300 hover:text-accent-cyan transition-colors"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Download className="w-4 h-4" />
+                    Download Resume
+                  </a>
+                )}
+                <a
+                  href="#contact"
+                  className="block text-lg font-bold text-accent-cyan"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Contact Me
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
