@@ -98,7 +98,7 @@ const Hero: React.FC = () => {
             className="mb-8 inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-cyber"
           >
             <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.6)]" />
-            <span className="text-xs font-bold uppercase tracking-widest text-gray-300">
+            <span className="text-xs font-bold uppercase tracking-widest text-gray-800 dark:text-gray-300">
               {availabilityLabel}
             </span>
           </motion.div>

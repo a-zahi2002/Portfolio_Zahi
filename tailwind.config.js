@@ -20,10 +20,10 @@ export default {
         },
         // Neon accents
         accent: {
-          cyan: '#00f3ff',
-          purple: '#9d5fff',
-          gold: '#f0c27a',
-          rose: '#e88da3',
+          cyan: 'var(--ct-cyan)',
+          purple: 'var(--ct-purple)',
+          gold: 'var(--ct-gold)',
+          rose: 'var(--ct-rose)',
         },
       },
       animation: {

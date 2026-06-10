@@ -70,7 +70,7 @@ const Certificates: React.FC = () => {
                   <div className="w-16 h-16 bg-accent-cyan/10 rounded-full flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500 border border-accent-cyan/20">
                     <Award className="w-8 h-8 text-accent-cyan group-hover:scale-110 transition-transform duration-500" />
                   </div>
-                  <h3 className="text-lg font-display font-bold text-white mb-2 group-hover:text-accent-cyan transition-colors duration-300">
+                  <h3 className="text-lg font-display font-bold text-gray-900 dark:text-white mb-2 group-hover:text-accent-cyan transition-colors duration-300">
                     {certificate.title}
                   </h3>
                   <p className="text-sm text-gray-400 font-sans">{certificate.issuer}</p>
@@ -147,7 +147,7 @@ const Certificates: React.FC = () => {
                 <div className="flex justify-end p-4 border-b border-white/5">
                   <button
                     onClick={() => setSelectedCertificate(null)}
-                    className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all text-gray-400 hover:text-white hover:scale-105"
+                    className="p-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:scale-105"
                     aria-label="Close modal"
                   >
                     <X className="w-5 h-5" />
@@ -156,14 +156,14 @@ const Certificates: React.FC = () => {
 
                 <div className="p-8 flex flex-col flex-1 overflow-y-auto">
                   <div className="mb-8">
-                    <h3 className="text-2xl md:text-3xl font-display font-bold text-white mb-3 leading-tight">
+                    <h3 className="text-2xl md:text-3xl font-display font-bold text-gray-900 dark:text-white mb-3 leading-tight">
                       {selectedCertificate.title}
                     </h3>
-                    <div className="inline-block px-3 py-1 bg-white/5 border border-white/10 rounded-full text-sm font-semibold text-gray-300 mb-6">
+                    <div className="inline-block px-3 py-1 bg-white/5 border border-white/10 rounded-full text-sm font-semibold text-gray-700 dark:text-gray-300 mb-6">
                       {selectedCertificate.issuer}
                     </div>
                     {selectedCertificate.issue_date && (
-                      <div className="text-sm text-gray-400 border-t border-white/10 pt-6">
+                      <div className="text-sm text-gray-600 dark:text-gray-400 border-t border-white/10 pt-6">
                         <span className="block text-xs uppercase tracking-wider font-bold mb-1 opacity-70">Date Issued</span>
                         {new Date(selectedCertificate.issue_date).toLocaleDateString('en-US', {
                           year: 'numeric', month: 'long', day: 'numeric'

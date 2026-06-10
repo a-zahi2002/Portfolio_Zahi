@@ -2,12 +2,12 @@ import { useState, useEffect } from 'react';
 
 export const useDarkMode = () => {
   const [isDark, setIsDark] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
+    const saved = sessionStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : true;
   });
 
   useEffect(() => {
-    localStorage.setItem('darkMode', JSON.stringify(isDark));
+    sessionStorage.setItem('darkMode', JSON.stringify(isDark));
     if (isDark) {
       document.documentElement.classList.add('dark');
     } else {

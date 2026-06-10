@@ -67,7 +67,7 @@ const Contact: React.FC = () => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.1, duration: 0.8 }}
-          className="text-5xl md:text-7xl font-display font-bold text-white mb-16 leading-[1.1]"
+          className="text-5xl md:text-7xl font-display font-bold text-gray-900 dark:text-white mb-16 leading-[1.1]"
         >
           {contactLoading ? (
             <div className="h-16 bg-white/5 animate-pulse rounded-2xl w-3/4 mx-auto" />
@@ -91,7 +91,7 @@ const Contact: React.FC = () => {
           <button
             onClick={handleCopy}
             disabled={contactLoading}
-            className="relative z-10 text-base sm:text-2xl md:text-5xl font-sans font-bold text-gray-200 hover:text-white transition-all duration-300 flex items-center justify-center gap-3 md:gap-6 py-4 md:py-6 px-6 md:px-10 w-full max-w-[90vw] sm:w-auto rounded-full glass-cyber hover:border-accent-cyan/50 disabled:opacity-50 hover:shadow-lg hover:shadow-accent-cyan/10 hover:-translate-y-1"
+            className="relative z-10 text-base sm:text-2xl md:text-5xl font-sans font-bold text-gray-700 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-all duration-300 flex items-center justify-center gap-3 md:gap-6 py-4 md:py-6 px-6 md:px-10 w-full max-w-[90vw] sm:w-auto rounded-full glass-cyber hover:border-accent-cyan/50 disabled:opacity-50 hover:shadow-lg hover:shadow-accent-cyan/10 hover:-translate-y-1"
           >
             <span className="truncate">{contactLoading ? '…' : email}</span>
             <div className="p-2.5 md:p-4 shrink-0 rounded-full bg-white/5 text-gray-400 group-hover:bg-accent-cyan group-hover:text-charcoal-950 transition-all duration-300 transform group-hover:scale-110 group-hover:rotate-12">

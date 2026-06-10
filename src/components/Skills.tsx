@@ -110,7 +110,7 @@ const SkillsCard: React.FC<{
             <div className="p-2.5 rounded-2xl bg-white/5 group-hover:scale-110 transition-transform duration-300">
               {ICON_MAP[skillGroup.icon] ?? <Code2 className="text-accent-cyan shrink-0" size={22} />}
             </div>
-            <h3 className="text-lg font-bold text-white font-display leading-none">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white font-display leading-none">
               {skillGroup.category}
             </h3>
           </div>
@@ -126,10 +126,10 @@ const SkillsCard: React.FC<{
             return (
               <div key={skill.id} className="space-y-2 group/item">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="font-medium text-gray-200 group-hover/item:text-accent-cyan transition-colors">
+                  <span className="font-medium text-gray-700 dark:text-gray-200 group-hover/item:text-accent-cyan transition-colors">
                     {skill.name}
                   </span>
-                  <span className="text-xs text-gray-400 font-mono font-semibold">
+                  <span className="text-xs text-gray-500 dark:text-gray-400 font-mono font-semibold">
                     {skill.proficiency}%
                   </span>
                 </div>

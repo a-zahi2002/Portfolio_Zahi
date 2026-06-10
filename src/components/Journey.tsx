@@ -149,7 +149,7 @@ const Journey: React.FC = () => {
                         <GraduationCap className="w-6 h-6 text-gray-400" />
                       )}
                     </div>
-                    <h3 className="text-xl font-display font-bold text-white mb-2">
+                    <h3 className="text-xl font-display font-bold text-gray-900 dark:text-white mb-2">
                       No {activeTab} added yet
                     </h3>
                     <p className="text-gray-500 max-w-sm mx-auto">
@@ -199,7 +199,7 @@ const Journey: React.FC = () => {
                               {item.start_date} - {item.end_date || 'Present'}
                             </div>
 
-                            <h3 className="text-xl font-display font-bold text-white mb-1 group-hover:text-accent-cyan transition-colors">
+                            <h3 className="text-xl font-display font-bold text-gray-900 dark:text-white mb-1 group-hover:text-accent-cyan transition-colors">
                               {itemTitle}
                             </h3>
                             <h4 className="text-sm font-medium font-sans text-gray-400 mb-4">
@@ -210,7 +210,7 @@ const Journey: React.FC = () => {
                               className="text-gray-400 text-sm leading-relaxed mb-4
                                 prose prose-sm dark:prose-invert max-w-none
                                 prose-p:mb-2 font-sans
-                                prose-strong:text-white prose-strong:font-bold
+                                prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:font-bold
                                 prose-ul:list-disc prose-ul:pl-4 prose-ul:mb-2
                                 prose-li:my-0.5"
                               dangerouslySetInnerHTML={{ __html: parseMarkdown(item.description ?? '') }}
@@ -221,7 +221,7 @@ const Journey: React.FC = () => {
                                 {itemTech.map(tech => (
                                   <span
                                     key={tech}
-                                    className="inline-flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase text-gray-300 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full"
+                                    className="inline-flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase text-gray-600 dark:text-gray-300 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 px-2.5 py-1 rounded-full"
                                   >
                                     {tech}
                                   </span>
