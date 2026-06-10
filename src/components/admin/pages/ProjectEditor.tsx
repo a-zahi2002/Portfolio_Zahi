@@ -201,7 +201,6 @@ const ProjectEditor: React.FC = () => {
 
         {/* Toggles */}
         <div className="p-5 bg-white dark:bg-charcoal-800/40 border border-gray-200 dark:border-white/5 rounded-2xl space-y-4">
-          <Toggle id="proj-featured" checked={form.featured} onChange={val => update('featured', val)} label="Mark as featured (wider card in bento grid)" />
           <Toggle id="proj-visible" checked={form.visible} onChange={val => update('visible', val)} label="Visible on portfolio" />
         </div>
       </div>
