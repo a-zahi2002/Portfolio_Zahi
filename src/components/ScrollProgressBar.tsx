@@ -1,81 +1,33 @@
-// ANIMATION ONLY — does not modify data, props, or CMS logic
+// Cyber Terminal — Scroll Progress Bar
+// Gradient progress line at top of viewport.
 
-import React, { useLayoutEffect, useRef } from 'react';
-import { gsap } from '../lib/gsap-config';
+import React, { useEffect, useState } from 'react';
 
 const ScrollProgressBar: React.FC = () => {
-  const barRef = useRef<HTMLDivElement>(null);
+  const [progress, setProgress] = useState(0);
 
-  useLayoutEffect(() => {
-    const bar = barRef.current;
-    if (!bar) return;
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      setProgress(docHeight > 0 ? (scrollTop / docHeight) * 100 : 0);
+    };
 
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      // Skip to final state immediately
-      gsap.set(bar, { scaleX: 1, transformOrigin: 'left center' });
-      return;
-    }
-
-    const ctx = gsap.context(() => {
-      // Drive bar width from 0 → 1 (scaleX) based on page scroll progress
-      gsap.fromTo(
-        bar,
-        { scaleX: 0 },
-        {
-          scaleX: 1,
-          ease: 'none',
-          transformOrigin: 'left center',
-          scrollTrigger: {
-            trigger: document.documentElement,
-            start: 'top top',
-            end: 'bottom bottom',
-            scrub: 0.3,
-            onUpdate: (self) => {
-              // Glow pulse when near 100%
-              if (self.progress > 0.98) {
-                gsap.to(bar, {
-                  boxShadow: '0 0 12px 3px #00f3ff, 0 0 24px 6px rgba(0,243,255,0.4)',
-                  duration: 0.4,
-                  overwrite: 'auto',
-                });
-              } else {
-                gsap.to(bar, {
-                  boxShadow: '0 0 6px 1px rgba(0,243,255,0.5)',
-                  duration: 0.4,
-                  overwrite: 'auto',
-                });
-              }
-            },
-          },
-        }
-      );
-    });
-
-    return () => ctx.revert();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
     <div
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '3px',
-        zIndex: 9999,
-        pointerEvents: 'none',
-      }}
+      className="fixed top-0 left-0 right-0 z-[100] h-[2px]"
+      style={{ pointerEvents: 'none' }}
     >
       <div
-        ref={barRef}
+        className="h-full transition-[width] duration-100 ease-out"
         style={{
-          width: '100%',
-          height: '100%',
-          background: 'linear-gradient(90deg, #3b82f6, #00f3ff, #9d00ff)',
-          transformOrigin: 'left center',
-          transform: 'scaleX(0)',
-          boxShadow: '0 0 6px 1px rgba(0,243,255,0.5)',
+          width: `${progress}%`,
+          background: 'linear-gradient(90deg, var(--ct-cyan), var(--ct-purple))',
+          boxShadow: '0 0 10px var(--ct-cyan-glow)',
         }}
       />
     </div>

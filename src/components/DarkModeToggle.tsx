@@ -1,18 +1,30 @@
+// Cyber Terminal — Dark Mode Toggle
+// Animated sun/moon icon transition.
+
 import React from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useDarkMode } from '../hooks/useDarkMode';
 
 const DarkModeToggle: React.FC = () => {
   const { isDark, toggleDarkMode } = useDarkMode();
 
   return (
-    <button
+    <motion.button
       onClick={toggleDarkMode}
-      className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors duration-300"
-      aria-label="Toggle dark mode"
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.95 }}
+      className="relative p-2 rounded-full text-gray-500 dark:text-gray-400 hover:text-accent-gold dark:hover:text-accent-gold transition-colors"
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {isDark ? <Sun size={20} /> : <Moon size={20} />}
-    </button>
+      <motion.div
+        initial={false}
+        animate={{ rotate: isDark ? 0 : 180 }}
+        transition={{ duration: 0.3 }}
+      >
+        {isDark ? <Moon size={18} /> : <Sun size={18} />}
+      </motion.div>
+    </motion.button>
   );
 };
 
